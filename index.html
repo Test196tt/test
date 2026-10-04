@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Phone</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;user-select:none}
+html,body{width:100%;height:100%;background:transparent;font-family:"Segoe UI",Tahoma,sans-serif;overflow:hidden}
+#phone{position:absolute;right:6vw;top:50%;transform:translateY(-50%) scale(var(--s,1));transform-origin:right center;width:290px;height:580px;border-radius:44px;background:#111;border:6px solid #2b2b30;box-shadow:0 20px 60px #000a;overflow:hidden;color:#fff;display:none}
+#phone.show{display:block;animation:up .25s ease}
+@keyframes up{from{opacity:0}to{opacity:1}}
+.screen{position:absolute;inset:0;padding:42px 16px 20px;background:linear-gradient(160deg,#3a2a6d,#1b4f72 60%,#0e2a3d);display:none;flex-direction:column}
+.screen.on{display:flex}
+.notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:90px;height:22px;background:#000;border-radius:14px;z-index:5}
+.bar{position:absolute;top:10px;left:22px;font-size:12px;font-weight:600;z-index:6}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px 8px;margin-top:20px}
+.app{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px;cursor:pointer}
+.ic{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;transition:transform .1s}
+.app:active .ic{transform:scale(.9)}
+.dock{margin-top:auto;display:flex;justify-content:center}
+.home{width:110px;height:5px;border-radius:3px;background:#fff9;cursor:pointer}
+h2{font-size:18px;margin:6px 0 10px}
+.back{font-size:13px;color:#8cc8ff;cursor:pointer;margin-bottom:4px}
+.disp{background:#0006;border-radius:12px;min-height:46px;padding:10px;font-size:22px;text-align:center;letter-spacing:2px;margin-bottom:12px;word-break:break-all}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.k{height:48px;border-radius:50%;background:#ffffff22;border:0;color:#fff;font-size:20px;cursor:pointer}
+.k:active{background:#ffffff55}
+.go{background:#2ecc71}.del{background:#e74c3c55}
+.err{color:#ff7675;font-size:12px;text-align:center;min-height:16px;margin-top:6px}
+.row{display:flex;justify-content:space-between;padding:9px 12px;background:#0005;border-radius:10px;margin-bottom:6px;font-size:14px}
+.row b{color:#55efc4}
+.list{overflow:auto;flex:1}
+.bal{background:#0006;border-radius:12px;padding:10px;font-size:13px;margin-bottom:8px;text-align:center}
+</style></head><body>
+<div id="phone">
+ <div class="notch"></div><div class="bar" id="clock">--:--</div>
+
+ <div class="screen on" id="s-home">
+  <div class="grid" id="apps"></div>
+  <div class="dock"><div class="home" onclick="act('close')"></div></div>
+ </div>
+
+ <div class="screen" id="s-pad">
+  <div class="back" onclick="show('home')">‹ กลับ</div>
+  <h2 id="pad-title">โทร</h2>
+  <div class="disp" id="num">&nbsp;</div>
+  <div class="pad" id="keys"></div>
+  <div class="err" id="err"></div>
+ </div>
+
+ <div class="screen" id="s-price">
+  <div class="back" onclick="show('home')">‹ กลับ</div>
+  <h2>ราคาสินค้า</h2>
+  <div class="list" id="prices"></div>
+ </div>
+</div>
+
+<script>
+// ---- สะพานเชื่อม CEF (ถ้าเปิดไฟล์ในเบราว์เซอร์ธรรมดาจะใช้ mock ให้ทดสอบหน้าตาได้) ----
+// Android WebView ฉีด window.cef หลังโหลดหน้าเสร็จ (onPageFinished) จึงต้องหยิบมาใช้ตอนเรียก ไม่ใช่ตอนโหลดสคริปต์
+var _q=[];
+var C={
+  emit:function(){var c=window.cef;if(c&&c.emit)c.emit.apply(c,arguments);else console.log('emit',[].slice.call(arguments))},
+  set_focus:function(f){var c=window.cef;if(c&&c.set_focus)c.set_focus(f)},
+  on:function(n,f){var c=window.cef;if(c&&c.on)c.on(n,f);else _q.push([n,f])}
+};
+(function wait(){if(window.cef&&window.cef.on){_q.forEach(function(x){window.cef.on(x[0],x[1])});_q=[]}else setTimeout(wait,50)})();
+var $=function(i){return document.getElementById(i)};
+var mode='call', buf='';
+
+var APPS=[
+ {id:'call',    n:'โทร',      i:'📞',c:'#2ecc71'},
+ {id:'sms',     n:'ข้อความ',  i:'💬',c:'#3498db'},
+ {id:'contacts',n:'รายชื่อ',  i:'👤',c:'#95a5a6'},
+ {id:'twitter', n:'Twitter',  i:'🐦',c:'#1da1f2'},
+ {id:'gps',     n:'GPS',      i:'📍',c:'#e74c3c'},
+ {id:'prices',  n:'ราคาสินค้า',i:'🏷️',c:'#f39c12'},
+ {id:'transfer',n:'โอนเงิน',  i:'💸',c:'#16a085'}
+];
+// ชื่อสินค้า (ลำดับต้องตรงกับที่ server ส่งมา) - ชื่อไทยอยู่ฝั่งเว็บเพื่อเลี่ยงปัญหา encoding
+var ITEMS=['องุ่น','แตงโม','ข้าว','เห็ด','แร่เหลือง','แร่เขียว','แร่ฟ้า','แร่แดง','ฉลามโต'];
+
+$('apps').innerHTML=APPS.map(function(a){
+  return '<div class="app" onclick="tap(\''+a.id+'\')"><div class="ic" style="background:'+a.c+'">'+a.i+'</div>'+a.n+'</div>';
+}).join('');
+$('keys').innerHTML=['1','2','3','4','5','6','7','8','9','✖','0','✔'].map(function(k){
+  var cl=k==='✔'?' go':k==='✖'?' del':'';
+  return '<button class="k'+cl+'" onclick="key(\''+k+'\')">'+k+'</button>';
+}).join('');
+
+function show(s){
+  ['home','pad','price'].forEach(function(x){$('s-'+x).classList.toggle('on',x===s)});
+}
+function act(a,p){C.emit('phone:act',a+'|'+(p||''));if(a==='close'&&C.set_focus)C.set_focus(false)}      // ส่งเป็นสตริงเดียว "action|ข้อมูล"
+function tap(id){
+  if(id==='call'||id==='sms'){mode=id;buf='';$('num').innerHTML='&nbsp;';$('err').textContent='';
+    $('pad-title').textContent=id==='call'?'โทร':'ส่งข้อความ (ใส่เบอร์)';show('pad');}
+  else if(id==='prices'){show('price')}
+  else act(id);
+}
+function key(k){
+  if(k==='✖'){buf=buf.slice(0,-1)}
+  else if(k==='✔'){if(buf.length)act(mode,buf);return}
+  else if(buf.length<10){buf+=k}
+  $('num').innerHTML=buf||'&nbsp;';
+}
+function fmt(n){return '$'+Number(n).toLocaleString('en-US')}
+
+// ---- event จาก server ----
+// phone:open  (ราคา 9 ค่า คั่นด้วย , )   phone:close   phone:error (รหัส)
+C.on('phone:open',function(prices){
+  var p=String(prices||'').split(',');
+  $('prices').innerHTML=ITEMS.map(function(n,i){return '<div class="row"><span>'+n+'</span><b>'+fmt(p[i]||0)+'</b></div>'}).join('');
+  show('home');$('phone').classList.add('show');
+});
+C.on('phone:close',function(){$('phone').classList.remove('show');if(C.set_focus)C.set_focus(false)});
+C.on('phone:error',function(code){$('err').textContent=(code==1?'เบอร์นี้ไม่ได้ออนไลน์อยู่':'ข้อมูลไม่ถูกต้อง')});
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape')act('close');
+  else if(/^[0-9]$/.test(e.key)&&$('s-pad').classList.contains('on'))key(e.key);
+  else if(e.key==='Backspace')key('✖');
+  else if(e.key==='Enter'&&$('s-pad').classList.contains('on'))key('✔');
+});
+function fit(){document.documentElement.style.setProperty('--s',Math.min(1,(innerHeight*0.94)/592))}
+fit();addEventListener('resize',fit);
+document.addEventListener('click',function(e){if(e.target===document.body||e.target===document.documentElement)act('close')});
+function tick(){var d=new Date();$('clock').textContent=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
+tick();setInterval(tick,20000);
+</script></body></html>
