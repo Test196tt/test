@@ -252,6 +252,15 @@
         function updateClock() { const now = new Date(); document.getElementById('clock').innerText = String(now.getHours()).padStart(2,'0') + ":" + String(now.getMinutes()).padStart(2,'0'); }
         setInterval(updateClock, 1000); updateClock();
 
+        // รูปโหลดไม่ได้ -> แสดงข้อความพร้อมลิงก์ที่ได้รับ (ไว้เช็กว่าลิงก์ถูกตัดหรือผิด)
+        function imgFail(img) {
+            var d = document.createElement('div');
+            d.style.cssText = 'font-size:11px;color:#ff7675;margin-top:8px;word-break:break-all';
+            var u = img.getAttribute('src') || '';
+            d.textContent = 'โหลดรูปไม่ได้ (' + u.length + ' ตัวอักษร): ' + (u.length > 70 ? u.slice(0, 70) + '...' : u);
+            img.parentNode.replaceChild(d, img);
+        }
+
         var toastTimer = null;
         function showToast(msg, duration, url, name, cover) {
             if (document.getElementById('phone-body').style.display === 'flex') return;
@@ -261,6 +270,7 @@
             document.getElementById('t-name').textContent = name || '';
             document.getElementById('t-msg').textContent = msg || '';
             var ti = document.getElementById('t-img'), u = safeUrl(url);
+            ti.onerror = function(){ ti.style.display = 'none'; };
             if (u) { ti.src = u; ti.style.display = 'block'; } else { ti.style.display = 'none'; }
             var t = document.getElementById('toast'); t.style.display = 'block';
             clearTimeout(toastTimer);
@@ -272,7 +282,7 @@
             msg = esc(msg); playername = esc(playername); url = safeUrl(url); cover = safeUrl(cover);
             const list = document.getElementById('twitter-list'); 
             const card = document.createElement('div'); card.className = 'tweet-card';
-            let imgHtml = ''; if(url && url.length > 5) imgHtml = `<img src="${url}" class="tweet-img">`;
+            let imgHtml = ''; if(url && url.length > 5) imgHtml = `<img src="${url}" class="tweet-img" onerror="imgFail(this)">`;
             const avatarHtml = (cover && cover.length > 5) ? `<img src="${cover}">` : (playername ? playername.charAt(0).toUpperCase() : '?');
             card.innerHTML = `<div class="tweet-header"><div class="avatar">${avatarHtml}</div><div class="user-info"><span class="username">${playername}</span><span class="action-text">ได้ทวิตว่า:</span></div></div><div class="tweet-msg">${msg}</div>${imgHtml}`;
             list.insertBefore(card, list.firstChild);
