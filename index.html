@@ -5,53 +5,51 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;user-select:none}
 html,body{width:100%;height:100%;background:transparent;font-family:"Segoe UI",Tahoma,sans-serif;overflow:hidden}
-#phone{position:absolute;right:6vw;top:50%;transform:translateY(-50%) scale(var(--s,1));transform-origin:right center;width:290px;height:580px;border-radius:44px;background:#111;border:6px solid #2b2b30;box-shadow:0 20px 60px #000a;overflow:hidden;color:#fff;display:none}
-#phone.show{display:block;animation:up .25s ease}
-@keyframes up{from{opacity:0}to{opacity:1}}
-.screen{position:absolute;inset:0;padding:42px 16px 20px;background:linear-gradient(160deg,#3a2a6d,#1b4f72 60%,#0e2a3d);display:none;flex-direction:column}
+/* ตัวเครื่องเดียวกับ twitter.html (ขนาด ขอบ รอยบาก แถบสถานะ ปุ่มโฮม) */
+#phone{position:absolute;bottom:50px;right:50px;width:330px;height:680px;background:#000;border-radius:45px;border:10px solid #222;box-shadow:0 25px 50px -12px rgba(0,0,0,.8);overflow:hidden;display:none;flex-direction:column;color:#fff;z-index:100}
+#phone.show{display:flex}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:28px;background:#222;border-bottom-left-radius:18px;border-bottom-right-radius:18px;z-index:102}
+.status-bar{height:40px;flex:none;background:#000;color:#fff;display:flex;justify-content:space-between;align-items:center;padding:12px 30px 0;font-size:13px;font-weight:500;z-index:101}
+.body{position:relative;flex:1}
+.home-indicator{flex:none;height:5px;width:110px;background:#fff;border-radius:10px;margin:15px auto 10px;opacity:.3;cursor:pointer}
+.screen{position:absolute;inset:0;padding:14px 16px;background:#000;display:none;flex-direction:column}
 .screen.on{display:flex}
-.notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:90px;height:22px;background:#000;border-radius:14px;z-index:5}
-.bar{position:absolute;top:10px;left:22px;font-size:12px;font-weight:600;z-index:6}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px 8px;margin-top:20px}
+#s-home{background:linear-gradient(160deg,#12151d,#000 70%)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px 6px;margin-top:10px}
 .app{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px;cursor:pointer}
 .ic{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;transition:transform .1s}
 .app:active .ic{transform:scale(.9)}
-.dock{margin-top:auto;display:flex;justify-content:center}
-.home{width:110px;height:5px;border-radius:3px;background:#fff9;cursor:pointer}
 h2{font-size:18px;margin:6px 0 10px}
-.back{font-size:13px;color:#8cc8ff;cursor:pointer;margin-bottom:4px}
-.disp{background:#0006;border-radius:12px;min-height:46px;padding:10px;font-size:22px;text-align:center;letter-spacing:2px;margin-bottom:12px;word-break:break-all}
+.back{font-size:13px;color:#1da1f2;cursor:pointer;margin-bottom:4px}
+.disp{background:#1c1c1e;border-radius:12px;min-height:46px;padding:10px;font-size:22px;text-align:center;letter-spacing:2px;margin-bottom:12px;word-break:break-all}
 .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.k{height:48px;border-radius:50%;background:#ffffff22;border:0;color:#fff;font-size:20px;cursor:pointer}
-.k:active{background:#ffffff55}
+.k{height:52px;border-radius:50%;background:#1c1c1e;border:0;color:#fff;font-size:20px;cursor:pointer}
+.k:active{background:#3a3a3c}
 .go{background:#2ecc71}.del{background:#e74c3c55}
 .err{color:#ff7675;font-size:12px;text-align:center;min-height:16px;margin-top:6px}
-.row{display:flex;justify-content:space-between;padding:9px 12px;background:#0005;border-radius:10px;margin-bottom:6px;font-size:14px}
+.row{display:flex;justify-content:space-between;padding:9px 12px;background:#1c1c1e;border-radius:10px;margin-bottom:6px;font-size:14px}
 .row b{color:#55efc4}
 .list{overflow:auto;flex:1}
-.bal{background:#0006;border-radius:12px;padding:10px;font-size:13px;margin-bottom:8px;text-align:center}
 </style></head><body>
 <div id="phone">
- <div class="notch"></div><div class="bar" id="clock">--:--</div>
-
- <div class="screen on" id="s-home">
-  <div class="grid" id="apps"></div>
-  <div class="dock"><div class="home" onclick="act('close')"></div></div>
+ <div class="notch"></div>
+ <div class="status-bar"><span id="clock">--:--</span><div style="display:flex;gap:6px;align-items:center"><span style="font-size:10px;opacity:.8">LTE</span><span style="font-size:14px">&#128267;</span></div></div>
+ <div class="body">
+  <div class="screen on" id="s-home"><div class="grid" id="apps"></div></div>
+  <div class="screen" id="s-pad">
+   <div class="back" onclick="show('home')">&lsaquo; กลับ</div>
+   <h2 id="pad-title">โทร</h2>
+   <div class="disp" id="num">&nbsp;</div>
+   <div class="pad" id="keys"></div>
+   <div class="err" id="err"></div>
+  </div>
+  <div class="screen" id="s-price">
+   <div class="back" onclick="show('home')">&lsaquo; กลับ</div>
+   <h2>ราคาสินค้า</h2>
+   <div class="list" id="prices"></div>
+  </div>
  </div>
-
- <div class="screen" id="s-pad">
-  <div class="back" onclick="show('home')">‹ กลับ</div>
-  <h2 id="pad-title">โทร</h2>
-  <div class="disp" id="num">&nbsp;</div>
-  <div class="pad" id="keys"></div>
-  <div class="err" id="err"></div>
- </div>
-
- <div class="screen" id="s-price">
-  <div class="back" onclick="show('home')">‹ กลับ</div>
-  <h2>ราคาสินค้า</h2>
-  <div class="list" id="prices"></div>
- </div>
+ <div class="home-indicator" onclick="act('close')"></div>
 </div>
 
 <script>
@@ -124,7 +122,7 @@ document.addEventListener('keydown',function(e){
   else if(e.key==='Backspace')key('✖');
   else if(e.key==='Enter'&&$('s-pad').classList.contains('on'))key('✔');
 });
-function fit(){document.documentElement.style.setProperty('--s',Math.min(1,(innerHeight*0.94)/592))}
+function fit(){$('phone').style.zoom=Math.min(1,(innerHeight-20)/710)}
 fit();addEventListener('resize',fit);
 document.addEventListener('click',function(e){if(e.target===document.body||e.target===document.documentElement)act('close')});
 function tick(){var d=new Date();$('clock').textContent=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
