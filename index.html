@@ -107,11 +107,14 @@ function fmt(n){return '$'+Number(n).toLocaleString('en-US')}
 
 // ---- event จาก server ----
 // phone:open  (ราคา 9 ค่า คั่นด้วย , )   phone:close   phone:error (รหัส)
-C.on('phone:open',function(prices){
+function openPhone(prices){
   var p=String(prices||'').split(',');
   $('prices').innerHTML=ITEMS.map(function(n,i){return '<div class="row"><span>'+n+'</span><b>'+fmt(p[i]||0)+'</b></div>'}).join('');
   show('home');$('phone').classList.add('show');
-});
+}
+C.on('phone:open',openPhone);
+// โหมดทดลองในเบราว์เซอร์: เปิดลิงก์แล้วต่อท้าย ?demo  (ในเกมจะไม่ใช้)
+if(/[?&]demo/.test(location.search))openPhone('150,120,80,200,500,700,900,1200,600');
 C.on('phone:close',function(){$('phone').classList.remove('show');if(C.set_focus)C.set_focus(false)});
 C.on('phone:error',function(code){$('err').textContent=(code==1?'เบอร์นี้ไม่ได้ออนไลน์อยู่':'ข้อมูลไม่ถูกต้อง')});
 

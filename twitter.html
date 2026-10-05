@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>SAMP Twitter Premium Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --twitter-blue: #1DA1F2;
+            --twitter-dark: #15202b;
+            --card-bg: #1c1c1e;
+            --text-main: #ffffff;
+            --text-dim: #8899a6;
+            --border-color: #333333;
+        }
+
+        body { margin: 0; padding: 0; overflow: hidden; font-family: 'Prompt', sans-serif; background-color: transparent; }
+        
+        /* Phone Body & Frame */
+        #phone-body {
+            position: absolute; bottom: 50px; right: 50px;
+            width: 330px; height: 680px;
+            background-color: #000;
+            border-radius: 45px;
+            border: 10px solid #222;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            z-index: 100;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 28px; background-color: #222; border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; z-index: 102; }
+        
+        .status-bar { height: 40px; background-color: #000; color: white; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; font-size: 13px; font-weight: 500; padding-top: 12px; z-index: 101; }
+        
+        /* Modern Header */
+        .app-header { 
+            position: relative; 
+            height: 50px; 
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .btn-settings {
+            position: absolute;
+            left: 15px;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-settings:hover { background: rgba(29, 161, 242, 0.1); }
+        .btn-settings svg { width: 22px; height: 22px; fill: var(--text-dim); transition: fill 0.2s; }
+        .btn-settings:hover svg { fill: var(--twitter-blue); }
+
+        .twitter-logo { width: 26px; height: 26px; fill: var(--twitter-blue); filter: drop-shadow(0 0 5px rgba(29, 161, 242, 0.3)); }
+
+        /* Tweet List Customization */
+        #twitter-list { flex: 1; background-color: #000; overflow-y: auto; padding: 12px; padding-bottom: 80px; scroll-behavior: smooth; }
+        #twitter-list::-webkit-scrollbar { width: 4px; }
+        #twitter-list::-webkit-scrollbar-thumb { background-color: #333; border-radius: 10px;}
+
+        /* Tweet Card Styling */
+        .tweet-card { 
+            background-color: var(--card-bg); 
+            border-radius: 18px; 
+            padding: 16px; 
+            margin-bottom: 12px; 
+            color: white; 
+            border: 1px solid #2c2c2e; 
+            animation: slideUp 0.5s ease-out forwards;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .tweet-header { display: flex; align-items: flex-start; margin-bottom: 10px; }
+        
+        .avatar { 
+            width: 42px; height: 42px; 
+            background: linear-gradient(135deg, #1DA1F2 0%, #0d8bd9 100%);
+            border-radius: 50%; 
+            margin-right: 12px; 
+            display: flex; align-items: center; justify-content: center; 
+            color: white; font-weight: 600; font-size: 18px;
+            overflow: hidden; flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .user-info { display: flex; flex-direction: column; }
+        .username { font-weight: 600; font-size: 15px; color: #fff; letter-spacing: 0.3px; }
+        .action-text { font-size: 11px; color: var(--twitter-blue); font-weight: 500; opacity: 0.8; }
+        
+        .tweet-msg { font-size: 14.5px; color: #e1e1e1; margin-bottom: 12px; line-height: 1.5; word-wrap: break-word; font-weight: 300; }
+        .tweet-img { width: 100%; height: auto; border-radius: 12px; display: block; margin-top: 8px; border: 1px solid #333; }
+
+        /* Floating Action Button */
+        #fab-post { 
+            position: absolute; bottom: 40px; right: 20px; 
+            width: 56px; height: 56px; 
+            background: linear-gradient(135deg, #1DA1F2 0%, #1785c7 100%);
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 8px 20px rgba(29, 161, 242, 0.4); 
+            cursor: pointer; z-index: 200; 
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+        #fab-post:hover { transform: scale(1.05) translateY(-2px); }
+        #fab-post:active { transform: scale(0.95); }
+        #fab-post svg { width: 26px; height: 26px; fill: white; }
+
+        /* Modern Modals */
+        .modal-overlay { 
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background-color: rgba(0,0,0,0.8); z-index: 300; 
+            flex-direction: column; justify-content: flex-end; align-items: center; 
+            backdrop-filter: blur(8px); 
+        }
+        .modal-content { 
+            width: 100%; background-color: #1c1c1e; 
+            border-radius: 30px 30px 0 0; padding: 25px; 
+            border-top: 1px solid #333;
+            animation: slideInBottom 0.3s ease-out;
+            box-sizing: border-box;
+        }
+        .modal-title { color: white; font-size: 18px; font-weight: 600; margin-bottom: 20px; text-align: center; }
+        
+        .input-group { margin-bottom: 12px; }
+        .input-field { 
+            width: 100%; background-color: #2c2c2e; border: 1px solid #3a3a3c; 
+            border-radius: 14px; padding: 14px; color: white; 
+            font-family: 'Prompt', sans-serif; font-size: 14px; 
+            box-sizing: border-box; outline: none; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .input-field:hover { background-color: #323234; }
+        .input-field:focus { border-color: var(--twitter-blue); background-color: #323234; }
+
+        .btn-post { 
+            width: 100%; background: var(--twitter-blue); color: white; 
+            border: none; padding: 14px; border-radius: 14px; 
+            font-weight: 600; font-size: 16px; cursor: pointer; 
+            margin-top: 10px; margin-bottom: 12px;
+            transition: filter 0.2s;
+        }
+        .btn-post:hover { filter: brightness(1.1); }
+        .btn-cancel { width: 100%; background: transparent; color: var(--text-dim); border: none; cursor: pointer; font-size: 14px; padding: 5px; }
+
+        /* Home Indicator (iPhone style) */
+        .home-indicator { 
+            height: 5px; width: 110px; background-color: #fff; border-radius: 10px; 
+            margin: 15px auto 10px auto; opacity: 0.3; z-index: 999; 
+            cursor: pointer; transition: all 0.3s;
+        }
+        .home-indicator:hover { opacity: 0.8; transform: scaleX(1.1); }
+
+        /* Animations */
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(30px) scale(0.95); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
+        }
+        @keyframes slideInBottom {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        /* แจ้งเตือนทวิตใหม่ (มุมซ้าย) */
+        #toast { position: absolute; top: 30vh; left: 2vw; width: min(280px, 46vw); display: none; background: rgba(28,28,30,.95); border: 1px solid #2c2c2e; border-radius: 14px; padding: 10px; color: #fff; z-index: 50; box-shadow: 0 6px 20px rgba(0,0,0,.5); animation: slideUp .4s ease-out; }
+        #toast .t-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        #toast .avatar { width: 28px; height: 28px; font-size: 13px; margin: 0; }
+        #toast .t-name { font-weight: 600; font-size: 13px; }
+        #toast .t-msg { font-size: 12.5px; color: #e1e1e1; word-wrap: break-word; }
+        #toast img.t-img { width: 100%; max-height: 110px; object-fit: cover; border-radius: 8px; margin-top: 6px; display: block; }
+    </style>
+</head>
+<body>
+    <div id="toast"><div class="t-head"><div class="avatar" id="t-av"></div><span class="t-name" id="t-name"></span></div><div class="t-msg" id="t-msg"></div><img class="t-img" id="t-img" style="display:none"></div>
+    <div id="phone-body">
+        <div class="notch"></div>
+        <div class="status-bar">
+            <span id="clock">12:00</span>
+            <div style="display:flex; gap:6px; align-items: center;">
+                <span style="font-size: 10px; opacity: 0.8;">LTE</span>
+                <span style="font-size: 14px;">🔋</span>
+            </div>
+        </div>
+        
+        <div class="app-header">
+            <div class="btn-settings" onclick="toggleSettings(true)" title="โปรไฟล์">
+                <svg viewBox="0 0 24 24"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.97 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.97 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg>
+            </div>
+            <svg class="twitter-logo" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+        </div>
+        
+        <div id="twitter-list">
+            </div>
+
+        <div id="fab-post" onclick="toggleModal(true)">
+            <svg viewBox="0 0 24 24"><path d="M17.25,18H6.75V4.5H17.25M14,2H10V4H14M17,2H15V4H17M20,2H18V4H20M5,2H3V4H5M2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6H2M19,18H5V8H19V18Z" /></svg>
+        </div>
+        
+        <div id="post-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-title">ทวิตข้อความใหม่</div>
+                <div class="input-group"><input type="text" id="inp-msg" class="input-field" placeholder="คุณกำลังทำอะไรอยู่?" readonly onclick="requestInput('msg')"></div>
+                <div class="input-group"><input type="text" id="inp-url" class="input-field" placeholder="URL รูปภาพ (ถ้ามี)" readonly onclick="requestInput('url')"></div>
+                <button class="btn-post" onclick="sendTweet()">ทวิตเลย</button>
+                <button class="btn-cancel" onclick="toggleModal(false)">ไว้วันหลัง</button>
+            </div>
+        </div>
+
+        <div id="settings-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-title">ตั้งค่ารูปโปรไฟล์</div>
+                <div class="input-group">
+                    <input type="text" id="inp-cover" class="input-field" placeholder="ใส่ลิงก์รูปภาพโปรไฟล์ของคุณ..." readonly onclick="requestInput('cover')">
+                </div>
+                <p style="color: #8899a6; font-size: 11px; text-align: center; margin-bottom: 15px;">รูปภาพจะถูกแสดงในทุกๆ ทวิตของคุณ</p>
+                <button class="btn-post" onclick="saveSettings()">บันทึกข้อมูล</button>
+                <button class="btn-cancel" onclick="toggleSettings(false)">ยกเลิก</button>
+            </div>
+        </div>
+
+        <div class="home-indicator" onclick="closePhone()" title="ปิดโทรศัพท์"></div>
+    </div>
+
+    <script>
+        // --- Logic remains the same with minor UX tweaks ---
+        function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+        function safeUrl(u){u=String(u||'').trim();return /^https?:\/\/[^\s"'<>]+$/i.test(u)?u:'';}
+
+        function decodeRussian(str) {
+            if(!str) return "";
+            if (/[\u0E00-\u0E7F]/.test(str)) return str;
+            const map = "ЂЃ‚ѓ„…†‡€‰Љ‹ЊЌЋЏђ‘’“”•–—˜™љ›œќžџ ЎўЈ¤Ґ¦§Ё©Є«¬­®Ї°±Ііґµ¶·ё№є»јЅѕїАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюя";
+            const bytes = new Uint8Array(str.length);
+            let p = 0;
+            for (let i = 0; i < str.length; i++) {
+                const c = str.charCodeAt(i);
+                if (c < 128) bytes[p++] = c;
+                else { const idx = map.indexOf(str[i]); if (idx !== -1) bytes[p++] = 0x80 + idx; else bytes[p++] = 63; }
+            }
+            try { return new TextDecoder("utf-8").decode(bytes.subarray(0, p)); } catch(e) { return str; }
+        }
+
+        decodeRussian = function(s){ return s || ""; };
+
+        function updateClock() { const now = new Date(); document.getElementById('clock').innerText = String(now.getHours()).padStart(2,'0') + ":" + String(now.getMinutes()).padStart(2,'0'); }
+        setInterval(updateClock, 1000); updateClock();
+
+        var toastTimer = null;
+        function showToast(msg, duration, url, name, cover) {
+            if (document.getElementById('phone-body').style.display === 'flex') return;
+            var av = document.getElementById('t-av'); av.textContent = '';
+            var c = safeUrl(cover);
+            if (c) { var im = document.createElement('img'); im.src = c; av.appendChild(im); } else { av.textContent = name ? name.charAt(0).toUpperCase() : '?'; }
+            document.getElementById('t-name').textContent = name || '';
+            document.getElementById('t-msg').textContent = msg || '';
+            var ti = document.getElementById('t-img'), u = safeUrl(url);
+            if (u) { ti.src = u; ti.style.display = 'block'; } else { ti.style.display = 'none'; }
+            var t = document.getElementById('toast'); t.style.display = 'block';
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function(){ t.style.display = 'none'; }, Math.max(3, duration || 10) * 1000);
+        }
+
+        function addTweet(msg, duration, url, playername, cover) {
+            showToast(msg, duration, url, playername, cover);
+            msg = esc(msg); playername = esc(playername); url = safeUrl(url); cover = safeUrl(cover);
+            const list = document.getElementById('twitter-list'); 
+            const card = document.createElement('div'); card.className = 'tweet-card';
+            let imgHtml = ''; if(url && url.length > 5) imgHtml = `<img src="${url}" class="tweet-img">`;
+            const avatarHtml = (cover && cover.length > 5) ? `<img src="${cover}">` : (playername ? playername.charAt(0).toUpperCase() : '?');
+            card.innerHTML = `<div class="tweet-header"><div class="avatar">${avatarHtml}</div><div class="user-info"><span class="username">${playername}</span><span class="action-text">ได้ทวิตว่า:</span></div></div><div class="tweet-msg">${msg}</div>${imgHtml}`;
+            list.insertBefore(card, list.firstChild);
+        }
+
+        function requestInput(type) { C.emit("open_keyboard", type); }
+
+        function updateInput(type, text) {
+            text = decodeRussian(text);
+            if(type === 'msg') document.getElementById('inp-msg').value = text;
+            if(type === 'url') document.getElementById('inp-url').value = text;
+            if(type === 'cover') document.getElementById('inp-cover').value = text;
+        }
+
+        function toggleModal(show) {
+            const modal = document.getElementById('post-modal'); const fab = document.getElementById('fab-post');
+            if(show) { modal.style.display = 'flex'; fab.style.opacity = '0'; } 
+            else { modal.style.display = 'none'; fab.style.opacity = '1'; }
+        }
+
+        function toggleSettings(show) {
+            const modal = document.getElementById('settings-modal');
+            if(show) { modal.style.display = 'flex'; } 
+            else { modal.style.display = 'none'; }
+        }
+
+        function sendTweet() {
+            const msg = document.getElementById('inp-msg').value.trim(); const url = document.getElementById('inp-url').value.trim();
+            if (msg === "" && url === "") return;
+            C.emit("tw:post");
+            toggleModal(false);
+            document.getElementById('inp-msg').value = '';
+            document.getElementById('inp-url').value = '';
+        }
+
+        function saveSettings() {
+            if (document.getElementById('inp-cover').value.trim().length > 5) { C.emit("tw:cover"); toggleSettings(false); }
+        }
+
+        function togglePhone(show) {
+            const phone = document.getElementById('phone-body');
+            if(show) {
+                phone.style.display = 'flex';
+                phone.style.transform = 'translateY(0)';
+                C.set_focus(true);
+            } else {
+                phone.style.display = 'none';
+                toggleModal(false);
+                toggleSettings(false);
+                C.set_focus(false);
+            }
+        }
+
+        function closePhone() { C.set_focus(false); C.emit("tw:close"); togglePhone(false); }
+
+        // Android ฉีด window.cef หลังโหลดหน้าเสร็จ จึงหยิบมาใช้ตอนเรียก
+        var _q = [];
+        var C = {
+            emit: function() { var c = window.cef; if (c && c.emit) c.emit.apply(c, arguments); },
+            set_focus: function(f) { var c = window.cef; if (c && c.set_focus) c.set_focus(f); },
+            on: function(n, f) { var c = window.cef; if (c && c.on) c.on(n, f); else _q.push([n, f]); }
+        };
+        (function wait() { if (window.cef && window.cef.on) { _q.forEach(function(x){ window.cef.on(x[0], x[1]); }); _q = []; } else setTimeout(wait, 50); })();
+
+        C.on('Twitter:NewPost', addTweet);
+        C.on('Phone:Toggle', function(state) { togglePhone(state === 1); });
+        C.on('Twitter:UpdateInput', updateInput);
+
+        function fit() { document.getElementById('phone-body').style.zoom = Math.min(1, (innerHeight - 20) / 710); }
+        fit(); addEventListener('resize', fit);
+
+        // โหมดทดลองในเบราว์เซอร์: ต่อท้ายลิงก์ด้วย ?demo
+        if (/[?&]demo/.test(location.search)) {
+            togglePhone(true);
+            addTweet('ทดสอบข้อความทวิต', 10, '', 'Player', '');
+        }
+    </script>
+</body>
+</html>
