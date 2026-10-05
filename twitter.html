@@ -357,7 +357,8 @@
         // โหมดทดลองในเบราว์เซอร์: ต่อท้ายลิงก์ด้วย ?demo
         if (/[?&]demo/.test(location.search)) {
             togglePhone(true);
-            addTweet('ทดสอบข้อความทวิต', 10, '', 'Player', '');
+            var im = location.search.match(/[?&]img=([^&]+)/);
+            addTweet('ทดสอบข้อความทวิต', 10, im ? decodeURIComponent(im[1]) : '', 'Player', '');   // ทดสอบลิงก์รูป: ?demo&img=ลิงก์รูป
         }
     </script>
 </body>
