@@ -24,7 +24,7 @@
 
   /* ---------- container (bottom-center, same spot as the old TextDraw bar) ---------- */
   #wrap{
-    position:fixed;left:0;right:0;bottom:9%;
+    position:fixed;left:0;right:0;bottom:8%;
     display:-webkit-flex;display:flex;
     -webkit-justify-content:center;justify-content:center;
     pointer-events:none;
@@ -39,7 +39,7 @@
   }
 
   .stack{
-    width:26vw;max-width:300px;min-width:150px;
+    width:15vw;max-width:170px;min-width:100px;
   }
 
   /* ---------- the logo is the main progress indicator ---------- */
@@ -64,9 +64,9 @@
 
   /* ---------- thin bar under the logo ---------- */
   .track{
-    position:relative;height:12px;margin-top:10px;
+    position:relative;height:8px;margin-top:6px;
     background:var(--track);
-    border:2px solid var(--paper);
+    border:1.5px solid var(--paper);
     border-radius:999px;
     overflow:hidden;
     box-shadow:0 3px 8px rgba(0,0,0,.45);
@@ -96,10 +96,10 @@
     display:-webkit-flex;display:flex;
     -webkit-justify-content:space-between;justify-content:space-between;
     -webkit-align-items:baseline;align-items:baseline;
-    margin-top:6px;padding:0 4px;
+    margin-top:4px;padding:0 3px;
     color:var(--paper);
     text-shadow:0 2px 4px rgba(0,0,0,.75),0 0 2px rgba(0,0,0,.9);
-    font-weight:600;font-size:15px;line-height:1.1;
+    font-weight:600;font-size:11px;line-height:1.1;
   }
   .dots span{
     display:inline-block;opacity:.2;
@@ -109,7 +109,7 @@
   .dots span:nth-child(3){-webkit-animation-delay:.4s;animation-delay:.4s}
   @-webkit-keyframes blink{0%,100%{opacity:.2}40%{opacity:1}}
   @keyframes blink{0%,100%{opacity:.2}40%{opacity:1}}
-  #pct{font-weight:700;font-size:17px;font-variant-numeric:tabular-nums;}
+  #pct{font-weight:700;font-size:12px;font-variant-numeric:tabular-nums;}
 
   @media (prefers-reduced-motion:reduce){
     #fill::after,.dots span{-webkit-animation:none;animation:none}
