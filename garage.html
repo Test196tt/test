@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garage</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--red:#ff2a3d;--red2:#ff5a68;--deep:#3a0a10;--bg:#0a0607;--line:#ffffff14;--mute:#ffffff99}
+*{box-sizing:border-box;margin:0;padding:0;user-select:none}
+html,body{height:100%;background:transparent;overflow:hidden;font-family:'Prompt','Sarabun','Segoe UI',sans-serif;color:#fff}
+#root{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:2.2vh}
+#root.on{display:flex}
+.panel,.list{width:min(66vw,760px);background:var(--bg);border:1px solid var(--line);border-radius:14px}
+.panel{padding:2vh 1.6vw 2vh}
+.hd{display:flex;align-items:center;gap:.9vw;margin-bottom:1.8vh}
+.ic{width:34px;height:34px;border-radius:50%;background:var(--deep);display:grid;place-items:center;flex:none}
+.ic svg{width:18px;height:18px;fill:var(--red2)}
+.hd b{font-size:clamp(12px,2.2vh,16px);font-weight:600;letter-spacing:.02em}
+.hd small{display:block;font-size:clamp(9px,1.5vh,11px);color:var(--mute)}
+.x{margin-left:auto;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--mute);font-size:16px;cursor:pointer}
+.x:hover{color:#fff;border-color:var(--red)}
+.body{display:grid;grid-template-columns:1fr 1.05fr;gap:1vw;height:clamp(120px,30vh,230px)}
+.stats,.view{border-radius:10px;background:linear-gradient(160deg,#150a0c,#0d0809);border:1px solid var(--line);padding:1.4vh 1vw}
+.st{display:flex;align-items:center;gap:.7vw;margin-bottom:1.1vh}
+.st i{width:26px;height:26px;border-radius:50%;background:var(--deep);display:grid;place-items:center;flex:none}
+.st i svg{width:14px;height:14px;fill:var(--red2)}
+.st b{display:block;font-size:clamp(10px,1.8vh,13px);font-weight:600;line-height:1.1}
+.st small{font-size:clamp(8px,1.3vh,10px);color:var(--mute)}
+.bar{margin-top:.9vh}
+.bar span{font-size:clamp(8px,1.4vh,10px);color:var(--mute)}
+.bar div{height:3px;border-radius:3px;background:#ffffff1a;margin-top:3px;overflow:hidden}
+.bar div u{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--red2));transition:width .35s}
+.view{position:relative;display:grid;place-items:center;background:radial-gradient(circle at 35% 70%,#4a0f17,#0d0809 70%)}
+.view span{position:absolute;top:1.2vh;right:1vw;font-size:clamp(9px,1.6vh,12px);font-weight:600;text-transform:uppercase}
+.view img{max-width:88%;max-height:78%;object-fit:contain;filter:drop-shadow(0 6px 10px #000a);transition:opacity .2s}
+.btns{display:grid;grid-template-columns:1fr;margin-top:1.6vh}
+.btns button{height:clamp(28px,5.4vh,40px);border-radius:8px;border:0;font-weight:500;font-size:clamp(10px,1.8vh,13px);font-family:inherit;color:#fff;cursor:pointer}
+#spawn{background:linear-gradient(90deg,var(--red),var(--red2))}
+#spawn:hover{filter:brightness(1.12)}
+#spawn:active{transform:scale(.98)}
+#spawn:disabled{opacity:.4;pointer-events:none}
+.list{display:flex;gap:.8vw;padding:1vh 1vw;overflow-x:auto}
+.car{display:flex;align-items:center;gap:.6vw;padding:.5vh .9vw;border-radius:9px;border:1px solid transparent;cursor:pointer;flex:none;font-size:clamp(9px,1.6vh,12px)}
+.car img{height:3.4vh;min-height:20px;width:auto}
+.car.on{border-color:var(--red);background:#ff2a3d1a}
+.car:hover{background:#ffffff0d}
+.empty{color:var(--mute);font-size:12px;padding:.6vh .5vw}
+</style>
+</head>
+<body>
+<div id="root">
+  <div class="panel">
+    <div class="hd">
+      <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3 2 11h3v9h14v-9h3L12 3Zm-4 9h8v2H8v-2Zm0 4h8v2H8v-2Z"/></svg></div>
+      <div><b>GARAGE</b><small>โรงรถของคุณ</small></div>
+      <button class="x" id="close">&times;</button>
+    </div>
+    <div class="body">
+      <div class="stats">
+        <div class="st"><i><svg viewBox="0 0 24 24"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-1.7-1L15 3.5h-4L10.7 6a7.6 7.6 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.6a7.5 7.5 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7.6 7.6 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7.6 7.6 0 0 0 1.7-1l2.4 1 2-3.4-2-1.6ZM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z"/></svg></i><div><b id="hp">0%</b><small>สภาพรถ</small></div></div>
+        <div class="st"><i><svg viewBox="0 0 24 24"><path d="M5 3h9v8h2a2 2 0 0 1 2 2v4a1 1 0 0 0 2 0V9l-2-2 1-1 3 3v8a3 3 0 0 1-6 0v-4h-2v7H5V3Zm2 2v5h5V5H7Z"/></svg></i><div><b id="fuel">0%</b><small>น้ำมัน</small></div></div>
+        <div class="bar"><span>ความเร็ว</span><div><u id="b_spd"></u></div></div>
+        <div class="bar"><span>อัตราเร่ง</span><div><u id="b_acc"></u></div></div>
+        <div class="bar"><span>การเบรก</span><div><u id="b_brk"></u></div></div>
+        <div class="bar"><span>การควบคุม</span><div><u id="b_hnd"></u></div></div>
+      </div>
+      <div class="view"><span id="nm">-</span><img id="img" alt=""></div>
+    </div>
+    <div class="btns"><button id="spawn">เบิกรถ</button></div>
+  </div>
+  <div class="list" id="list"></div>
+</div>
+
+<script>
+// IMG_BASE: put one image per vehicle model here, e.g. img/579.png (same folder as this page)
+const IMG_BASE = "img/";
+const FALLBACK = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 50"><path fill="#ffffff" d="M10 34l6-12c2-4 5-6 9-6h50c5 0 8 2 11 6l11 6c4 1 7 3 7 7v3h-8a9 9 0 0 0-18 0H46a9 9 0 0 0-18 0H10z"/><circle cx="37" cy="38" r="6" fill="#222"/><circle cx="87" cy="38" r="6" fill="#222"/></svg>');
+const $ = id => document.getElementById(id);
+const hasCef = typeof cef !== "undefined";
+const send = (n, ...a) => { if (hasCef) cef.emit(n, ...a); else console.log("emit", n, a); };
+const on = (n, f) => { if (hasCef) cef.on(n, f); };
+
+let cars = [], sel = -1;
+const imgOf = c => IMG_BASE + c.model + ".png";
+function setImg(el, c) { el.onerror = () => { el.onerror = null; el.src = FALLBACK; }; el.src = imgOf(c); }
+
+function render() {
+  const list = $("list"); list.innerHTML = "";
+  if (!cars.length) { list.innerHTML = '<div class="empty">ยังไม่มีรถในโรงรถ</div>'; }
+  cars.forEach((c, i) => {
+    const d = document.createElement("div");
+    d.className = "car" + (i === sel ? " on" : "");
+    const im = document.createElement("img"); setImg(im, c);
+    d.append(im, document.createTextNode(c.name));
+    d.onclick = () => select(i);
+    list.append(d);
+  });
+  $("spawn").disabled = sel < 0;
+}
+
+function select(i) {
+  sel = i; const c = cars[i];
+  if (!c) return render();
+  $("nm").textContent = c.name;
+  setImg($("img"), c);
+  $("hp").textContent = c.hp + "%";
+  $("fuel").textContent = c.fuel + "%";
+  ["spd", "acc", "brk", "hnd"].forEach(k => $("b_" + k).style.width = Math.max(0, Math.min(100, c[k])) + "%");
+  render();
+}
+
+// ---- events from the server ----
+on("garage:clear", () => { cars = []; sel = -1; });
+// garage:add -> [dbid, model, "name", fuel, hp, speed, accel, brake, handling]
+on("garage:add", (id, model, name, fuel, hp, spd, acc, brk, hnd) => cars.push({ id, model, name, fuel, hp, spd, acc, brk, hnd }));
+on("garage:show", show => {
+  $("root").classList.toggle("on", !!+show);
+  if (+show) { render(); if (cars.length) select(0); }
+});
+
+// ---- events to the server ----
+$("spawn").onclick = () => { if (sel >= 0) send("garage:spawn", String(cars[sel].id)); };
+$("close").onclick = () => send("garage:close", "1");
+addEventListener("keydown", e => { if (e.key === "Escape") send("garage:close", "1"); });
+
+// preview in a normal browser (no CEF)
+if (!hasCef) {
+  cars = [
+    { id: 1, model: 579, name: "Huntley", fuel: 100, hp: 100, spd: 70, acc: 60, brk: 55, hnd: 50 },
+    { id: 2, model: 482, name: "Alpha Van", fuel: 100, hp: 100, spd: 65, acc: 50, brk: 60, hnd: 55 }
+  ];
+  document.body.style.background = "#222";
+  $("root").classList.add("on"); render(); select(1);
+}
+</script>
+</body>
+</html>
