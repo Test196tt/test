@@ -87,6 +87,7 @@ function bindAll() {
   for (const n in handlers) if (!bound[n]) { c.on(n, handlers[n]); bound[n] = true; }
   return true;
 }
+const setFocus = v => { try { const c = getCef(); if (c && typeof c.set_focus === "function") c.set_focus(!!v); } catch (e) {} };
 const send = (n, ...a) => { const c = getCef(); if (c) c.emit(n, ...a); else console.log("emit (no cef)", n, a); };
 const on = (n, f) => { handlers[n] = f; bindAll(); };
 
@@ -125,13 +126,16 @@ on("garage:clear", () => { cars = []; sel = -1; });
 on("garage:add", (id, model, name, fuel, hp, spd, acc, brk, hnd) => cars.push({ id, model, name, fuel, hp, spd, acc, brk, hnd }));
 on("garage:show", show => {
   $("root").classList.toggle("on", !!+show);
+  setFocus(!!+show);
   if (+show) { render(); if (cars.length) select(0); }
 });
 
 // ---- events to the server ----
-$("spawn").onclick = () => { if (sel >= 0) send("garage:spawn", String(cars[sel].id)); };
-$("close").onclick = () => send("garage:close", "1");
-addEventListener("keydown", e => { if (e.key === "Escape") send("garage:close", "1"); });
+// close locally first (so it always closes even if the server event is lost), then tell the server
+function closeUI() { $("root").classList.remove("on"); setFocus(false); send("garage:close", "1"); }
+$("spawn").onclick = () => { if (sel >= 0) { send("garage:spawn", String(cars[sel].id)); $("root").classList.remove("on"); setFocus(false); } };
+$("close").onclick = closeUI;
+addEventListener("keydown", e => { if (e.key === "Escape") closeUI(); });
 
 // keep trying until the game's cef object appears (max 60s)
 if (!bindAll()) {
