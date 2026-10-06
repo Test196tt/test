@@ -77,9 +77,18 @@ html,body{height:100%;background:transparent;overflow:hidden;font-family:'Prompt
 const IMG_BASE = "img/";
 const FALLBACK = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 50"><path fill="#ffffff" d="M10 34l6-12c2-4 5-6 9-6h50c5 0 8 2 11 6l11 6c4 1 7 3 7 7v3h-8a9 9 0 0 0-18 0H46a9 9 0 0 0-18 0H10z"/><circle cx="37" cy="38" r="6" fill="#222"/><circle cx="87" cy="38" r="6" fill="#222"/></svg>');
 const $ = id => document.getElementById(id);
-const hasCef = typeof cef !== "undefined";
-const send = (n, ...a) => { if (hasCef) cef.emit(n, ...a); else console.log("emit", n, a); };
-const on = (n, f) => { if (hasCef) cef.on(n, f); };
+// The in-game browser may inject `cef` slightly AFTER this script runs, so look it up lazily
+// and bind the handlers as soon as it exists (otherwise the page wrongly thinks it is a normal browser).
+const PREVIEW = /[?&]preview=1/.test(location.search);   // add ?preview=1 to the URL to test in a normal browser
+const getCef = () => (typeof cef !== "undefined" ? cef : (window.cef || null));
+const handlers = {}, bound = {};
+function bindAll() {
+  const c = getCef(); if (!c) return false;
+  for (const n in handlers) if (!bound[n]) { c.on(n, handlers[n]); bound[n] = true; }
+  return true;
+}
+const send = (n, ...a) => { const c = getCef(); if (c) c.emit(n, ...a); else console.log("emit (no cef)", n, a); };
+const on = (n, f) => { handlers[n] = f; bindAll(); };
 
 let cars = [], sel = -1;
 const imgOf = c => IMG_BASE + c.model + ".png";
@@ -124,8 +133,14 @@ $("spawn").onclick = () => { if (sel >= 0) send("garage:spawn", String(cars[sel]
 $("close").onclick = () => send("garage:close", "1");
 addEventListener("keydown", e => { if (e.key === "Escape") send("garage:close", "1"); });
 
-// preview in a normal browser (no CEF)
-if (!hasCef) {
+// keep trying until the game's cef object appears (max 60s)
+if (!bindAll()) {
+  let tries = 0;
+  const t = setInterval(() => { if (bindAll() || ++tries > 600) clearInterval(t); }, 100);
+}
+
+// preview in a normal browser - ONLY with ?preview=1, never inside the game
+if (PREVIEW && !getCef()) {
   cars = [
     { id: 1, model: 579, name: "Huntley", fuel: 100, hp: 100, spd: 70, acc: 60, brk: 55, hnd: 50 },
     { id: 2, model: 482, name: "Alpha Van", fuel: 100, hp: 100, spd: 65, acc: 50, brk: 60, hnd: 55 }
