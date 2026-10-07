@@ -113,9 +113,11 @@ button{font-family:inherit}
 #spawn:disabled{opacity:.35;pointer-events:none;filter:grayscale(.6)}
 :focus-visible{outline:2px solid var(--red-hi);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+#dbg{position:fixed;left:6px;bottom:6px;z-index:99;font:11px/1.4 monospace;color:#8f8;background:#000b;padding:3px 7px;border-radius:4px;pointer-events:none;white-space:pre}
 </style>
 </head>
 <body>
+<div id="dbg"></div>
 <div id="root">
   <div class="shell">
     <svg width="0" height="0" style="position:absolute"><defs>
@@ -176,7 +178,18 @@ function bindAll() {
 }
 const setFocus = v => { try { const c = getCef(); if (c && typeof c.set_focus === "function") c.set_focus(!!v); } catch (e) {} };
 const send = (n, ...a) => { const c = getCef(); if (c) c.emit(n, ...a); else console.log("emit (no cef)", n, a); };
-const on = (n, f) => { handlers[n] = f; bindAll(); };
+// ---- on-screen debug line (set DEBUG=false when everything works) ----
+const DEBUG = true;
+const st = { v: "6", cef: "no", ready: "-", add: 0, exp: "-", show: "-", spawn: "-", err: "" };
+function upd() {
+  const d = $("dbg"); if (!d) return;
+  d.style.display = DEBUG ? "block" : "none";
+  d.textContent = "garage v" + st.v + " | cef:" + st.cef + " ready:" + st.ready + " add:" + st.add + "/" + st.exp +
+    " show:" + st.show + " spawn:" + st.spawn + (st.err ? "\nERR: " + st.err : "");
+}
+addEventListener("error", e => { st.err = String(e.message || e); upd(); });
+const safe = f => (...a) => { try { return f(...a); } catch (e) { st.err = String((e && e.message) || e); upd(); } };
+const on = (n, f) => { handlers[n] = safe(f); bindAll(); };
 
 // The server may send either separate arguments or ONE json string like "[1,579,...]". Accept both.
 function norm(args) {
@@ -186,7 +199,7 @@ function norm(args) {
   return args;
 }
 
-let cars = [], sel = -1, busy = false;
+let cars = [], sel = -1, busy = false, resynced = false;
 const C = 163.4; // ring circumference (r=26)
 const clamp = v => Math.max(0, Math.min(100, +v || 0));
 const imgOf = c => IMG_BASE + c.model + ".png";
@@ -236,19 +249,24 @@ function select(i) {
 }
 
 // ---- events from the server ----
-on("garage:clear", () => { cars = []; sel = -1; });
+on("garage:clear", () => { cars = []; sel = -1; st.add = 0; upd(); });
 // garage:add -> [dbid, model, "name", fuel, hp, speed, accel, brake, handling]
 on("garage:add", (...a) => {
   const [id, model, name, fuel, hp, spd, acc, brk, hnd] = norm(a);
   const car = { id: +id, model: +model, name: String(name), fuel: +fuel, hp: +hp, spd: +spd, acc: +acc, brk: +brk, hnd: +hnd };
   const k = cars.findIndex(x => x.id === car.id);
   if (k >= 0) cars[k] = car; else cars.push(car);
+  st.add = cars.length; upd();
   // if the panel is already visible (add arrived after show) refresh it, and select a car so the button is enabled
   if ($("root").classList.contains("on")) { if (sel < 0) select(0); else render(); }
 });
 on("garage:show", (...a) => {
-  const v = norm(a)[0];
+  const na = norm(a), v = na[0];
   const show = v === true || v === 1 || v === "1" || v === "true";
+  st.show = show ? "on" : "off"; if (na[1] !== undefined) st.exp = na[1]; upd();
+  // fewer cars than the server said it sent -> ask the server to send the list again (once per opening)
+  if (show && na[1] !== undefined && cars.length < +na[1] && !resynced) { resynced = true; send("garage:ready", "1"); }
+  if (!show) resynced = false;
   $("root").classList.toggle("on", show);
   setFocus(show);
   busy = false;
@@ -261,6 +279,7 @@ function closeUI() { hide(); send("garage:close", "1"); }
 function spawn() {
   if (sel < 0 || busy || !cars[sel]) return;
   busy = true;
+  st.spawn = "id " + cars[sel].id; upd();
   send("garage:spawn", String(cars[sel].id));
   hide();
 }
@@ -282,7 +301,7 @@ if (!bindAll()) {
 
 // tell the server the page is loaded and listening, so it can send the car list at the right time
 let announced = false;
-function announce() { if (announced || !getCef()) return; announced = true; send("garage:ready", "1"); }
+function announce() { st.cef = getCef() ? "yes" : "no"; if (announced || !getCef()) { upd(); return; } announced = true; st.ready = "sent"; upd(); send("garage:ready", "1"); }
 announce();
 if (!announced) { const t2 = setInterval(() => { announce(); if (announced) clearInterval(t2); }, 100); }
 
@@ -296,6 +315,7 @@ if (PREVIEW && !getCef()) {
   document.body.style.background = "#222";
   $("root").classList.add("on"); render(); select(0);
 }
+upd();
 </script>
 </body>
 </html>
