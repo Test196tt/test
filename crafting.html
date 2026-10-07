@@ -92,7 +92,7 @@ const U={
 const TABS=[['w','คราฟอาวุธ'],['i','คราฟไอเทม'],['u','อัพเกรดอาวุธ']];
 let S={m:{},rm:0,gm:0,t:[0,0,0]},tab='w',sel=null;
 const $=id=>document.getElementById(id), fmt=n=>Number(n).toLocaleString('en-US');
-const send=(e,a)=>{try{window.cef&&cef.emit(e,String(a))}catch(_){}};
+const send=(e,a)=>{try{if(window.cef){cef.emit(e,String(a));st('emit '+e)}else st('emit FAIL no cef: '+e)}catch(x){st('emit ERR '+e)}};
 
 function have(r){return Object.keys(r.m).every(k=>(S.m[k]||0)>=r.m[k])&&S.rm>=r.rm&&S.gm>=r.gm}
 function tabs(){$('tabs').innerHTML=TABS.map(t=>`<div class="tab ${t[0]==tab?'on':''}" data-t="${t[0]}"><span>${t[1]}</span></div>`).join('');
@@ -136,20 +136,47 @@ function hide(){$('wrap').classList.remove('on')}
 function close(){hide();send('crafting:close',1)}
 $('x').onclick=close;
 addEventListener('keydown',e=>{if(e.key=='Escape')close()});
+function diag(){ // ใช้ตรวจเมื่อไม่พบ cef: ถ่ายรูปหน้าจอส่งให้ผู้พัฒนา
+ try{
+  const f=document.createElement('iframe');f.style.display='none';document.body.appendChild(f);
+  const base=new Set(Object.getOwnPropertyNames(f.contentWindow));f.remove();
+  const extra=Object.getOwnPropertyNames(window).filter(k=>!base.has(k)&&!/^(on|webkit)/.test(k)).slice(0,40);
+  const d=document.createElement('div');
+  d.style.cssText='position:fixed;left:8px;top:8px;max-width:60vw;padding:8px;background:#000c;color:#ff5566;font:12px monospace;z-index:99;word-break:break-all';
+  d.textContent='NO cef | typeof cef='+typeof window.cef+' | globals: '+extra.join(', ');
+  document.body.appendChild(d);
+ }catch(e){}
+}
+const DBG=/debug/.test(location.search),LOG=[];
+function st(m){if(!DBG)return;LOG.push(m);if(LOG.length>8)LOG.shift();
+ let d=document.getElementById('st');if(!d){d=document.createElement('div');d.id='st';
+ d.style.cssText='position:fixed;left:6px;top:6px;max-width:70vw;padding:6px 8px;background:#000d;color:#7CFC00;font:12px monospace;z-index:99;white-space:pre-wrap;pointer-events:none';document.body.appendChild(d)}
+ d.textContent=LOG.join('\n')}
+st('page loaded');
 let bound=false;
 function bind(){
- if(bound||!window.cef)return bound;
+ if(bound)return true;
+ if(!window.cef||typeof cef.on!='function')return false;
  bound=true;
- cef.on('crafting:open',open);cef.on('crafting:close',hide);
- cef.emit('crafting:ready','1');
+ st('cef found: on='+typeof cef.on+' emit='+typeof cef.emit);
+ cef.on('crafting:open',function(){st('GOT open event');open.apply(null,arguments)});
+ cef.on('crafting:close',hide);
+ cef.emit('crafting:ready','1');st('emit crafting:ready');
  return true;
 }
+// ช่องทางสำรอง เหมือน loading.html
+window.craftingOpen=open;window.craftingClose=hide;
+addEventListener('message',function(e){const d=e.data;if(!d)return;
+ if(d.event=='crafting:open'){st('GOT open via message');open(d.args!==undefined?d.args:d.data)}
+ if(d.event=='crafting:close')hide()});
 if(!bind()){
  if(parent!==window||location.protocol=='file:'||/preview/.test(location.search)){ // พรีวิวในเบราว์เซอร์/iframe เท่านั้น
   document.body.style.background='#1c1c22 radial-gradient(circle at 30% 30%,#3a1a1e,#111)';
   open({m:{yel:60,red:30,blue:50,lime:40,wire:25},rm:5000,gm:20000,t:[2,1,0]});
  }else{ // ในเกม: รอ cef พร้อม (สูงสุด ~15 วินาที)
-  let n=0;const t=setInterval(()=>{if(bind()||++n>75)clearInterval(t)},200);
+  let n=0;const t=setInterval(()=>{if(bind()){clearInterval(t);return}
+   if(n==0||n==10||n==20)st('waiting cef... typeof cef='+typeof window.cef);if(++n==15)diag(); // 3 วินาทีแล้วยังไม่เจอ cef -> โชว์รายชื่อตัวเชื่อมที่พบ
+   if(n>75)clearInterval(t)},200);
  }
 }
 </script>
