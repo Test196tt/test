@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>Crafting</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;user-select:none}
+html,body{width:100%;height:100%;overflow:hidden;background:transparent;font-family:'Segoe UI','Tahoma',sans-serif;color:#eee}
+:root{--r:#e11d2e;--r2:#7f0d17;--bg:#0b0b0d;--bg2:#141417;--ln:#2a2a30}
+#wrap{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(120,0,10,.28),rgba(0,0,0,.78))}
+#wrap.on{display:flex;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+#panel{width:min(1020px,96vw);height:min(600px,92vh);background:linear-gradient(160deg,var(--bg2),var(--bg));border:1px solid var(--ln);position:relative;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(225,29,46,.25)}
+#panel:before,#panel:after{content:"";position:absolute;width:26px;height:26px;border:2px solid var(--r)}
+#panel:before{top:-2px;left:-2px;border-right:0;border-bottom:0}
+#panel:after{bottom:-2px;right:-2px;border-left:0;border-top:0}
+header{display:flex;align-items:center;gap:18px;padding:14px 20px;border-bottom:1px solid var(--ln);background:linear-gradient(90deg,rgba(225,29,46,.22),transparent 60%)}
+.logo{font-size:22px;font-weight:800;letter-spacing:3px}.logo b{color:var(--r)}
+.logo small{display:block;font-size:10px;letter-spacing:4px;color:#888;font-weight:400}
+.tabs{display:flex;gap:6px;margin-left:24px}
+.tab{padding:9px 22px;background:#1a1a1e;border:1px solid var(--ln);transform:skewX(-14deg);cursor:pointer;font-size:14px;transition:.15s}
+.tab span{display:inline-block;transform:skewX(14deg)}
+.tab:hover{border-color:var(--r)}
+.tab.on{background:var(--r);border-color:var(--r);box-shadow:0 0 16px rgba(225,29,46,.6)}
+.money{margin-left:auto;display:flex;gap:10px;font-size:13px}
+.money div{padding:6px 12px;background:#000;border:1px solid var(--ln)}
+.money b.rm{color:#ff5566}.money b.gm{color:#4ade80}
+#x{width:34px;height:34px;border:1px solid var(--ln);background:#1a1a1e;color:#fff;font-size:16px;cursor:pointer}
+#x:hover{background:var(--r);border-color:var(--r)}
+main{flex:1;display:flex;min-height:0}
+#list{width:46%;padding:16px;overflow:auto;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;align-content:start;border-right:1px solid var(--ln)}
+.card{padding:14px;background:#111114;border:1px solid var(--ln);cursor:pointer;position:relative;transition:.15s}
+.card:hover{border-color:var(--r);transform:translateY(-2px)}
+.card.on{border-color:var(--r);background:linear-gradient(160deg,rgba(225,29,46,.28),#111114);box-shadow:inset 0 0 0 1px var(--r)}
+.card .ic{font-size:34px}.card .nm{margin-top:6px;font-size:15px;font-weight:600}
+.card .sub{font-size:11px;color:#888;margin-top:2px}
+.card.no{opacity:.45}
+.tag{position:absolute;top:8px;right:8px;font-size:10px;padding:2px 7px;background:var(--r2);border:1px solid var(--r)}
+#detail{flex:1;padding:22px;display:flex;flex-direction:column;min-width:0}
+#detail h2{font-size:24px;letter-spacing:1px}#detail h2 i{font-style:normal;margin-right:10px}
+#detail .desc{color:#999;font-size:12px;margin:4px 0 14px}
+.sec{font-size:11px;letter-spacing:3px;color:var(--r);margin:10px 0 8px}
+.mats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mat{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#000;border:1px solid var(--ln);border-left:3px solid var(--c)}
+.mat .n{flex:1;font-size:13px}.mat .q{font-size:13px;font-variant-numeric:tabular-nums}
+.ok{color:#4ade80}.bad{color:#ff4455}
+.chance{height:10px;background:#000;border:1px solid var(--ln);margin-top:4px}
+.chance div{height:100%;background:linear-gradient(90deg,var(--r2),var(--r));box-shadow:0 0 10px var(--r)}
+.dmg{display:flex;align-items:center;gap:12px;font-size:20px;font-weight:700}
+.dmg small{font-size:11px;color:#888;font-weight:400}.dmg em{color:var(--r);font-style:normal}
+#go{margin-top:auto;padding:15px;border:0;background:var(--r);color:#fff;font-size:16px;font-weight:700;letter-spacing:3px;cursor:pointer;clip-path:polygon(14px 0,100% 0,calc(100% - 14px) 100%,0 100%);transition:.15s}
+#go:hover:not(:disabled){filter:brightness(1.2);box-shadow:0 0 24px var(--r)}
+#go:disabled{background:#2a2a30;color:#777;cursor:not-allowed}
+.empty{margin:auto;color:#666;text-align:center}
+footer{padding:8px 20px;border-top:1px solid var(--ln);font-size:11px;color:#777;display:flex;justify-content:space-between}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:var(--r2)}
+</style>
+</head>
+<body>
+<div id="wrap">
+ <div id="panel">
+  <header>
+   <div class="logo">คราฟ <b>อาวุธ</b></div>
+   <div class="tabs" id="tabs"></div>
+   <div class="money"><div>เงินแดง <b class="rm" id="rm">0</b></div><div>เงินเขียว <b class="gm" id="gm">0</b></div></div>
+   <button id="x">✕</button>
+  </header>
+  <main><div id="list"></div><div id="detail"></div></main>
+  <footer><span>คลิกเลือกรายการ แล้วกดปุ่มเพื่อเริ่ม</span><span>[ESC] ปิดหน้าต่าง</span></footer>
+ </div>
+</div>
+<script>
+const MAT={yel:['แร่เหลือง','#facc15'],red:['แร่แดง','#ef4444'],blue:['แร่ฟ้า','#38bdf8'],lime:['ปูน','#d4d4d8'],wire:['สายไฟ','#fb923c']};
+// สูตรคราฟ (id ต้องตรงกับ StartSelectCraft ใน pawn)
+const R={
+ 1:{n:'คาตานะ',i:'🗡️',g:'w',m:{yel:50,red:50,blue:40,lime:30},rm:3000,gm:10000},
+ 2:{n:'ไม้เบสบอล',i:'🏏',g:'w',m:{yel:40,red:35,blue:45,lime:25},rm:4500,gm:9500},
+ 3:{n:'มีด',i:'🔪',g:'w',m:{yel:60,red:70,blue:50,lime:35,wire:20},rm:6000,gm:15000},
+ 4:{n:'เกราะ',i:'🛡️',g:'i',m:{lime:10},rm:0,gm:1000},
+ 5:{n:'AED',i:'🩺',g:'i',m:{lime:10},rm:0,gm:1500},
+ 6:{n:'แหวนแก๊ง',i:'💍',g:'i',m:{yel:30,red:25,lime:5},rm:0,gm:1000},
+ 7:{n:'ยาปั้ม',i:'💊',g:'i',m:{lime:15},rm:0,gm:1000}
+};
+// อัพเกรด (id 1=ไม้เบสบอล 2=คาตานะ 3=มีด) ใช้วัตถุดิบเหมือนตอนคราฟ
+const U={
+ 1:{r:2,max:5,ch:[90,70,50,30],dmg:[5,8,12,14,16]},
+ 2:{r:1,max:3,ch:[50,20],dmg:[5,9,14]},
+ 3:{r:3,max:4,ch:[60,45,30],dmg:[6,8,12,14]}
+};
+const TABS=[['w','คราฟอาวุธ'],['i','คราฟไอเทม'],['u','อัพเกรดอาวุธ']];
+let S={m:{},rm:0,gm:0,t:[0,0,0]},tab='w',sel=null;
+const $=id=>document.getElementById(id), fmt=n=>Number(n).toLocaleString('en-US');
+const send=(e,a)=>{try{window.cef&&cef.emit(e,String(a))}catch(_){}};
+
+function have(r){return Object.keys(r.m).every(k=>(S.m[k]||0)>=r.m[k])&&S.rm>=r.rm&&S.gm>=r.gm}
+function tabs(){$('tabs').innerHTML=TABS.map(t=>`<div class="tab ${t[0]==tab?'on':''}" data-t="${t[0]}"><span>${t[1]}</span></div>`).join('');
+ document.querySelectorAll('.tab').forEach(e=>e.onclick=()=>{tab=e.dataset.t;sel=null;render()})}
+function ids(){return tab=='u'?[1,2,3]:Object.keys(R).filter(k=>R[k].g==tab).map(Number)}
+function render(){
+ tabs();$('rm').textContent=fmt(S.rm);$('gm').textContent=fmt(S.gm);
+ $('list').innerHTML=ids().map(id=>{
+  const up=tab=='u',r=up?R[U[id].r]:R[id],t=S.t[id-1];
+  const sub=up?(t?`เทียร์ ${t} / ${U[id].max}`:'ไม่มีในกระเป๋า'):(have(r)?'วัตถุดิบครบ':'วัตถุดิบไม่พอ');
+  return `<div class="card ${sel==id?'on':''} ${up&&!t?'no':''}" data-id="${id}"><div class="ic">${r.i}</div><div class="nm">${r.n}</div><div class="sub">${sub}</div>${up&&t?`<div class="tag">T${t}</div>`:''}</div>`}).join('');
+ document.querySelectorAll('.card').forEach(e=>e.onclick=()=>{sel=+e.dataset.id;render()});
+ detail();
+}
+function detail(){
+ const d=$('detail');
+ if(!sel){d.innerHTML='<div class="empty">เลือกรายการทางซ้าย<br>เพื่อดูรายละเอียด</div>';return}
+ const up=tab=='u',u=U[sel],r=up?R[u.r]:R[sel],t=S.t[sel-1];
+ let ok=have(r),extra='',label='เริ่มคราฟ';
+ if(up){
+  label='เริ่มอัพเกรด';
+  if(!t){ok=false;label='ไม่มีอาวุธในกระเป๋า'}
+  else if(t>=u.max){ok=false;label='เทียร์สูงสุดแล้ว'}
+  else extra=`<div class="sec">DAMAGE</div><div class="dmg">${u.dmg[t-1]} <em>➜</em> ${u.dmg[t]} <small>เทียร์ ${t} ➜ ${t+1}</small></div>
+   <div class="sec">โอกาสสำเร็จ ${u.ch[t-1]}%</div><div class="chance"><div style="width:${u.ch[t-1]}%"></div></div>`;
+ }else extra=`<div class="sec">โอกาสสำเร็จ 100%</div><div class="chance"><div style="width:100%"></div></div>`;
+ const row=(n,c,need,has)=>`<div class="mat" style="--c:${c}"><span class="n">${n}</span><span class="q ${has>=need?'ok':'bad'}">${fmt(has)} / ${fmt(need)}</span></div>`;
+ let m=Object.keys(r.m).map(k=>row(MAT[k][0],MAT[k][1],r.m[k],S.m[k]||0)).join('');
+ if(r.rm)m+=row('เงินแดง','#ff5566',r.rm,S.rm);
+ m+=row('เงินเขียว','#4ade80',r.gm,S.gm);
+ d.innerHTML=`<h2><i>${r.i}</i>${up?'อัพเกรด ':''}${r.n}</h2><div class="desc">${up?'ใช้วัตถุดิบเท่ากับตอนคราฟ หากล้มเหลวอาจเสียวัตถุดิบ':'ใช้เวลาคราฟประมาณ 40 วินาที'}</div>
+  <div class="sec">วัตถุดิบที่ใช้</div><div class="mats">${m}</div>${extra}
+  <button id="go" ${ok?'':'disabled'}>${label}</button>`;
+ $('go').onclick=()=>{if(ok)send(up?'crafting:upgrade':'crafting:craft',sel)};
+}
+function open(a){
+ try{if(typeof a=='string')a=JSON.parse(a);if(Array.isArray(a)&&a.length==1)a=a[0];if(typeof a=='string')a=JSON.parse(a)}catch(_){return}
+ S=Object.assign({m:{},rm:0,gm:0,t:[0,0,0]},a);sel=null;render();$('wrap').classList.add('on');
+}
+function hide(){$('wrap').classList.remove('on')}
+function close(){hide();send('crafting:close',1)}
+$('x').onclick=close;
+addEventListener('keydown',e=>{if(e.key=='Escape')close()});
+if(window.cef){cef.on('crafting:open',open);cef.on('crafting:close',hide);cef.emit('crafting:ready','1')}
+else{ // พรีวิวในเบราว์เซอร์ธรรมดา
+ document.body.style.background='#1c1c22 radial-gradient(circle at 30% 30%,#3a1a1e,#111)';
+ open({m:{yel:60,red:30,blue:50,lime:40,wire:25},rm:5000,gm:20000,t:[2,1,0]});
+}
+</script>
+</body>
+</html>
