@@ -240,7 +240,11 @@ on("garage:clear", () => { cars = []; sel = -1; });
 // garage:add -> [dbid, model, "name", fuel, hp, speed, accel, brake, handling]
 on("garage:add", (...a) => {
   const [id, model, name, fuel, hp, spd, acc, brk, hnd] = norm(a);
-  cars.push({ id: +id, model: +model, name: String(name), fuel: +fuel, hp: +hp, spd: +spd, acc: +acc, brk: +brk, hnd: +hnd });
+  const car = { id: +id, model: +model, name: String(name), fuel: +fuel, hp: +hp, spd: +spd, acc: +acc, brk: +brk, hnd: +hnd };
+  const k = cars.findIndex(x => x.id === car.id);
+  if (k >= 0) cars[k] = car; else cars.push(car);
+  // if the panel is already visible (add arrived after show) refresh it, and select a car so the button is enabled
+  if ($("root").classList.contains("on")) { if (sel < 0) select(0); else render(); }
 });
 on("garage:show", (...a) => {
   const v = norm(a)[0];
@@ -248,7 +252,7 @@ on("garage:show", (...a) => {
   $("root").classList.toggle("on", show);
   setFocus(show);
   busy = false;
-  if (show) { render(); if (cars.length) select(0); }
+  if (show) { render(); if (cars.length) select(cars[sel] ? sel : 0); }
 });
 
 // ---- events to the server ----
@@ -275,6 +279,12 @@ if (!bindAll()) {
   let tries = 0;
   const t = setInterval(() => { if (bindAll() || ++tries > 600) clearInterval(t); }, 100);
 }
+
+// tell the server the page is loaded and listening, so it can send the car list at the right time
+let announced = false;
+function announce() { if (announced || !getCef()) return; announced = true; send("garage:ready", "1"); }
+announce();
+if (!announced) { const t2 = setInterval(() => { announce(); if (announced) clearInterval(t2); }, 100); }
 
 // preview in a normal browser - ONLY with ?preview=1
 if (PREVIEW && !getCef()) {
