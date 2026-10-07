@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>duty hud</title>
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; font-family: "Segoe UI", Tahoma, sans-serif; }
+  #hud { position: fixed; right: 14px; bottom: 14px; display: flex; gap: 8px; }
+  .item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 6px 4px 4px; border-radius: 8px;
+    background: rgba(12, 12, 12, .85); border: 1px solid rgba(255, 40, 40, .55);
+    box-shadow: 0 0 10px rgba(255, 0, 0, .25);
+  }
+  .ico {
+    width: 28px; height: 28px; border-radius: 6px; background: #1b1b1b;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ico svg { width: 18px; height: 18px; fill: #fff; }
+  .num {
+    min-width: 34px; height: 24px; padding: 0 8px; border-radius: 12px; box-sizing: border-box;
+    background: linear-gradient(180deg, #ff3b3b, #b30000); color: #fff;
+    font-weight: 700; font-size: 14px; line-height: 24px; text-align: center;
+  }
+  .num.bump { animation: bump .25s ease; }
+  @keyframes bump { 50% { transform: scale(1.25); } }
+</style>
+</head>
+<body>
+<div id="hud">
+  <!-- council -->
+  <div class="item"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2 2 8v2h20V8L12 2zM4 12v7H3v2h18v-2h-1v-7h-2v7h-3v-7h-2v7h-2v-7H9v7H6v-7H4z"/></svg></div><div class="num" id="n0">0</div></div>
+  <!-- police -->
+  <div class="item"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5l-8-3zm0 5 1.5 3 3.3.5-2.4 2.3.6 3.3L12 14.500 9 16.100l.6-3.300L7.200 10.500l3.300-.5L12 7z"/></svg></div><div class="num" id="n1">0</div></div>
+  <!-- medic -->
+  <div class="item"><div class="ico"><svg viewBox="0 0 24 24"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6V3z"/></svg></div><div class="num" id="n2">0</div></div>
+</div>
+
+<script>
+  var last = [-1, -1, -1];
+
+  function apply(c, p, m) {
+    var v = [c, p, m];
+    for (var i = 0; i < 3; i++) {
+      var el = document.getElementById("n" + i);
+      var val = parseInt(v[i], 10) || 0;
+      if (val !== last[i]) {
+        el.textContent = val;
+        el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump");
+        last[i] = val;
+      }
+    }
+  }
+
+  // Cef_Emit(playerid, "duty:update", "[council,police,medic]")
+  // accepts both styles: handler(c, p, m) and handler([c, p, m])
+  cef.on("duty:update", function (a, b, c) {
+    if (Array.isArray(a)) apply(a[0], a[1], a[2]);
+    else apply(a, b, c);
+  });
+</script>
+</body>
+</html>
