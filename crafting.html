@@ -136,10 +136,21 @@ function hide(){$('wrap').classList.remove('on')}
 function close(){hide();send('crafting:close',1)}
 $('x').onclick=close;
 addEventListener('keydown',e=>{if(e.key=='Escape')close()});
-if(window.cef){cef.on('crafting:open',open);cef.on('crafting:close',hide);cef.emit('crafting:ready','1')}
-else if(parent!==window||location.protocol=='file:'){ // พรีวิวในเบราว์เซอร์/iframe เท่านั้น (ในเกมไม่ทำงาน)
- document.body.style.background='#1c1c22 radial-gradient(circle at 30% 30%,#3a1a1e,#111)';
- open({m:{yel:60,red:30,blue:50,lime:40,wire:25},rm:5000,gm:20000,t:[2,1,0]});
+let bound=false;
+function bind(){
+ if(bound||!window.cef)return bound;
+ bound=true;
+ cef.on('crafting:open',open);cef.on('crafting:close',hide);
+ cef.emit('crafting:ready','1');
+ return true;
+}
+if(!bind()){
+ if(parent!==window||location.protocol=='file:'||/preview/.test(location.search)){ // พรีวิวในเบราว์เซอร์/iframe เท่านั้น
+  document.body.style.background='#1c1c22 radial-gradient(circle at 30% 30%,#3a1a1e,#111)';
+  open({m:{yel:60,red:30,blue:50,lime:40,wire:25},rm:5000,gm:20000,t:[2,1,0]});
+ }else{ // ในเกม: รอ cef พร้อม (สูงสุด ~15 วินาที)
+  let n=0;const t=setInterval(()=>{if(bind()||++n>75)clearInterval(t)},200);
+ }
 }
 </script>
 </body>
