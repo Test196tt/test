@@ -92,7 +92,6 @@ const U={
 const TABS=[['w','คราฟอาวุธ'],['i','คราฟไอเทม'],['u','อัพเกรดอาวุธ']];
 let S={m:{},rm:0,gm:0,t:[0,0,0]},tab='w',sel=null;
 const $=id=>document.getElementById(id), fmt=n=>Number(n).toLocaleString('en-US');
-const send=(e,a)=>{try{if(window.cef){cef.emit(e,String(a));st('emit '+e)}else st('emit FAIL no cef: '+e)}catch(x){st('emit ERR '+e)}};
 
 function have(r){return Object.keys(r.m).every(k=>(S.m[k]||0)>=r.m[k])&&S.rm>=r.rm&&S.gm>=r.gm}
 function tabs(){$('tabs').innerHTML=TABS.map(t=>`<div class="tab ${t[0]==tab?'on':''}" data-t="${t[0]}"><span>${t[1]}</span></div>`).join('');
@@ -128,56 +127,69 @@ function detail(){
   <button id="go" ${ok?'':'disabled'}>${label}</button>`;
  $('go').onclick=()=>{if(ok)send(up?'crafting:upgrade':'crafting:craft',sel)};
 }
-function open(a){
- try{if(typeof a=='string')a=JSON.parse(a);if(Array.isArray(a)&&a.length==1)a=a[0];if(typeof a=='string')a=JSON.parse(a)}catch(_){return}
- const was=$('wrap').classList.contains('on');S=Object.assign({m:{},rm:0,gm:0,t:[0,0,0]},a);if(!was)sel=null;render();$('wrap').classList.add('on');send('crafting:shown',1);
-}
-function hide(){$('wrap').classList.remove('on')}
-function close(){hide();send('crafting:close',1)}
-$('x').onclick=close;
-addEventListener('keydown',e=>{if(e.key=='Escape')close()});
-function diag(){ // ใช้ตรวจเมื่อไม่พบ cef: ถ่ายรูปหน้าจอส่งให้ผู้พัฒนา
- try{
-  const f=document.createElement('iframe');f.style.display='none';document.body.appendChild(f);
-  const base=new Set(Object.getOwnPropertyNames(f.contentWindow));f.remove();
-  const extra=Object.getOwnPropertyNames(window).filter(k=>!base.has(k)&&!/^(on|webkit)/.test(k)).slice(0,40);
-  const d=document.createElement('div');
-  d.style.cssText='position:fixed;left:8px;top:8px;max-width:60vw;padding:8px;background:#000c;color:#ff5566;font:12px monospace;z-index:99;word-break:break-all';
-  d.textContent='NO cef | typeof cef='+typeof window.cef+' | globals: '+extra.join(', ');
-  document.body.appendChild(d);
- }catch(e){}
-}
-const DBG=/debug/.test(location.search),LOG=[];
+/* ---- debug overlay (เปิดด้วย ?debug=1 ที่ท้าย URL) ---- */
+var DBG=/debug/.test(location.search),LOG=[];
 function st(m){if(!DBG)return;LOG.push(m);if(LOG.length>8)LOG.shift();
- let d=document.getElementById('st');if(!d){d=document.createElement('div');d.id='st';
+ var d=document.getElementById('st');if(!d){d=document.createElement('div');d.id='st';
  d.style.cssText='position:fixed;left:6px;top:6px;max-width:70vw;padding:6px 8px;background:#000d;color:#7CFC00;font:12px monospace;z-index:99;white-space:pre-wrap;pointer-events:none';document.body.appendChild(d)}
  d.textContent=LOG.join('\n')}
 st('page loaded');
-let bound=false;
-function bind(){
- if(bound)return true;
- if(!window.cef||typeof cef.on!='function')return false;
- bound=true;
- st('cef found: on='+typeof cef.on+' emit='+typeof cef.emit);
- cef.on('crafting:open',function(){st('GOT open event');open.apply(null,arguments)});
- cef.on('crafting:close',hide);
- cef.emit('crafting:ready','1');st('emit crafting:ready');
- return true;
+
+/* ---- สะพานเชื่อม CEF (แบบเดียวกับ index.html / twitter.html ที่ใช้งานได้) ----
+   Android WebView ฉีด window.cef หลังโหลดหน้าเสร็จ จึงต้องหยิบมาใช้ตอนเรียก ไม่ใช่ตอนโหลดสคริปต์ */
+var _q=[];
+var C={
+ emit:function(){var c=window.cef;if(c&&c.emit){c.emit.apply(c,arguments);return true}return false},
+ set_focus:function(f){var c=window.cef;if(c&&c.set_focus)c.set_focus(f)},
+ on:function(n,f){var c=window.cef;if(c&&c.on)c.on(n,f);else _q.push([n,f])}
+};
+function send(e,a){var ok=C.emit(e,String(a));st((ok?'emit ':'emit FAIL ')+e)}
+(function wait(){
+ if(window.cef&&window.cef.on){
+  _q.forEach(function(x){window.cef.on(x[0],x[1])});_q=[];
+  st('cef bound');
+  C.emit('crafting:ready','1');
+ }else setTimeout(wait,50);
+})();
+
+/* ---- แปลงข้อมูลที่ server ส่งมา ----
+   ในเกม: ["yel,red,blue,lime,wire,rm,gm,t1,t2,t3"]  (CSV)   พรีวิว/ทดสอบ: object หรือ JSON ก็ได้ */
+function parse(a){
+ try{
+  if(Array.isArray(a)&&a.length==1)a=a[0];
+  if(typeof a=='string'){
+   var s=a.replace(/^\s+|\s+$/g,''),c=s.charAt(0);
+   if(c=='{'||c=='['||c=='"')return parse(JSON.parse(s));
+   var p=s.split(',').map(function(x){return Number(x)||0});
+   if(p.length<10)return null;
+   return {m:{yel:p[0],red:p[1],blue:p[2],lime:p[3],wire:p[4]},rm:p[5],gm:p[6],t:[p[7],p[8],p[9]]};
+  }
+  return (a&&typeof a=='object')?a:null;
+ }catch(_){return null}
 }
-// ช่องทางสำรอง เหมือน loading.html
-window.craftingOpen=open;window.craftingClose=hide;
-addEventListener('message',function(e){const d=e.data;if(!d)return;
- if(d.event=='crafting:open'){st('GOT open via message');open(d.args!==undefined?d.args:d.data)}
- if(d.event=='crafting:close')hide()});
-if(!bind()){
- if(parent!==window||location.protocol=='file:'||/preview/.test(location.search)){ // พรีวิวในเบราว์เซอร์/iframe เท่านั้น
-  document.body.style.background='#1c1c22 radial-gradient(circle at 30% 30%,#3a1a1e,#111)';
-  open({m:{yel:60,red:30,blue:50,lime:40,wire:25},rm:5000,gm:20000,t:[2,1,0]});
- }else{ // ในเกม: รอ cef พร้อม (สูงสุด ~15 วินาที)
-  let n=0;const t=setInterval(()=>{if(bind()){clearInterval(t);return}
-   if(n==0||n==10||n==20)st('waiting cef... typeof cef='+typeof window.cef);if(++n==15)diag(); // 3 วินาทีแล้วยังไม่เจอ cef -> โชว์รายชื่อตัวเชื่อมที่พบ
-   if(n>75)clearInterval(t)},200);
- }
+function openUI(a){
+ var d=parse(a);
+ if(!d){st('open: bad data '+String(a).slice(0,60));return}
+ var was=$('wrap').classList.contains('on');
+ S=Object.assign({m:{},rm:0,gm:0,t:[0,0,0]},d);
+ if(!was)sel=null;
+ render();$('wrap').classList.add('on');
+ st('opened');
+ send('crafting:shown',1);
+}
+function hide(){$('wrap').classList.remove('on')}
+function closeUI(){hide();C.set_focus(false);send('crafting:close',1)}
+$('x').onclick=closeUI;
+addEventListener('keydown',function(e){if(e.key=='Escape')closeUI()});
+
+C.on('crafting:open',function(){st('GOT open event');openUI(arguments[0])});
+C.on('crafting:close',hide);
+window.craftingOpen=openUI;window.craftingClose=hide;
+
+/* โหมดทดลองในเบราว์เซอร์: เปิดไฟล์แล้วต่อท้าย ?demo (ในเกมไม่ใช้) */
+if(/[?&](demo|preview)/.test(location.search)||location.protocol=='file:'){
+ document.body.style.background='#1c1c22 radial-gradient(circle at 30% 30%,#3a1a1e,#111)';
+ openUI({m:{yel:60,red:30,blue:50,lime:40,wire:25},rm:5000,gm:20000,t:[2,1,0]});
 }
 </script>
 </body>
