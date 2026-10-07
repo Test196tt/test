@@ -127,12 +127,8 @@ function detail(){
   <button id="go" ${ok?'':'disabled'}>${label}</button>`;
  $('go').onclick=()=>{if(ok)send(up?'crafting:upgrade':'crafting:craft',sel)};
 }
-/* ---- debug overlay (เปิดด้วย ?debug=1 ที่ท้าย URL) ---- */
-var DBG=/debug/.test(location.search),LOG=[];
-function st(m){if(!DBG)return;LOG.push(m);if(LOG.length>8)LOG.shift();
- var d=document.getElementById('st');if(!d){d=document.createElement('div');d.id='st';
- d.style.cssText='position:fixed;left:6px;top:6px;max-width:70vw;padding:6px 8px;background:#000d;color:#7CFC00;font:12px monospace;z-index:99;white-space:pre-wrap;pointer-events:none';document.body.appendChild(d)}
- d.textContent=LOG.join('\n')}
+/* debug overlay ถูกลบออกแล้ว */
+function st(){}
 st('page loaded');
 
 /* ---- สะพานเชื่อม CEF (แบบเดียวกับ index.html / twitter.html ที่ใช้งานได้) ----
