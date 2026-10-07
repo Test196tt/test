@@ -130,7 +130,7 @@ function detail(){
 }
 function open(a){
  try{if(typeof a=='string')a=JSON.parse(a);if(Array.isArray(a)&&a.length==1)a=a[0];if(typeof a=='string')a=JSON.parse(a)}catch(_){return}
- S=Object.assign({m:{},rm:0,gm:0,t:[0,0,0]},a);sel=null;render();$('wrap').classList.add('on');send('crafting:shown',1);
+ const was=$('wrap').classList.contains('on');S=Object.assign({m:{},rm:0,gm:0,t:[0,0,0]},a);if(!was)sel=null;render();$('wrap').classList.add('on');send('crafting:shown',1);
 }
 function hide(){$('wrap').classList.remove('on')}
 function close(){hide();send('crafting:close',1)}
