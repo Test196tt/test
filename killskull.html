@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>killskull</title>
+<style>
+  :root{
+    --skull-scale:1;        /* ขนาดหัวกระโหลก 1 = กว้างเท่าโลโก้หลอดโหลด (9vw สูงสุด 110px) ปรับตรงนี้ */
+    --skull-offset-y:0px;   /* ขยับขึ้น(ติดลบ)/ลง(บวก) */
+  }
+  html,body{margin:0;padding:0;width:100%;height:100%;background:transparent;overflow:hidden;pointer-events:none;-webkit-user-select:none;user-select:none;}
+  /* ตำแหน่งเดียวกับ #wrap ใน loading.html: กึ่งกลางจอ ด้านล่าง bottom:8% */
+  #anchor{
+    position:fixed;left:0;right:0;bottom:8%;
+    display:flex;justify-content:center;
+  }
+  #skull{
+    width:calc(9vw * var(--skull-scale));
+    max-width:calc(110px * var(--skull-scale));
+    min-width:calc(72px * var(--skull-scale));
+    height:auto;
+    overflow:visible;
+    transform:translateY(var(--skull-offset-y)) scale(.2);
+    transform-origin:50% 100%;
+    opacity:0;
+    filter:drop-shadow(0 0 .6vh rgba(255,0,0,.9)) drop-shadow(0 0 1.6vh rgba(255,0,0,.55));
+  }
+  #skull.on{animation:pop .45s cubic-bezier(.2,1.4,.4,1) forwards, shake .5s .45s ease-in-out 1;opacity:1;transform:translateY(var(--skull-offset-y)) scale(1);}
+  #skull.off{animation:out .35s ease-in forwards;}
+  #skull .eye{animation:flick .7s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center;}
+  #skull .aura{animation:pulse 1.2s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center;}
+  @keyframes pop{0%{opacity:0;transform:translateY(var(--skull-offset-y)) scale(.2) rotate(-12deg)}
+                 70%{opacity:1;transform:translateY(var(--skull-offset-y)) scale(1.18) rotate(4deg)}
+                 100%{opacity:1;transform:translateY(var(--skull-offset-y)) scale(1) rotate(0)}}
+  @keyframes shake{0%,100%{transform:translateY(var(--skull-offset-y)) rotate(0)}
+                   25%{transform:translateY(var(--skull-offset-y)) rotate(-4deg)}
+                   75%{transform:translateY(var(--skull-offset-y)) rotate(4deg)}}
+  @keyframes out{from{opacity:1;transform:translateY(var(--skull-offset-y)) scale(1)}
+                 to{opacity:0;transform:translateY(calc(var(--skull-offset-y) - 2vh)) scale(.7)}}
+  @keyframes flick{from{opacity:.6;transform:scale(.9)}to{opacity:1;transform:scale(1.1)}}
+  @keyframes pulse{from{opacity:.6;transform:scale(.92)}to{opacity:1;transform:scale(1.05)}}
+
+</style>
+</head>
+<body>
+<div id="anchor">
+  <svg id="skull" viewBox="0 0 120 130" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="bone" cx=".4" cy=".28" r=".85">
+        <stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#ece6d3"/><stop offset="1" stop-color="#a39a82"/>
+      </radialGradient>
+      <radialGradient id="shade" cx=".5" cy=".42" r=".62">
+        <stop offset=".55" stop-color="#3a2a10" stop-opacity="0"/><stop offset="1" stop-color="#3a2a10" stop-opacity=".45"/>
+      </radialGradient>
+      <radialGradient id="eyeg" cx=".5" cy=".5" r=".5">
+        <stop offset="0" stop-color="#fff2a8"/><stop offset=".3" stop-color="#ff3b2a"/><stop offset="1" stop-color="#8a0000" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="aura" cx=".5" cy=".5" r=".5">
+        <stop offset="0" stop-color="#ff1a1a" stop-opacity=".55"/><stop offset="1" stop-color="#ff1a1a" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="blur"><feGaussianBlur stdDeviation="1.6"/></filter>
+    </defs>
+
+    <!-- รัศมีแดงด้านหลัง -->
+    <circle class="aura" cx="60" cy="66" r="78" fill="url(#aura)"/>
+
+    <!-- กะโหลก -->
+    <path id="head" d="M60 6C32 6 14 26 14 52C14 66 20 76 29 82L31 96C31 100 34 103 38 103L40 118C40 121 43 123 46 123L74 123C77 123 80 121 80 118L82 103C86 103 89 100 89 96L91 82C100 76 106 66 106 52C106 26 88 6 60 6Z"
+          fill="url(#bone)" stroke="#161616" stroke-width="2.6" stroke-linejoin="round"/>
+    <path d="M60 6C32 6 14 26 14 52C14 66 20 76 29 82L31 96C31 100 34 103 38 103L40 118C40 121 43 123 46 123L74 123C77 123 80 121 80 118L82 103C86 103 89 100 89 96L91 82C100 76 106 66 106 52C106 26 88 6 60 6Z"
+          fill="url(#shade)"/>
+
+    <!-- รอยร้าว -->
+    <path d="M60 7 56 20 63 29 57 40M97 30 89 38 94 47M24 34 31 40 27 49" stroke="#5e5442" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/>
+    <!-- โหนกแก้ม -->
+    <path d="M30 76C34 82 38 86 42 88M90 76C86 82 82 86 78 88" stroke="#7d735c" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".7"/>
+
+    <!-- เบ้าตา -->
+    <path d="M26 54C26 44 36 40 46 44C54 47 57 56 53 64C49 73 36 75 30 68C27 64 26 58 26 54Z" fill="#090909"/>
+    <path d="M94 54C94 44 84 40 74 44C66 47 63 56 67 64C71 73 84 75 90 68C93 64 94 58 94 54Z" fill="#090909"/>
+    <!-- แสงในตา -->
+    <circle class="eye" cx="40" cy="58" r="9" fill="url(#eyeg)" filter="url(#blur)"/>
+    <circle class="eye" cx="80" cy="58" r="9" fill="url(#eyeg)" filter="url(#blur)"/>
+    <circle class="eye" cx="40" cy="58" r="3.2" fill="#fff0a0"/>
+    <circle class="eye" cx="80" cy="58" r="3.2" fill="#fff0a0"/>
+
+    <!-- จมูก -->
+    <path d="M60 70C56 76 52 84 54 89C57 87 59 85 60 85C61 85 63 87 66 89C68 84 64 76 60 70Z" fill="#0d0d0d"/>
+
+    <!-- ปาก + ฟัน -->
+    <rect x="41" y="100" width="38" height="20" rx="4" fill="#141414"/>
+    <g fill="#f3eedd" stroke="#2a2a2a" stroke-width=".9">
+      <rect x="41.4" y="100" width="5.6" height="11" rx="1.6"/><rect x="47.8" y="100" width="5.6" height="12" rx="1.6"/>
+      <rect x="54.2" y="100" width="5.6" height="12" rx="1.6"/><rect x="60.6" y="100" width="5.6" height="12" rx="1.6"/>
+      <rect x="67" y="100" width="5.6" height="12" rx="1.6"/><rect x="73.4" y="100" width="5.2" height="11" rx="1.6"/>
+      <rect x="44.6" y="111" width="5.6" height="9" rx="1.6"/><rect x="51" y="112" width="5.6" height="9" rx="1.6"/>
+      <rect x="57.4" y="112" width="5.6" height="9" rx="1.6"/><rect x="63.8" y="112" width="5.6" height="9" rx="1.6"/>
+      <rect x="70.2" y="111" width="5.2" height="9" rx="1.6"/>
+    </g>
+  </svg>
+</div>
+
+<script>
+(function(){
+  var skull = document.getElementById('skull');
+  var hideTimer = null, clearTimer = null;
+
+  function skullHide(){
+    skull.classList.remove('on');
+    skull.classList.add('off');
+    clearTimeout(clearTimer);
+    clearTimer = setTimeout(function(){ skull.classList.remove('off'); }, 400);
+  }
+
+  // ms = เวลาที่โชว์ (มิลลิวินาที)
+  function skullShow(ms){
+    ms = parseInt(ms, 10) || 2500;
+    var already = skull.classList.contains('on');
+    clearTimeout(clearTimer);
+    skull.classList.remove('off');
+    if (!already){
+      void skull.getBoundingClientRect();   // restart animation
+      skull.classList.add('on');
+    }
+    clearTimeout(hideTimer);                // ส่งซ้ำตอนโชว์อยู่ = แค่ต่อเวลา ไม่เล่นอนิเมชั่นใหม่
+    hideTimer = setTimeout(skullHide, ms);
+  }
+  window.skullShow = skullShow;
+
+  // server sends: Cef_Emit(playerid, "skull:show", "[2500]")  (รับแบบเดียวกับ loading.html)
+  function onShow(){
+    var a = Array.prototype.slice.call(arguments);
+    if (a.length === 1){
+      var v = a[0];
+      if (typeof v === 'string'){
+        try { v = JSON.parse(v); } catch(e){ v = v.split(','); }
+      }
+      a = (v instanceof Array) ? v : [v];
+    }
+    var ms = Number(a[0]);
+    skullShow(isNaN(ms) ? 2500 : ms);
+  }
+
+  var tries = 0;
+  (function register(){
+    if (window.cef && typeof window.cef.on === 'function'){
+      window.cef.on('skull:show', onShow);
+      return;
+    }
+    if (tries++ < 50) setTimeout(register, 100);
+  })();
+
+  window.addEventListener('message', function(e){
+    var d = e.data;
+    if (d && d.event === 'skull:show') onShow(d.args !== undefined ? d.args : d.data);
+  });
+
+  // ทดสอบในเบราว์เซอร์: เปิด killskull.html?demo=1
+  if (/[?&]demo=1/.test(location.search)){
+    document.body.style.background = '#2b2f36';
+    skullShow(2500);
+    setInterval(function(){ skullShow(2500); }, 4500);
+  }
+})();
+</script>
+</body>
+</html>
