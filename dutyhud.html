@@ -53,11 +53,40 @@
   }
 
   // Cef_Emit(playerid, "duty:update", "[council,police,medic]")
-  // accepts both styles: handler(c, p, m) and handler([c, p, m])
-  cef.on("duty:update", function (a, b, c) {
-    if (Array.isArray(a)) apply(a[0], a[1], a[2]);
-    else apply(a, b, c);
-  });
+  // accepts every shape the CEF client may hand over:
+  //   handler(c, p, m) | handler([c, p, m]) | handler("[c,p,m]") | handler({...})
+  function onDuty() {
+    var a = arguments[0], b = arguments[1], c = arguments[2];
+
+    if (typeof a === "string") {
+      try { a = JSON.parse(a); } catch (e) { return; }
+    }
+    if (Array.isArray(a)) {
+      apply(a[0], a[1], a[2]);
+    } else if (a && typeof a === "object") {
+      apply(a.council || a[0], a.police || a[1], a.medic || a[2]);
+    } else {
+      apply(a, b, c);
+    }
+  }
+
+  // the Android client injects window.cef only AFTER the page has loaded, so a bare cef.on(...) at load time
+  // throws and the handler is never registered (HUD stays 0). Same bridge as index.html / twitter.html:
+  var _q = [];
+  function onCef(name, fn) {
+    var c = window.cef;
+    if (c && c.on) c.on(name, fn); else _q.push([name, fn]);
+  }
+  (function wait() {
+    if (window.cef && window.cef.on) {
+      _q.forEach(function (x) { window.cef.on(x[0], x[1]); });
+      _q = [];
+    } else {
+      setTimeout(wait, 50);
+    }
+  })();
+
+  onCef("duty:update", onDuty);
 </script>
 </body>
 </html>
