@@ -85,7 +85,7 @@ html,body{margin:0;height:100%;background:transparent;overflow:hidden;pointer-ev
       <polygon points="20,5.5 34.5,20 20,34.5 5.5,20" fill="#171217" stroke="#0b080b" stroke-width="6" stroke-linejoin="round"/>
       <polygon class="prog" id="pg-hg" pathLength="100" points="20,9 31,20 20,31 9,20" style="stroke-dasharray:0 100"/>
     </svg>
-    <svg class="ic" viewBox="0 0 24 24"><path d="M15.5 2.5a6.5 6.5 0 0 0-5.9 9.2l-5.6 5.6a2.4 2.4 0 1 0-1.4 3.4 2.4 2.4 0 0 0 3.4-1.4l.1.1a2.4 2.4 0 1 0 3.4-3.4l5.600-5.600A6.500 6.500 0 0 0 15.500 2.500z"/></svg>
+    <svg class="ic" viewBox="0 0 24 24"><path d="M3 10c0-3.9 4-6.5 9-6.5s9 2.6 9 6.5z"/><path d="M3 11.8q1.5-1.2 3 0t3 0t3 0t3 0t3 0t3 0v1.2q-1.5 1.2-3 0t-3 0t-3 0t-3 0t-3 0t-3 0z"/><rect x="3" y="14.7" width="18" height="2.7" rx="1.35"/><path d="M3 18.5h18v.5c0 1.4-1.1 2.5-2.5 2.5h-13C4.1 21.5 3 20.4 3 19z"/></svg>
   </div>
   <div class="mini" id="m-wt">
     <svg class="dm" viewBox="0 0 40 40">
@@ -101,7 +101,7 @@ html,body{margin:0;height:100%;background:transparent;overflow:hidden;pointer-ev
   var $=function(id){return document.getElementById(id)};
   function clamp(v){v=Math.round(Number(v));return isNaN(v)?0:Math.max(0,Math.min(100,v))}
 
-  // hud:update  ->  [hp, armor, hunger, thirst, show, uid]   (uid = ไอดีตัวละคร ไม่ใส่ก็ได้)
+  // hud:update  ->  [hp, armor, hunger, thirst, show, uid]   (uid = ไอดีผู้เล่นที่เริ่มจาก 0 ตอนเข้าเกม เช่น player.id / source)
   function apply(hp,ar,hg,wt,show,uid){
     hp=clamp(hp);ar=clamp(ar);hg=clamp(hg);wt=clamp(wt);
     $('fill').style.width=hp+'%';
@@ -124,8 +124,8 @@ html,body{margin:0;height:100%;background:transparent;overflow:hidden;pointer-ev
   // โหมดทดสอบในเบราว์เซอร์: เปิดไฟล์ด้วย ?demo
   if(/[?&]demo/.test(location.search)){
     document.body.style.background='#6f6a52';   // พื้นหลังทึบเฉพาะโหมดทดสอบ จะได้เห็น HUD ชัด
-    var t=0;apply(100,0,100,55,1,3938);
-    setInterval(function(){t++;apply(50+Math.round(50*Math.abs(Math.sin(t/6))),Math.round(100*Math.abs(Math.cos(t/9))),Math.max(0,100-t%100),70,1,3938+t*10)},700);
+    var t=0;apply(100,0,100,55,1,0);
+    setInterval(function(){t++;apply(50+Math.round(50*Math.abs(Math.sin(t/6))),Math.round(100*Math.abs(Math.cos(t/9))),Math.max(0,100-t%100),70,1,t%10)},700);
   }
 })();
 </script>
