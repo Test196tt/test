@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>MELVY TOWN item notify</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden;
+    user-select:none;-webkit-user-select:none;pointer-events:none;
+    font-family:'Segoe UI','Noto Sans Thai','Noto Sans',Tahoma,Arial,sans-serif}
+
+  /* กองการ์ดอยู่ขวากลางจอ การ์ดใหม่ต่อท้ายด้านล่าง */
+  #stack{
+    position:fixed;right:1.1vw;top:50%;transform:translateY(-50%);
+    display:flex;flex-direction:column;gap:7px;align-items:flex-end;
+  }
+
+  .n{
+    --c:#35ff7a;--c2:rgba(53,255,122,.5);--g:rgba(40,255,110,.26);--bg:#0b2a16;
+    position:relative;box-sizing:border-box;
+    width:clamp(150px,13vw,210px);padding:7px 11px 7px 8px;border-radius:12px;
+    display:flex;align-items:center;gap:9px;
+    background:linear-gradient(160deg,#0b0b0d 0%,#07140c 58%,var(--bg) 100%);
+    border:1px solid var(--c2);
+    box-shadow:0 0 16px var(--g),inset 0 0 14px rgba(0,0,0,.65);
+    opacity:0;transform:translateX(34px);
+    transition:opacity .28s ease,transform .28s ease;
+  }
+  .n.remove{
+    --c:#ff3b4a;--c2:rgba(255,45,60,.55);--g:rgba(255,30,50,.28);--bg:#2b0a0f;
+    background:linear-gradient(160deg,#0b0b0d 0%,#170709 58%,var(--bg) 100%);
+  }
+  .n.in{opacity:1;transform:translateX(0)}
+  .n.out{opacity:0;transform:translateX(34px)}
+  .n.pop{animation:pop .22s ease}
+  @keyframes pop{50%{transform:scale(1.06)}}
+
+  /* แถบสีด้านซ้าย */
+  .n::before{
+    content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0;
+    background:var(--c);box-shadow:0 0 8px var(--c);
+  }
+
+  .img{
+    flex:none;width:42px;height:42px;border-radius:9px;margin-left:4px;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(0,0,0,.45);border:1px solid var(--c2);
+  }
+  .img img{max-width:34px;max-height:34px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6))}
+  .img em{font-style:normal;font-size:20px}
+
+  .tx{min-width:0;flex:1;line-height:1.1}
+  .tx small{display:block;font-size:9.5px;font-weight:800;letter-spacing:.09em;color:var(--c);opacity:.9}
+  .tx b{display:block;margin-top:2px;font-size:20px;font-weight:800;color:#fff;
+    text-shadow:0 0 10px var(--g)}
+</style>
+</head>
+<body>
+  <div id="stack"></div>
+<script>
+  // โฟลเดอร์รูปไอเทม (PNG) ที่เดียวกับ notify.html  ไฟล์ละ 1 ไอเทม ชื่อตามหลังเครื่องหมาย : ของ itemPng ใน main.pwn
+  // เช่น "ms_uiinv:item_11" => items/item_11.png   /  "Ko:Ko" => items/Ko.png
+  var IMG_BASE='items/';
+  var MAX=5;          // การ์ดสูงสุดพร้อมกัน
+  var LIFE=5000;      // ms ที่การ์ดอยู่ (เท่าของเดิม 5 วินาที)
+
+  var stack=document.getElementById('stack');
+  var cards=[];       // {el,key,qty,timer}
+
+  function args(e){
+    var d=e.detail;
+    try{if(typeof d==='string')d=JSON.parse(d);}catch(_){d=[];}
+    return Array.isArray(d)?d:[d];
+  }
+
+  function kill(c){
+    if(c.dead)return;
+    c.dead=true;
+    clearTimeout(c.timer);
+    c.el.classList.remove('in');
+    c.el.classList.add('out');
+    setTimeout(function(){
+      if(c.el.parentNode)c.el.parentNode.removeChild(c.el);
+      var i=cards.indexOf(c);if(i>=0)cards.splice(i,1);
+    },320);
+  }
+
+  function arm(c){
+    clearTimeout(c.timer);
+    c.timer=setTimeout(function(){kill(c);},LIFE);
+  }
+
+  function push(type,name,qty){
+    name=String(name||'').replace(/[^A-Za-z0-9_\-]/g,'');
+    qty=+qty||0;
+    if(!name||qty<=0)return;
+    var key=type+':'+name;
+
+    // ได้ของชนิดเดิมซ้ำ (เช่น ขุดแร่ทีละก้อน) => บวกเลขในการ์ดเดิม ไม่ขึ้นการ์ดใหม่รัว ๆ
+    for(var i=cards.length-1;i>=0;i--){
+      var o=cards[i];
+      if(o.key===key&&!o.dead){
+        o.qty+=qty;
+        o.num.textContent=(type==='add'?'+':'-')+o.qty;
+        o.el.classList.remove('pop');void o.el.offsetWidth;o.el.classList.add('pop');
+        arm(o);
+        return;
+      }
+    }
+
+    var el=document.createElement('div');
+    el.className='n '+type;
+
+    var box=document.createElement('div');box.className='img';
+    var im=new Image();
+    im.onerror=function(){box.innerHTML='<em>\uD83D\uDCE6</em>';};   // ไม่มีรูป => กล่องแทน
+    im.src=IMG_BASE+name+'.png';
+    box.appendChild(im);
+
+    var tx=document.createElement('div');tx.className='tx';
+    var sm=document.createElement('small');
+    sm.textContent=(type==='add'?'ได้รับไอเทม':'ไอเทมลดลง');
+    var num=document.createElement('b');
+    num.textContent=(type==='add'?'+':'-')+qty;
+    tx.appendChild(sm);tx.appendChild(num);
+
+    el.appendChild(box);el.appendChild(tx);
+    stack.appendChild(el);
+
+    var c={el:el,key:key,qty:qty,num:num,timer:0,dead:false};
+    cards.push(c);
+    while(cards.filter(function(x){return !x.dead;}).length>MAX){
+      kill(cards.filter(function(x){return !x.dead;})[0]);
+    }
+
+    void el.offsetWidth;
+    el.classList.add('in');
+    arm(c);
+  }
+
+  // notify:add / notify:remove -> ["ชื่อไฟล์รูป", จำนวน]
+  window.addEventListener('cef:notify:add',function(e){var a=args(e);push('add',a[0],a[1]);});
+  window.addEventListener('cef:notify:remove',function(e){var a=args(e);push('remove',a[0],a[1]);});
+
+  // เปิดไฟล์นี้ในเบราว์เซอร์ด้วย #test เพื่อดูตัวอย่าง
+  if(location.hash==='#test'){
+    document.body.style.background='#222';
+    push('add','item_11',5);
+    setTimeout(function(){push('remove','item_1',2);},500);
+    setTimeout(function(){push('add','item_3',10);},1000);
+  }
+</script>
+</body>
+</html>
