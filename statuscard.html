@@ -853,6 +853,15 @@
         .url-msg.ok { color: #2ed573; }
         .url-msg.err { color: #ff6b78; }
 
+        /* ===== ขนาด + ตำแหน่ง: ขนาดกลาง อยู่กลางบนจอ (ปรับขนาดที่ --card-scale ตัวเดียว: 1 = ขนาดเดิม, 0.8 = กลาง, 0.65 = เล็ก) ===== */
+        .card-wrapper-top {
+            --card-scale: 0.8;
+            top: 14px !important;
+            left: 50% !important;
+            transform: translateX(-50%) scale(var(--card-scale)) !important;
+            transform-origin: top center !important;
+        }
+
         /* ===== หน้าสถานะ: ส่วนเพิ่ม ===== */
         .info-value.kd b { color: #ff6b78; font-weight: 700; }
         .header-money-group.hide { display: none; }
