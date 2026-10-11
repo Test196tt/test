@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>MELVY TOWN auto farm</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden;
+    user-select:none;-webkit-user-select:none;pointer-events:none;
+    font-family:'Segoe UI','Noto Sans Thai','Noto Sans',Tahoma,Arial,sans-serif}
+
+  /* การ์ดอยู่ซ้ายกลางจอ โทนแดง-ดำ */
+  #card{
+    position:fixed;left:1.1vw;top:50%;
+    width:clamp(118px,10.5vw,168px);box-sizing:border-box;
+    padding:9px 10px 11px;border-radius:14px;
+    background:linear-gradient(160deg,#0b0b0d 0%,#170709 58%,#2b0a0f 100%);
+    border:1px solid rgba(255,45,60,.55);
+    box-shadow:0 0 18px rgba(255,30,50,.28),inset 0 0 18px rgba(0,0,0,.65);
+    opacity:0;transform:translate(-26px,-50%);
+    transition:opacity .3s ease,transform .3s ease;
+  }
+  #card.on{opacity:1;transform:translate(0,-50%)}
+
+  .head{display:flex;align-items:center;gap:7px}
+  .mark{
+    flex:none;width:15px;height:15px;border-radius:5px;
+    background:linear-gradient(135deg,#ff3b4a,#8f0f1b);
+    box-shadow:0 0 8px rgba(255,45,60,.6);
+  }
+  .ttl{min-width:0;line-height:1.1}
+  .ttl b{display:block;font-size:11px;font-weight:800;letter-spacing:.07em;color:#fff}
+  .ttl span{display:block;margin-top:2px;font-size:6.5px;font-weight:700;letter-spacing:.14em;color:#ff3b4a}
+
+  .ring{position:relative;width:76px;height:76px;margin:9px auto 7px}
+  .ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+  .ring .track{fill:rgba(0,0,0,.45);stroke:#3a1015;stroke-width:5}
+  .ring .bar{fill:none;stroke:#ff2d3c;stroke-width:5;stroke-linecap:round;
+    filter:drop-shadow(0 0 4px rgba(255,45,60,.7))}
+  .ring .ico{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:29px;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,.6);
+  }
+
+  .cnt{
+    display:flex;align-items:center;justify-content:center;gap:7px;
+    padding:3px 0;border-radius:9px;
+    background:rgba(255,45,60,.10);border:1px solid rgba(255,45,60,.38);
+    font-size:12.5px;font-weight:800;color:#fff;
+  }
+  .cnt i{font-style:normal;color:#ff3b4a;font-weight:700}
+  .cnt span{color:#c9c9cf}
+</style>
+</head>
+<body>
+  <div id="card">
+    <div class="head">
+      <div class="mark"></div>
+      <div class="ttl"><b>AUTO FARM</b><span>WORKING PROGRESS</span></div>
+    </div>
+    <div class="ring">
+      <svg viewBox="0 0 76 76">
+        <circle class="track" cx="38" cy="38" r="33"></circle>
+        <circle class="bar" id="bar" cx="38" cy="38" r="33"></circle>
+      </svg>
+      <div class="ico" id="ico">🌾</div>
+    </div>
+    <div class="cnt"><b id="c">0</b><i>|</i><span id="l">50</span></div>
+  </div>
+<script>
+  // ลำดับไอคอน = ลำดับงานในเซิร์ฟเวอร์: 0 ข้าว / 1 แตงโม / 2 เห็ด / 3 องุ่น
+  var ICONS=['\uD83C\uDF3E','\uD83C\uDF49','\uD83C\uDF44','\uD83C\uDF47'];
+  var C=2*Math.PI*33;
+  var card=document.getElementById('card'),bar=document.getElementById('bar'),
+      ico=document.getElementById('ico'),cEl=document.getElementById('c'),lEl=document.getElementById('l');
+  bar.style.strokeDasharray=C;
+  bar.style.strokeDashoffset=C;
+
+  function args(e){
+    var d=e.detail;
+    try{if(typeof d==='string')d=JSON.parse(d);}catch(_){d=[];}
+    return Array.isArray(d)?d:[d];
+  }
+  // seconds > 0 = วิ่งวงแหวน 0->100% ตามเวลานั้น / 0 = รีเซ็ตวงแหวน
+  function progress(sec){
+    bar.style.transition='none';
+    bar.style.strokeDashoffset=C;
+    void bar.getBoundingClientRect();
+    if(sec>0){
+      bar.style.transition='stroke-dashoffset '+sec+'s linear';
+      bar.style.strokeDashoffset=0;
+    }
+  }
+
+  // farm:show -> [งาน, จำนวนในกระเป๋า, เพดาน]  (แสดงการ์ด / อัปเดตตัวเลข ไม่รีเซ็ตวงแหวน)
+  window.addEventListener('cef:farm:show',function(e){
+    var a=args(e),site=+a[0]||0;
+    ico.textContent=ICONS[site]||ICONS[0];
+    cEl.textContent=(+a[1]||0);
+    lEl.textContent=(+a[2]||0);
+    card.classList.add('on');
+  });
+  // farm:progress -> [วินาที]
+  window.addEventListener('cef:farm:progress',function(e){
+    progress(+args(e)[0]||0);
+  });
+  // farm:hide -> [0]
+  window.addEventListener('cef:farm:hide',function(){
+    card.classList.remove('on');
+    setTimeout(function(){progress(0);},350);
+  });
+</script>
+</body>
+</html>
