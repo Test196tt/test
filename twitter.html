@@ -151,6 +151,23 @@
         .btn-post:hover { filter: brightness(1.1); }
         .btn-cancel { width: 100%; background: transparent; color: var(--text-dim); border: none; cursor: pointer; font-size: 14px; padding: 5px; }
 
+        /* ปุ่มเลือกรูปจากมือถือ + พรีวิว */
+        .pick-btn { position: relative; overflow: hidden; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+            background-color: #2c2c2e; border: 1px dashed #4a4a4c; border-radius: 14px; padding: 14px; color: white;
+            font-family: 'Prompt', sans-serif; font-size: 14px; box-sizing: border-box; cursor: pointer; transition: all 0.2s; }
+        .pick-btn:hover { background-color: #323234; border-color: var(--twitter-blue); }
+        .pick-btn input[type=file] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 0; }
+        .pick-preview { position: relative; margin-top: 10px; display: none; }
+        .pick-preview img { width: 100%; max-height: 140px; object-fit: cover; border-radius: 12px; border: 1px solid #333; display: block; }
+        .pick-preview.round { width: 96px; height: 96px; margin: 12px auto 0; }
+        .pick-preview.round img { width: 96px; height: 96px; max-height: none; border-radius: 50%; border: 2px solid var(--twitter-blue); }
+        .pick-remove { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 50%; border: none;
+            background: rgba(0,0,0,.7); color: #fff; font-size: 13px; line-height: 26px; padding: 0; cursor: pointer; }
+        .pick-status { min-height: 16px; font-size: 12px; margin-top: 6px; text-align: center; color: var(--text-dim); }
+        .pick-status.ok { color: #00b894; }
+        .pick-status.err { color: #ff7675; }
+        .btn-post:disabled { filter: grayscale(.8) brightness(.7); cursor: default; }
+
         /* Home Indicator (iPhone style) */
         .home-indicator { 
             height: 5px; width: 110px; background-color: #fff; border-radius: 10px; 
@@ -207,8 +224,12 @@
             <div class="modal-content">
                 <div class="modal-title">ทวิตข้อความใหม่</div>
                 <div class="input-group"><input type="text" id="inp-msg" class="input-field" placeholder="คุณกำลังทำอะไรอยู่?" readonly onclick="requestInput('msg')"></div>
-                <div class="input-group"><input type="text" id="inp-url" class="input-field" placeholder="URL รูปภาพ (ถ้ามี)" readonly onclick="requestInput('url')"></div>
-                <button class="btn-post" onclick="sendTweet()">ทวิตเลย</button>
+                <div class="input-group">
+                    <label class="pick-btn"><span>📷 เลือกรูปจากมือถือ (ถ้ามี)</span><input type="file" accept="image/*" onchange="onFile('img', this)"></label>
+                    <div class="pick-preview" id="prev-img"><img id="prev-img-el" alt=""><button type="button" class="pick-remove" onclick="clearPick('img')">✕</button></div>
+                    <div class="pick-status" id="st-img"></div>
+                </div>
+                <button class="btn-post" id="btn-send" onclick="sendTweet()">ทวิตเลย</button>
                 <button class="btn-cancel" onclick="toggleModal(false)">ไว้วันหลัง</button>
             </div>
         </div>
@@ -217,10 +238,12 @@
             <div class="modal-content">
                 <div class="modal-title">ตั้งค่ารูปโปรไฟล์</div>
                 <div class="input-group">
-                    <input type="text" id="inp-cover" class="input-field" placeholder="ใส่ลิงก์รูปภาพโปรไฟล์ของคุณ..." readonly onclick="requestInput('cover')">
+                    <label class="pick-btn"><span>🖼️ เลือกรูปโปรไฟล์จากมือถือ</span><input type="file" accept="image/*" onchange="onFile('cover', this)"></label>
+                    <div class="pick-preview round" id="prev-cover"><img id="prev-cover-el" alt=""></div>
+                    <div class="pick-status" id="st-cover"></div>
                 </div>
                 <p style="color: #8899a6; font-size: 11px; text-align: center; margin-bottom: 15px;">รูปภาพจะถูกแสดงในทุกๆ ทวิตของคุณ</p>
-                <button class="btn-post" onclick="saveSettings()">บันทึกข้อมูล</button>
+                <button class="btn-post" id="btn-save" onclick="saveSettings()">บันทึกข้อมูล</button>
                 <button class="btn-cancel" onclick="toggleSettings(false)">ยกเลิก</button>
             </div>
         </div>
@@ -293,8 +316,9 @@
         function updateInput(type, text) {
             text = decodeRussian(text);
             if(type === 'msg') document.getElementById('inp-msg').value = text;
-            if(type === 'url') document.getElementById('inp-url').value = text;
-            if(type === 'cover') document.getElementById('inp-cover').value = text;
+            // เซิร์ฟเวอร์ส่งรูปที่เก็บไว้กลับมา (ตอนเปิดมือถือใหม่) -> โชว์พรีวิวจากลิงก์นั้น
+            if(type === 'url') setPicked('img', safeUrl(text), false);
+            if(type === 'cover') setPicked('cover', safeUrl(text), false);
         }
 
         function toggleModal(show) {
@@ -310,16 +334,151 @@
         }
 
         function sendTweet() {
-            const msg = document.getElementById('inp-msg').value.trim(); const url = document.getElementById('inp-url').value.trim();
+            if (PICK.img.busy) { setStatus('img', 'กำลังอัปโหลดรูป รอสักครู่...', 'err'); return; }
+            const msg = document.getElementById('inp-msg').value.trim(); const url = PICK.img.url;
             if (msg === "" && url === "") return;
             C.emit("tw:post");
             toggleModal(false);
             document.getElementById('inp-msg').value = '';
-            document.getElementById('inp-url').value = '';
+            clearPick('img', true);   // ล้างเฉพาะหน้าเว็บ (เซิร์ฟเวอร์ล้างร่างของตัวเองหลังโพสต์)
         }
 
         function saveSettings() {
-            if (document.getElementById('inp-cover').value.trim().length > 5) { C.emit("tw:cover"); toggleSettings(false); }
+            var P = PICK.cover;
+            if (P.busy) { setStatus('cover', 'กำลังอัปโหลดรูป รอสักครู่...', 'err'); return; }
+            if (P.dirty && P.url) { C.emit("tw:cover"); P.dirty = false; toggleSettings(false); }
+            else if (P.url) toggleSettings(false);          // ไม่ได้เปลี่ยนรูป
+            else setStatus('cover', 'กรุณาเลือกรูปก่อน', 'err');
+        }
+
+        // =====================================================================
+        //  เลือกรูปจากมือถือ -> ย่อขนาด -> อัปโหลดขึ้นที่เก็บรูป -> ส่งลิงก์ที่ได้ให้เซิร์ฟเวอร์
+        //  (เซิร์ฟเวอร์เก็บได้แค่ข้อความสั้นๆ จึงไม่ส่งไฟล์รูปผ่านเกมโดยตรง)
+        // =====================================================================
+        // >>> ใส่ API key ของ ImgBB ตรงนี้ (สมัครฟรีที่ https://api.imgbb.com) <<<
+        var IMG_API_KEY = 'f29afe027fbd32e1ea7b5669d396b930';
+        var IMG_API_URL = 'https://api.imgbb.com/1/upload';
+        var MAX_FILE_MB = 20;
+
+        var PICK = {
+            img:   { max: 1280, square: false, q: 0.82, name: 'tweet.jpg',  ev: 'tw:img',      clearEv: 'tw:imgclear', url: '', busy: false, dirty: false, token: 0, xhr: null, blob: '' },
+            cover: { max: 256,  square: true,  q: 0.85, name: 'avatar.jpg', ev: 'tw:coverurl', clearEv: '',            url: '', busy: false, dirty: false, token: 0, xhr: null, blob: '' }
+        };
+
+        function setStatus(kind, text, cls) {
+            var el = document.getElementById('st-' + kind);
+            el.textContent = text || '';
+            el.className = 'pick-status' + (cls ? ' ' + cls : '');
+        }
+
+        function setBusy(kind, busy) {
+            PICK[kind].busy = busy;
+            var b = document.getElementById(kind === 'img' ? 'btn-send' : 'btn-save');
+            if (b) b.disabled = busy;
+        }
+
+        function showPreview(kind, src) {
+            var box = document.getElementById('prev-' + kind), im = document.getElementById('prev-' + kind + '-el');
+            if (src) { im.src = src; box.style.display = 'block'; } else { im.removeAttribute('src'); box.style.display = 'none'; }
+        }
+
+        // ตั้งค่ารูปที่เลือกไว้แล้ว (มาจากเซิร์ฟเวอร์ หรืออัปโหลดสำเร็จ)
+        function setPicked(kind, url, dirty) {
+            var P = PICK[kind];
+            if (P.busy) return;
+            P.url = url || ''; P.dirty = !!dirty;
+            showPreview(kind, P.url);
+            setStatus(kind, '');
+        }
+
+        function clearPick(kind, localOnly) {
+            var P = PICK[kind];
+            P.token++;
+            if (P.xhr) { try { P.xhr.abort(); } catch (e) {} P.xhr = null; }
+            if (P.blob) { URL.revokeObjectURL(P.blob); P.blob = ''; }
+            P.url = ''; P.dirty = false;
+            setBusy(kind, false);
+            showPreview(kind, '');
+            setStatus(kind, '');
+            if (!localOnly && P.clearEv) C.emit(P.clearEv);
+        }
+
+        // ย่อรูป (และครอปเป็นจัตุรัสถ้าเป็นรูปโปรไฟล์) แล้วแปลงเป็น JPEG
+        function resizeImage(file, P) {
+            return new Promise(function (resolve, reject) {
+                var u = URL.createObjectURL(file), im = new Image();
+                im.onload = function () {
+                    try {
+                        var w = im.naturalWidth, h = im.naturalHeight, sx = 0, sy = 0, sw = w, sh = h, tw, th;
+                        if (P.square) { var s = Math.min(w, h); sx = (w - s) / 2; sy = (h - s) / 2; sw = s; sh = s; tw = th = Math.min(P.max, s); }
+                        else { var k = Math.min(1, P.max / Math.max(w, h)); tw = Math.max(1, Math.round(w * k)); th = Math.max(1, Math.round(h * k)); }
+                        var c = document.createElement('canvas'); c.width = tw; c.height = th;
+                        var g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, tw, th);
+                        g.drawImage(im, sx, sy, sw, sh, 0, 0, tw, th);
+                        URL.revokeObjectURL(u);
+                        c.toBlob(function (b) { b ? resolve(b) : reject(new Error('toBlob')); }, 'image/jpeg', P.q);
+                    } catch (e) { URL.revokeObjectURL(u); reject(e); }
+                };
+                im.onerror = function () { URL.revokeObjectURL(u); reject(new Error('load')); };
+                im.src = u;
+            });
+        }
+
+        function uploadImage(kind, blob) {
+            var P = PICK[kind];
+            return new Promise(function (resolve, reject) {
+                if (!IMG_API_KEY) return reject(new Error('nokey'));
+                var fd = new FormData(); fd.append('image', blob, P.name);
+                var x = new XMLHttpRequest(); P.xhr = x;
+                x.open('POST', IMG_API_URL + '?key=' + encodeURIComponent(IMG_API_KEY));
+                x.timeout = 60000;
+                x.upload.onprogress = function (e) { if (e.lengthComputable) setStatus(kind, 'กำลังอัปโหลด ' + Math.round(e.loaded / e.total * 100) + '%'); };
+                x.onload = function () {
+                    try {
+                        var j = JSON.parse(x.responseText), u = j && j.data && j.data.url;
+                        if (x.status === 200 && u) resolve(String(u).replace(/^http:\/\//i, 'https://'));
+                        else reject(new Error('api ' + x.status));
+                    } catch (e) { reject(e); }
+                };
+                x.onerror = function () { reject(new Error('network')); };
+                x.ontimeout = function () { reject(new Error('timeout')); };
+                x.onabort = function () { reject(new Error('abort')); };
+                x.send(fd);
+            });
+        }
+
+        function onFile(kind, input) {
+            var P = PICK[kind], file = input.files && input.files[0];
+            input.value = '';                       // เลือกไฟล์เดิมซ้ำได้
+            if (!file) return;
+            if (file.type && file.type.indexOf('image/') !== 0) { setStatus(kind, 'ไฟล์นี้ไม่ใช่รูปภาพ', 'err'); return; }
+            if (file.size > MAX_FILE_MB * 1024 * 1024) { setStatus(kind, 'ไฟล์ใหญ่เกิน ' + MAX_FILE_MB + ' MB', 'err'); return; }
+
+            clearPick(kind, true);                  // ยกเลิกอันเก่าที่ค้างอยู่ (ถ้ามี)
+            var my = ++P.token;
+            setBusy(kind, true);
+            setStatus(kind, 'กำลังเตรียมรูป...');
+
+            resizeImage(file, P).then(function (blob) {
+                if (my !== P.token) throw new Error('abort');
+                P.blob = URL.createObjectURL(blob);
+                showPreview(kind, P.blob);          // โชว์รูปจากเครื่องทันที ไม่ต้องรออัปโหลด
+                return uploadImage(kind, blob);
+            }).then(function (url) {
+                if (my !== P.token) return;
+                if (!safeUrl(url) || url.length > 120) throw new Error('badurl');
+                P.xhr = null; P.url = url; P.dirty = true;
+                setBusy(kind, false);
+                C.emit(P.ev, url);                  // ส่งลิงก์ให้เซิร์ฟเวอร์เก็บเป็นร่าง
+                setStatus(kind, 'อัปโหลดสำเร็จ ✓', 'ok');
+            }).catch(function (e) {
+                if (my !== P.token) return;         // ถูกยกเลิก/เปลี่ยนรูปแล้ว
+                console.log('upload fail:', e && e.message);
+                var m = { nokey: 'ระบบอัปโหลดรูปยังไม่พร้อมใช้งาน', network: 'เน็ตมีปัญหา อัปโหลดไม่สำเร็จ', timeout: 'อัปโหลดนานเกินไป ลองใหม่อีกครั้ง', load: 'เปิดไฟล์รูปนี้ไม่ได้' };
+                var key = e && e.message;
+                clearPick(kind, true);
+                setStatus(kind, m[key] || 'อัปโหลดไม่สำเร็จ ลองใหม่อีกครั้ง', 'err');
+            });
         }
 
         function togglePhone(show) {
