@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Safe</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--g1:#2c2d31;--g2:#222326;--g3:#17181a;--gl:#3d3e44;--red:#e0243a;--red2:#8e1423;--tx:#ececee;--mu:#9a9ca3}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:transparent;font-family:Kanit,"Noto Sans Thai",Tahoma,sans-serif;color:var(--tx);overflow:hidden;user-select:none}
+#app{display:none;position:fixed;inset:0;align-items:center;justify-content:center}
+#app.on{display:flex}
+.wrap{position:relative;width:660px;transform:scale(var(--k,1))}
+#app.on .wrap{animation:inIn .24s cubic-bezier(.2,.9,.3,1.1) both}
+#app.out .wrap{animation:inOut .18s ease-in both}
+@keyframes inIn{from{opacity:0;transform:translateY(20px) scale(calc(var(--k,1)*.95))}to{opacity:1;transform:scale(var(--k,1))}}
+@keyframes inOut{to{opacity:0;transform:translateY(12px) scale(calc(var(--k,1)*.97))}}
+@media(prefers-reduced-motion:reduce){#app .wrap{animation:none!important}}
+.win{background:var(--g1);border:1px solid var(--gl);border-radius:12px;overflow:hidden;box-shadow:0 14px 50px #000a}
+.top{display:flex;align-items:center;gap:8px;padding:9px 14px;background:linear-gradient(90deg,var(--red),var(--red2));font-weight:600;font-size:14px;letter-spacing:.5px}
+.top svg{width:16px;height:16px}
+.tier{margin-left:6px;padding:1px 10px;border-radius:9px;background:#0004;font-size:11px;font-weight:500}
+.top .x{margin-left:auto;width:24px;height:24px;border-radius:6px;display:grid;place-items:center;cursor:pointer;background:#0004;font-size:13px}
+.top .x:hover{background:#000a}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px}
+.pane{background:var(--g2);border-radius:10px;padding:8px}
+.pane h3{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:500;margin:0 2px 6px}
+.pane h3 em{font-style:normal;font-size:11px;color:var(--mu)}
+.bar{height:5px;background:var(--g3);border-radius:3px;overflow:hidden;margin:0 2px 8px}
+.bar div{height:100%;width:0;background:var(--red);transition:width .3s}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;height:310px;overflow-y:auto;align-content:start;padding-right:3px}
+.grid::-webkit-scrollbar{width:4px}.grid::-webkit-scrollbar-thumb{background:var(--red);border-radius:3px}
+.s{position:relative;height:58px;background:var(--g3);border:1px solid transparent;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer}
+.s:hover{border-color:var(--red2)}.s.sel{border-color:var(--red);box-shadow:0 0 12px #e0243a55}
+.s img{width:28px;height:28px;object-fit:contain;pointer-events:none;margin-top:6px}
+.s .q{position:absolute;top:3px;width:100%;text-align:center;font-size:9px;color:var(--mu)}
+.s .n{font-size:9px;margin-top:1px;max-width:94%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s.e{cursor:default}.s.e:hover{border-color:transparent}
+.pop{position:absolute;z-index:5;display:none;gap:4px;padding:4px;background:var(--g2);border:1px solid var(--red);border-radius:9px;box-shadow:0 6px 20px #000a}
+.pop.on{display:flex}
+.pop button{background:var(--red);color:#fff;border:0;border-radius:6px;padding:6px 10px;font:500 12px Kanit,sans-serif;cursor:pointer;white-space:nowrap}
+.pop button:hover{background:#ff3a50}
+.foot{padding:0 14px 10px;font-size:11px;color:var(--mu);display:flex;justify-content:space-between}
+</style></head><body>
+<div id="app"><div class="wrap" id="wrap">
+ <div class="win">
+  <div class="top"><svg viewBox="0 0 20 20"><rect x="1" y="1" width="8" height="8" rx="2" fill="#fff"/><rect x="11" y="1" width="8" height="8" rx="2" fill="#c9cbd1"/><rect x="1" y="11" width="8" height="8" rx="2" fill="#8a8d96"/><rect x="11" y="11" width="8" height="8" rx="2" fill="#2c2d31"/></svg>ตู้เซฟ<span class="tier" id="tier">เทียร์ 1</span><div class="x" id="close">&#10005;</div></div>
+  <div class="cols">
+   <section class="pane"><h3>กระเป๋า<em id="iu">0 ชิ้น</em></h3><div class="bar" style="visibility:hidden"><div></div></div><div class="grid" id="gI"></div></section>
+   <section class="pane"><h3>ตู้เซฟ<em id="su">0/100</em></h3><div class="bar"><div id="sb"></div></div><div class="grid" id="gS"></div></section>
+  </div>
+  <div class="foot"><span>คลิกไอเทมเพื่อย้าย · ดับเบิลคลิก = ย้ายทั้งหมด</span><span>[N] ปิด</span></div>
+ </div>
+ <div class="pop" id="pop"><button data-n="1">ย้าย 1</button><button data-n="10" id="b10">ย้าย 10</button><button data-n="-1">ทั้งหมด</button></div>
+</div></div>
+<script>
+// [ชื่อ, ไฟล์รูป, หมวด] เรียงตาม index ของ itemData ใน main.pwn (เหมือน inventory.html)
+const IT=[["ไม่พบข้อมูล","item_0","u"],["ปูน","item_1","u"],["สายไฟ","item_2","u"],["องุ่น","item_3","f"],["แตงโม","item_4","f"],["ข้าว","item_5","f"],["เห็ด","item_6","f"],["แร่เหลือง","item_7","u"],["แร่เขียว","item_8","u"],["แร่ฟ้า","item_9","u"],["แร่แดง","item_10","u"],["แร่","item_11","u"],["สนับ","item_12","w"],["ไม้สนุ๊ก","item_13","w"],["ไม้เบสบอล","item_14","w"],["ไม้กอล์ฟ","item_15","w"],["คาตานะ","item_16","w"],["มีด","Ko","w"],["ไม้เบสบอลเทียร์2","item_14","w"],["ไม้เบสบอลเทียร์3","item_14","w"],["ไม้เบสบอลเทียร์4","item_14","w"],["ไม้เบสบอลเทียร์5","item_14","w"],["คาตานะเทียร์2","item_16","w"],["คาตานะเทียร์3","item_16","w"],["มีดเทียร์2","Ko","w"],["มีดเทียร์3","Ko","w"],["มีดเทียร์4","Ko","w"],["มือถือ","item_17","u"],["พิซซ่า","item_18","f"],["น้ำเปล่า","item_19","f"],["วิทยุ","reo","u"],["เกราะ","ga","u"],["aed","aed","u"],["แหวนแก๊ง","va","s"],["ยาปั้ม","ya","u"],["ปืนยิงสตั้น","te","w"],["Boombox","boom","u"],["ฉลาม","sar","u"],["อาหารฉลาม","ag","f"],["ฉลามโต","sar","u"],["โทเคนฮาโลวีน","hallo","u"],["แฟชั่นฟักทอง","funk","s"],["กุญแจตู้เซฟ","safekey","u"],["กุญแจตู้เซฟเทียร์2","safekey","u"],["กุญแจตู้เซฟเทียร์3","safekey","u"]];
+const IMG="items/",PREVIEW=false;
+const PH="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect x="6" y="6" width="36" height="36" rx="9" fill="#2c2d31" stroke="#e0243a" stroke-width="2"/><path d="M24 13l9 11-9 11-9-11z" fill="#e0243a"/></svg>');
+const $=id=>document.getElementById(id);
+let bag=[],safe=[],tier=1,cap=100,sel=null,K=1,ct,keyI="",keyS="";
+const img=i=>`<img src="${IMG}${IT[i][1]}.png" onerror="this.onerror=null;this.src=PH">`;
+const send=(e,v)=>{try{cef.emit(e,v)}catch(_){console.log(e,v);if(PREVIEW)mock(e,v)}};
+const parse=s=>(s||"").split(";").filter(Boolean).map(r=>{const p=r.split(":");return{i:Math.min(+p[0],IT.length-1),q:+p[1]}});
+const sum=a=>a.reduce((n,o)=>n+o.q,0);
+function fit(){const w=$("wrap");K=Math.min(1,(innerWidth-12)/w.offsetWidth,(innerHeight-12)/w.offsetHeight);w.style.setProperty("--k",K)}
+function fill(g,list,side,key){
+ const k=list.map(o=>o.i+":"+o.q).join(";");
+ if(k!==key){
+  let h=list.map(o=>`<div class="s" data-side="${side}" data-i="${o.i}">${img(o.i)}<span class="q">${o.q}</span><span class="n">${IT[o.i][0]}</span></div>`).join("");
+  for(let n=list.length;n<20;n++)h+='<div class="s e"></div>';
+  const st=g.scrollTop;g.innerHTML=h;g.scrollTop=st;
+ }
+ return k;
+}
+function draw(){
+ keyI=fill($("gI"),bag,"I",keyI);keyS=fill($("gS"),safe,"S",keyS);
+ document.querySelectorAll(".s[data-i]").forEach(el=>el.classList.toggle("sel",!!sel&&el.dataset.side==sel.side&&+el.dataset.i==sel.i));
+ const used=sum(safe);
+ $("iu").textContent=sum(bag)+" ชิ้น";$("su").textContent=used+"/"+cap;
+ $("sb").style.width=Math.min(100,cap?used/cap*100:0)+"%";
+ $("tier").textContent="เทียร์ "+tier;
+ place();
+}
+function place(){
+ const p=$("pop"),el=sel&&document.querySelector(`.s[data-side="${sel.side}"][data-i="${sel.i}"]`);
+ if(!el){p.classList.remove("on");return}
+ const g=el.parentElement.getBoundingClientRect(),r=el.getBoundingClientRect(),w=$("wrap").getBoundingClientRect();
+ if(r.top<g.top-2||r.bottom>g.bottom+2){p.classList.remove("on");return}
+ const o=(sel.side=="I"?bag:safe).find(x=>x.i==sel.i);
+ $("b10").style.display=o&&o.q>10?"":"none";
+ p.classList.add("on");
+ const pw=p.offsetWidth*K,ph=p.offsetHeight*K;
+ let left=sel.side=="I"?r.right+6*K:r.left-pw-6*K;
+ if(sel.side=="I"&&r.right+6*K+pw>w.right-4*K)left=r.left-pw-6*K;
+ p.style.left=((left-w.left)/K)+"px";p.style.top=((r.top-w.top+(r.height-ph)/2)/K)+"px";
+}
+const move=n=>{if(sel)send("safe:move",(sel.side=="I"?"d":"w")+"|"+sel.i+"|"+n)};
+document.addEventListener("click",e=>{
+ const s=e.target.closest(".s[data-i]"),b=e.target.closest("#pop button");
+ if(b){move(b.dataset.n);return}
+ sel=s?{side:s.dataset.side,i:+s.dataset.i}:(e.target.closest("#pop")?sel:null);
+ draw();
+});
+document.addEventListener("dblclick",e=>{const s=e.target.closest(".s[data-i]");if(s){sel={side:s.dataset.side,i:+s.dataset.i};move(-1)}});
+["gI","gS"].forEach(id=>$(id).addEventListener("scroll",place));
+$("close").onclick=()=>send("safe:close","");
+addEventListener("keydown",e=>{if(e.key=="Escape")send("safe:close","")});
+function load(a){
+ const[x,y,t,c]=a;bag=parse(x);safe=parse(y);tier=+t||1;cap=+c||100;
+ if(sel&&!(sel.side=="I"?bag:safe).some(o=>o.i==sel.i))sel=null;
+ draw();
+}
+const openUI=()=>{clearTimeout(ct);$("app").classList.remove("out");$("app").classList.add("on");fit();draw()};
+const closeUI=()=>{if(!$("app").classList.contains("on"))return;sel=null;place();$("app").classList.add("out");ct=setTimeout(()=>$("app").classList.remove("on","out"),180)};
+const norm=(...a)=>{let x=a[0];if(a.length==1){if(typeof x=="string"&&x[0]=="[")try{x=JSON.parse(x)}catch(_){}if(Array.isArray(x))return x}return a};
+let bound=false;
+function bind(){
+ if(bound)return true;
+ if(!window.cef||!cef.on)return false;
+ cef.on("safe:open",(...a)=>{load(norm(...a));openUI()});
+ cef.on("safe:update",(...a)=>load(norm(...a)));
+ cef.on("safe:close",closeUI);
+ return bound=true;
+}
+if(!bind()){const iv=setInterval(()=>{if(bind())clearInterval(iv)},100);addEventListener("load",bind)}
+addEventListener("resize",fit);
+// ---- โหมดตัวอย่างนอกเกม: จำลองเซิร์ฟเวอร์ให้ลองย้ายของได้ ----
+function mock(e,v){
+ if(e=="safe:close"){closeUI();setTimeout(openUI,900);return}
+ const[d,i,n]=v.split("|"),from=d=="d"?bag:safe,to=d=="d"?safe:bag,idx=+i;
+ const f=from.find(o=>o.i==idx);if(!f)return;
+ let q=+n<=0||+n>f.q?f.q:+n;
+ if(d=="d"){const sp=cap-sum(safe);if(sp<=0)return;q=Math.min(q,sp)}
+ f.q-=q;if(f.q<=0)from.splice(from.indexOf(f),1);
+ const t=to.find(o=>o.i==idx);if(t)t.q+=q;else to.push({i:idx,q});
+ if(sel&&!(sel.side=="I"?bag:safe).some(o=>o.i==sel.i))sel=null;
+ draw();
+}
+if(PREVIEW||location.hash=="#preview"){
+ bag=parse("3:12;28:5;16:1;10:40;29:8;4:20;5:15;1:100;2:60;7:5;8:5;9:5;11:30;12:1");
+ safe=parse("6:9;30:1;31:2;14:1");
+ openUI();
+}
+</script></body></html>
