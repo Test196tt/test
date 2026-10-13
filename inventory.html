@@ -24,7 +24,7 @@ html,body{height:100%;background:transparent;font-family:Kanit,"Noto Sans Thai",
 .h em{position:absolute;top:-4px;left:-4px;min-width:18px;height:18px;padding:0 5px 0 4px;border-radius:9px 4px 9px 4px;background:var(--red);font:600 10px/18px Kanit,sans-serif;font-style:normal;text-align:center}
 .win{background:var(--g1);border:1px solid var(--gl);border-radius:12px;overflow:hidden;box-shadow:0 14px 50px #000a}
 .top{display:flex;align-items:center;gap:8px;padding:9px 14px;background:linear-gradient(90deg,var(--red),var(--red2));font-weight:600;font-size:14px;letter-spacing:.5px}
-.top svg{width:20px;height:20px}.top .x{margin-left:auto;width:24px;height:24px;border-radius:6px;display:grid;place-items:center;cursor:pointer;background:#0004;font-size:13px}
+.top svg{width:16px;height:16px}.top .x{margin-left:auto;width:24px;height:24px;border-radius:6px;display:grid;place-items:center;cursor:pointer;background:#0004;font-size:13px}
 .top .x:hover{background:#000a}
 .body{padding:8px}
 .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;height:310px;overflow-y:hidden}
@@ -48,7 +48,7 @@ html,body{height:100%;background:transparent;font-family:Kanit,"Noto Sans Thai",
 <div id="app"><div class="wrap">
  <div class="side" id="side"></div>
  <div class="win">
-  <div class="top"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3 7 7 .6-5.3 4.7L18.3 22 12 18.2 5.7 22l1.6-7.7L2 9.6 9 9z"/></svg>INVENTORY<div class="x" id="close">&#10005;</div></div>
+  <div class="top"><svg viewBox="0 0 20 20"><rect x="1" y="1" width="8" height="8" rx="2" fill="#fff"/><rect x="11" y="1" width="8" height="8" rx="2" fill="#c9cbd1"/><rect x="1" y="11" width="8" height="8" rx="2" fill="#8a8d96"/><rect x="11" y="11" width="8" height="8" rx="2" fill="#2c2d31"/></svg>INVENTORY<div class="x" id="close">&#10005;</div></div>
   <div class="body">
    <div class="grid" id="grid"></div>
    <div class="wt"><span id="cnt">ช่องเก็บของ 0/30</span><div style="display:flex;align-items:center;gap:8px"><div class="bar"><div id="fill"></div></div></div></div>
