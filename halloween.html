@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Halloween Overlay</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+    pointer-events: none;   /* ไม่บังการกด/ลากของผู้เล่น */
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* ---------- ขอบจอสีส้ม ---------- */
+  #vignette {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at center,
+        rgba(255, 120, 0, 0) 55%,
+        rgba(255, 110, 0, 0.28) 78%,
+        rgba(255, 90, 0, 0.62) 100%);
+    animation: glow 3.2s ease-in-out infinite;
+    will-change: opacity;
+  }
+  @keyframes glow {
+    0%, 100% { opacity: 0.75; }
+    50%      { opacity: 1; }
+  }
+
+  /* ---------- ค้างคาว ---------- */
+  #sky {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+  }
+  .bat {
+    position: absolute;
+    left: 0;
+    top: 0;
+    will-change: transform;
+  }
+  .bat svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    fill: #0d0907;
+    filter: drop-shadow(0 0 3px rgba(255, 130, 0, 0.75));
+    transform-origin: 50% 60%;
+    animation: flap 0.28s ease-in-out infinite alternate;
+  }
+  @keyframes flap {
+    from { transform: scaleY(1); }
+    to   { transform: scaleY(0.45); }
+  }
+</style>
+</head>
+<body>
+<div id="vignette"></div>
+<div id="sky"></div>
+
+<script>
+(function () {
+  var BAT_COUNT = 7;          // จำนวนค้างคาวที่บินพร้อมกัน (ลดถ้าเครื่องหนัก)
+  var sky = document.getElementById('sky');
+
+  var BAT_SVG =
+    '<svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">' +
+    '<path d="M50 22 C40 8 22 6 4 16 C12 18 16 24 18 32 C24 26 30 26 34 32 ' +
+    'C38 28 44 28 50 34 C56 28 62 28 66 32 C70 26 76 26 82 32 C84 24 88 18 96 16 ' +
+    'C78 6 60 8 50 22 Z"/>' +
+    '<path d="M44 22 L46 11 L50 19 L54 11 L56 22 Z"/>' +
+    '<ellipse cx="50" cy="28" rx="5" ry="8"/>' +
+    '</svg>';
+
+  function rand(a, b) { return a + Math.random() * (b - a); }
+
+  function launch(el) {
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    var size = rand(26, 64);                    // ขนาดค้างคาว (px)
+    var fromLeft = Math.random() < 0.5;
+    var y = rand(h * 0.04, h * 0.7);
+    var amp = rand(10, 45);                     // แกว่งขึ้นลง
+    var dur = rand(6500, 13000);                // เวลาบินข้ามจอ (ms)
+    var phase = rand(0, Math.PI * 2);
+    var x0 = fromLeft ? -size * 1.5 : w + size * 1.5;
+    var x1 = fromLeft ? w + size * 1.5 : -size * 1.5;
+    var flip = fromLeft ? 1 : -1;
+
+    el.style.width = size + 'px';
+    el.style.opacity = rand(0.75, 1).toFixed(2);
+
+    var start = null;
+    function frame(ts) {
+      if (start === null) start = ts;
+      var t = (ts - start) / dur;
+      if (t >= 1) { setTimeout(function () { launch(el); }, rand(0, 1800)); return; }
+      var x = x0 + (x1 - x0) * t;
+      var yy = y + Math.sin(t * 9 + phase) * amp;
+      el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + yy.toFixed(1) + 'px) scaleX(' + flip + ')';
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  for (var i = 0; i < BAT_COUNT; i++) {
+    var el = document.createElement('div');
+    el.className = 'bat';
+    el.innerHTML = BAT_SVG;
+    el.style.transform = 'translate(-300px,-300px)';
+    sky.appendChild(el);
+    (function (e, delay) { setTimeout(function () { launch(e); }, delay); })(el, i * 900 + rand(0, 600));
+  }
+})();
+</script>
+</body>
+</html>
