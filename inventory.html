@@ -33,7 +33,7 @@ html,body{height:100%;background:transparent;font-family:Kanit,"Noto Sans Thai",
 .s img{width:30px;height:30px;object-fit:contain;pointer-events:none;margin-top:5px}
 .s .q{position:absolute;top:3px;width:100%;text-align:center;font-size:9px;color:var(--mu)}
 .s .n{font-size:9px;margin-top:1px;max-width:94%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.s.e{cursor:default}.s.e:hover{border-color:transparent}
+.s.m{border-color:#e0243a55;background:linear-gradient(180deg,#2a1a1d,var(--g3))}.s.e{cursor:default}.s.e:hover{border-color:transparent}
 .btn{background:var(--red);color:#fff;border:0;border-radius:6px;padding:6px 16px;font:500 12px Kanit,sans-serif;cursor:pointer;white-space:nowrap}
 .btn:hover{background:#ff3a50}
 .pop{position:absolute;z-index:5;display:none;padding:4px;background:var(--g2);border:1px solid var(--red);border-radius:9px;box-shadow:0 6px 20px #000a}
@@ -58,10 +58,12 @@ html,body{height:100%;background:transparent;font-family:Kanit,"Noto Sans Thai",
   <div class="pop" id="pop"><button class="btn" id="use">ใช้ไอเทม</button></div>
 </div></div>
 <script>
-const IT=[["ไม่พบข้อมูล","item_0","u"],["ปูน","item_1","u"],["สายไฟ","item_2","u"],["องุ่น","item_3","f"],["แตงโม","item_4","f"],["ข้าว","item_5","f"],["เห็ด","item_6","f"],["แร่เหลือง","item_7","u"],["แร่เขียว","item_8","u"],["แร่ฟ้า","item_9","u"],["แร่แดง","item_10","u"],["แร่","item_11","u"],["สนับ","item_12","w"],["ไม้สนุ๊ก","item_13","w"],["ไม้เบสบอล","item_14","w"],["ไม้กอล์ฟ","item_15","w"],["คาตานะ","item_16","w"],["มีด","Ko","w"],["ไม้เบสบอลเทียร์2","item_14","w"],["ไม้เบสบอลเทียร์3","item_14","w"],["ไม้เบสบอลเทียร์4","item_14","w"],["ไม้เบสบอลเทียร์5","item_14","w"],["คาตานะเทียร์2","item_16","w"],["คาตานะเทียร์3","item_16","w"],["มีดเทียร์2","Ko","w"],["มีดเทียร์3","Ko","w"],["มีดเทียร์4","Ko","w"],["มือถือ","item_17","u"],["พิซซ่า","item_18","f"],["น้ำเปล่า","item_19","f"],["วิทยุ","reo","u"],["เกราะ","ga","u"],["aed","aed","u"],["แหวนแก๊ง","va","s"],["ยาปั้ม","ya","u"],["ปืนยิงสตั้น","te","w"],["Boombox","boom","u"],["ฉลาม","sar","u"],["อาหารฉลาม","ag","f"],["ฉลามโต","sar","u"],["โทเคนฮาโลวีน","hallo","u"],["แฟชั่นฟักทอง","funk","s"],["กุญแจตู้เซฟ","safekey","u"],["กุญแจตู้เซฟเทียร์2","safekey","u"],["กุญแจตู้เซฟเทียร์3","safekey","u"]];
+const IT=[["ไม่พบข้อมูล","item_0","u"],["ปูน","item_1","u"],["สายไฟ","item_2","u"],["องุ่น","item_3","f"],["แตงโม","item_4","f"],["ข้าว","item_5","f"],["เห็ด","item_6","f"],["แร่เหลือง","item_7","u"],["แร่เขียว","item_8","u"],["แร่ฟ้า","item_9","u"],["แร่แดง","item_10","u"],["แร่","item_11","u"],["สนับ","item_12","w"],["ไม้สนุ๊ก","item_13","w"],["ไม้เบสบอล","item_14","w"],["ไม้กอล์ฟ","item_15","w"],["คาตานะ","item_16","w"],["มีด","Ko","w"],["ไม้เบสบอลเทียร์2","item_14","w"],["ไม้เบสบอลเทียร์3","item_14","w"],["ไม้เบสบอลเทียร์4","item_14","w"],["ไม้เบสบอลเทียร์5","item_14","w"],["คาตานะเทียร์2","item_16","w"],["คาตานะเทียร์3","item_16","w"],["มีดเทียร์2","Ko","w"],["มีดเทียร์3","Ko","w"],["มีดเทียร์4","Ko","w"],["มือถือ","item_17","u"],["พิซซ่า","item_18","f"],["น้ำเปล่า","item_19","f"],["วิทยุ","reo","u"],["เกราะ","ga","u"],["aed","aed","u"],["แหวนแก๊ง","va","s"],["ยาปั้ม","ya","u"],["ปืนยิงสตั้น","te","w"],["Boombox","boom","u"],["ฉลาม","sar","u"],["อาหารฉลาม","ag","f"],["ฉลามโต","sar","u"],["โทเคนฮาโลวีน","hallo","u"],["แฟชั่นฟักทอง","funk","s"],["กุญแจตู้เซฟ","safekey","u"],["กุญแจตู้เซฟเทียร์2","safekey","u"],["กุญแจตู้เซฟเทียร์3","safekey","u"],["เงิน","money","m"],["เงินแดง","redmoney","m"]];
 const MAXSLOT=30,IMG="items/",ROWS=5,PREVIEW=false;
 const PH="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect x="6" y="6" width="36" height="36" rx="9" fill="#2c2d31" stroke="#e0243a" stroke-width="2"/><path d="M24 13l9 11-9 11-9-11z" fill="#e0243a"/></svg>');
 let items=[],hot=[],sel=-1;
+const fmt=n=>n>=1e9?(n/1e9).toFixed(2).replace(/\.?0+$/,"")+"B":n>=1e6?(n/1e6).toFixed(2).replace(/\.?0+$/,"")+"M":n.toLocaleString("en-US");
+const isM=o=>IT[o.i][2]=="m";
 const $=id=>document.getElementById(id);
 const img=i=>`<img src="${IMG}${IT[i][1]}.png" onerror="this.onerror=null;this.src=PH">`;
 let ct;
@@ -90,11 +92,12 @@ function draw(){
  const g=$("grid"),key=items.map(o=>o.s+":"+o.i+":"+o.q).join(";");
  if(key!==gridKey){ // สร้างตารางใหม่เฉพาะตอนข้อมูลเปลี่ยน ไม่งั้นการเลื่อนจะถูกรีเซ็ต
   gridKey=key;
-  let h=items.map(o=>`<div class="s ${o.s==sel?"sel":""}" data-s="${o.s}">${img(o.i)}<span class="q">${o.q}</span><span class="n">${IT[o.i][0]}</span></div>`).join("");
-  for(let k=items.length;k<MAXSLOT;k++)h+='<div class="s e"></div>';
+  let h=items.map(o=>`<div class="s ${o.s==sel?"sel":""}${isM(o)?" m":""}" data-s="${o.s}" title="${o.q}">${img(o.i)}<span class="q">${fmt(o.q)}</span><span class="n">${IT[o.i][0]}</span></div>`).join("");
+  for(let k=items.length;k<MAXSLOT+items.filter(isM).length;k++)h+='<div class="s e"></div>';
   const st=g.scrollTop;g.innerHTML=h;g.scrollTop=st;
  }else g.querySelectorAll(".s[data-s]").forEach(el=>el.classList.toggle("sel",+el.dataset.s==sel));
- $("cnt").textContent="ช่องเก็บของ "+items.length+"/"+MAXSLOT;$("fill").style.width=Math.min(100,items.length/MAXSLOT*100)+"%";
+ const used=items.filter(o=>!isM(o)).length; // เงิน/เงินแดงไม่นับเป็นช่อง
+ $("cnt").textContent="ช่องเก็บของ "+used+"/"+MAXSLOT;$("fill").style.width=Math.min(100,used/MAXSLOT*100)+"%";
  $("side").innerHTML=[1,2,3,4,5,6,7].map(hslot).join("");
  arrows();place();
 }
@@ -159,6 +162,6 @@ function bind(){
 if(!bind()){const iv=setInterval(()=>{if(bind())clearInterval(iv)},100);addEventListener("load",bind)}
 addEventListener("resize",fit);
 if(PREVIEW||location.hash=="#preview"){ // โหมดตัวอย่างเฉพาะตอนเปิดดูนอกเกม
- load("0:3:12;1:28:5;2:16:1;3:41:1;4:10:40;5:29:8;6:35:1;7:33:1;8:4:20;9:5:15;10:6:9;11:30:1;12:31:2;13:27:1;14:1:100;15:2:60;16:7:5;17:8:5;18:9:5;19:11:30;20:12:1;21:13:1;22:14:1;23:15:1;24:32:1;25:34:3","3,16,-1,41,-1,29,-1");openUI();
+ load("1498:45:1250000;1499:46:80000;0:3:12;1:28:5;2:16:1;3:41:1;4:10:40;5:29:8;6:35:1;7:33:1;8:4:20;9:5:15;10:6:9;11:30:1;12:31:2;13:27:1;14:1:100;15:2:60;16:7:5;17:8:5;18:9:5;19:11:30;20:12:1;21:13:1;22:14:1;23:15:1;24:32:1;25:34:3","3,16,-1,41,-1,29,-1");openUI();
 }
 </script></body></html>
