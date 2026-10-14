@@ -6,9 +6,9 @@
 :root{--red:#e0243a;--red2:#8e1423;--bg:#17181a;--bg2:#222326;--bd:#3d3e44;--tx:#ececee;--mu:#6f7178}
 *{box-sizing:border-box;margin:0}
 html,body{height:100%;background:transparent;font-family:Kanit,Tahoma,sans-serif;color:var(--tx);overflow:hidden;user-select:none}
-#app{display:none;position:fixed;inset:0;align-items:center;justify-content:center}
+#app{display:none;position:fixed;inset:0;align-items:center;justify-content:flex-end;padding-right:7vw}
 #app.on{display:flex}
-.wrap{position:relative;width:300px;height:190px;transform:scale(var(--k,1))}
+.wrap{position:relative;width:300px;height:190px;transform-origin:right center;transform:scale(var(--k,1))}
 #app.on .wrap{animation:rIn .22s cubic-bezier(.2,.9,.3,1.1) both}
 #app.out .wrap{animation:rOut .16s ease-in both}
 @keyframes rIn{from{opacity:0;transform:translateY(16px) scale(calc(var(--k,1)*.94))}to{opacity:1;transform:scale(var(--k,1))}}
@@ -43,7 +43,7 @@ const $=id=>document.getElementById(id);
 const LOCKED='<rect x="6" y="14" width="20" height="14" rx="3"/><path d="M10 14V10a6 6 0 0 1 12 0v4"/><circle cx="16" cy="21" r="1.600" fill="currentColor"/>';
 const OPEN='<rect x="6" y="14" width="20" height="14" rx="3"/><path d="M10 14V10a6 6 0 0 1 11.500-2.400"/><circle cx="16" cy="21" r="1.600" fill="currentColor"/>';
 let K=1,ct,guard,st={e:0,l:0};
-function fit(){const w=document.querySelector(".wrap");K=Math.max(.6,Math.min(1.4,innerHeight/620,innerWidth/380));w.style.setProperty("--k",K)}
+function fit(){const w=document.querySelector(".wrap");K=Math.max(.5,Math.min(.8,innerHeight/900,innerWidth/560));w.style.setProperty("--k",K)}
 const send=(e,v)=>{try{cef.emit(e,v)}catch(_){console.log(e,v);if(location.hash=="#preview")fake(e)}};
 function paint(e,l){
  st={e:+e?1:0,l:+l?1:0};
