@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>ตลาดรับซื้อ</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#e03340;
+    --red-hi:#ff5560;
+    --red-dk:#a8212c;
+    --bg:#2b3448;
+    --panel:#242c3d;
+    --tile:#3b455b;
+    --tile-hi:#465169;
+    --text:#f2f4f8;
+    --muted:#9aa4b8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
+  html,body{width:100%;height:100%;overflow:hidden;background:transparent;
+    font-family:'Kanit','Sarabun','Tahoma',system-ui,sans-serif;color:var(--text)}
+
+  #root{position:fixed;inset:0;display:none;align-items:center;justify-content:center}
+  #root.show{display:flex}
+
+  /* เวทีขนาดคงที่ แล้วย่อ/ขยายให้พอดีจอด้วย JS */
+  #stage{width:1000px;height:620px;flex:none;transform-origin:center center;
+    display:flex;gap:14px;padding:14px;background:var(--bg);border:2px solid #151a26;
+    border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+
+  .panel{background:var(--panel);display:flex;flex-direction:column;min-width:0}
+  .left{flex:1 1 auto}
+  .right{width:290px;flex:none}
+
+  .bar{height:46px;flex:none;background:var(--red);color:#fff;display:flex;align-items:center;
+    justify-content:center;font-size:19px;font-weight:500;letter-spacing:.3px;position:relative;
+    border-bottom:2px solid var(--red-dk)}
+  .bar .x{position:absolute;right:8px;top:7px;width:32px;height:32px;border:0;border-radius:4px;
+    background:rgba(0,0,0,.22);color:#fff;font-size:17px;cursor:pointer;font-family:inherit}
+  .bar .x:active{background:rgba(0,0,0,.4)}
+  .bar .star{margin-right:8px;font-size:17px}
+
+  /* ---------- ตารางสินค้า ---------- */
+  .grid{flex:1;padding:14px;display:grid;grid-template-columns:repeat(6,1fr);
+    grid-auto-rows:max-content;gap:10px;align-content:start;overflow-y:auto}
+  .tile{position:relative;background:var(--tile);border:2px solid transparent;border-radius:4px;
+    aspect-ratio:63/77;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:6px;cursor:pointer;transition:background .12s,border-color .12s,transform .08s}
+  .tile:active{transform:scale(.96)}
+  .tile .ico{width:62%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+    font-size:44px;line-height:1;filter:grayscale(1) brightness(1.2);transition:filter .12s}
+  .tile .ico img,.tile .ico svg{width:100%;height:100%;object-fit:contain}
+  .tile .nm{font-size:13px;color:#e8ecf4;white-space:nowrap}
+  .tile .cnt{position:absolute;top:4px;right:5px;min-width:22px;padding:0 5px;height:18px;border-radius:9px;
+    background:rgba(0,0,0,.45);font-size:11px;line-height:18px;text-align:center;color:#fff}
+  .tile.has .cnt{background:var(--red)}
+  .tile.empty{opacity:.4}
+  .tile:hover{background:var(--tile-hi)}
+  .tile.sel{border-color:var(--red-hi);background:var(--tile-hi);box-shadow:0 0 0 2px rgba(224,51,64,.35) inset}
+  .tile.sel .ico,.tile:hover .ico{filter:none}
+
+  /* ---------- แถบขายด้านล่าง ---------- */
+  .sell{height:50px;flex:none;border:0;background:var(--red);color:#fff;font-family:inherit;
+    font-size:18px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:10px;
+    cursor:pointer;border-top:2px solid var(--red-dk)}
+  .sell:active{background:var(--red-dk)}
+  .sell.off{background:#5a2a31;color:#c9a4a8;cursor:default}
+  .sell .money{color:#fff;font-weight:600}
+
+  /* ---------- รายการราคา ---------- */
+  .list{flex:1;overflow-y:auto;padding:6px 10px 6px 8px}
+  .list::-webkit-scrollbar{width:5px}
+  .list::-webkit-scrollbar-thumb{background:var(--red);border-radius:3px}
+  .list::-webkit-scrollbar-track{background:transparent}
+  .row{display:flex;align-items:center;height:48px;padding:0 6px;gap:8px}
+  .row .ri{width:26px;height:26px;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px}
+  .row .ri img,.row .ri svg{width:100%;height:100%;object-fit:contain}
+  .row .rn{flex:1;text-align:center;font-size:16px;font-weight:500}
+  .row .rp{font-size:15px;font-weight:600;color:#fff;min-width:64px;text-align:right}
+  .row + .row{border-top:1px solid rgba(255,255,255,.04)}
+
+  /* ---------- toast ---------- */
+  #toast{position:fixed;left:50%;bottom:7%;transform:translate(-50%,20px);opacity:0;pointer-events:none;
+    background:#1a2030;border:2px solid var(--red);color:#fff;padding:10px 22px;border-radius:6px;
+    font-size:17px;transition:opacity .2s,transform .2s;z-index:10}
+  #toast.show{opacity:1;transform:translate(-50%,0)}
+  #toast b{color:var(--red-hi)}
+</style>
+</head>
+<body>
+
+<div id="root">
+  <div id="stage">
+    <section class="panel left">
+      <div class="bar">ตลาดรับซื้อ<button class="x" id="btnClose">✕</button></div>
+      <div class="grid" id="grid"></div>
+      <button class="sell off" id="btnSell"></button>
+    </section>
+    <aside class="panel right">
+      <div class="bar"><span class="star">★</span>ราคารับซื้อ</div>
+      <div class="list" id="list"></div>
+    </aside>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+/* =====================================================================
+   ตั้งค่า
+   ===================================================================== */
+
+// ลำดับต้องตรงกับ gMktItem[] ใน ms_market.inc เป๊ะ ๆ
+// e = อีโมจิ, gem = สีของแร่ (วาดเป็นก้อนหิน SVG), id = เลขไอเทมใน itemData (ใช้กับ ICON_URL)
+const ITEMS = [
+  { n:'องุ่น',      e:'🍇', id:3  },
+  { n:'แตงโม',     e:'🍉', id:4  },
+  { n:'ข้าว',       e:'🌾', id:5  },
+  { n:'เห็ด',       e:'🍄', id:6  },
+  { n:'แร่เหลือง',  gem:'#f2c230', id:7  },
+  { n:'แร่เขียว',   gem:'#3fcf6a', id:8  },
+  { n:'แร่ฟ้า',     gem:'#3fb2f0', id:9  },
+  { n:'แร่แดง',     gem:'#f0443f', id:10 },
+  { n:'ฉลามโต',    e:'🦈' }
+];
+
+// ถ้ามีรูปไอเทมของจริงบน GitHub Pages ให้ใส่ลิงก์ตรงนี้ แล้วรูปจะถูกใช้แทนอีโมจิ
+// เช่น "https://test196tt.github.io/test/items/item_{id}.png"   ({id} = เลขไอเทม)
+// ปล่อยว่างไว้ = ใช้อีโมจิ/ก้อนแร่ (ไอเทมที่ไม่มี id จะใช้อีโมจิเสมอ)
+const ICON_URL = "";
+
+/* ---- ชั้นเชื่อมกับไคลเอนต์ CEF ----
+   ถ้าหน้าอื่นของคุณ (index.html / twitter.html) เรียก emit/on ด้วยชื่ออื่น
+   ให้แก้แค่สองฟังก์ชันนี้ที่เดียว */
+function cefEmit(ev, arg){
+  try{
+    if (window.cef && typeof cef.emit === 'function') cef.emit(ev, arg === undefined ? '' : arg);
+  }catch(e){}
+}
+function cefOn(ev, fn){
+  try{
+    if (window.cef && typeof cef.on === 'function') cef.on(ev, fn);
+  }catch(e){}
+}
+
+/* =====================================================================
+   สถานะ
+   ===================================================================== */
+let prices = ITEMS.map(()=>0);
+let counts = ITEMS.map(()=>0);
+let sel = -1;
+
+const $ = id => document.getElementById(id);
+const fmt = n => '$' + Number(n||0).toLocaleString('en-US');
+
+function iconHTML(it){
+  if (ICON_URL && it.id){
+    const u = ICON_URL.replace('{id}', it.id);
+    return '<img src="'+u+'" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{innerHTML:window.__fb('+ITEMS.indexOf(it)+')}))">';
+  }
+  return fallbackIcon(it);
+}
+function fallbackIcon(it){
+  if (it.gem){
+    return '<svg viewBox="0 0 64 64"><polygon points="10,42 20,18 38,10 54,22 56,44 36,56" fill="'+it.gem+'"/>'
+         + '<polygon points="20,18 38,10 36,32" fill="#fff" opacity=".28"/>'
+         + '<polygon points="36,32 54,22 56,44 36,56" fill="#000" opacity=".22"/></svg>';
+  }
+  return it.e || '❔';
+}
+window.__fb = i => fallbackIcon(ITEMS[i]);
+
+/* =====================================================================
+   วาดหน้าจอ
+   ===================================================================== */
+function buildStatic(){
+  // รายการราคาด้านขวา (วาดครั้งเดียว แล้วอัปเดตเฉพาะตัวเลข)
+  $('list').innerHTML = ITEMS.map((it,i)=>
+    '<div class="row"><div class="ri">'+iconHTML(it)+'</div><div class="rn">'+it.n+
+    '</div><div class="rp" id="rp'+i+'">$0</div></div>').join('');
+
+  // ตารางสินค้าด้านซ้าย
+  $('grid').innerHTML = ITEMS.map((it,i)=>
+    '<div class="tile" data-i="'+i+'"><span class="cnt" id="cn'+i+'">0</span>'+
+    '<div class="ico">'+iconHTML(it)+'</div><div class="nm">'+it.n+'</div></div>').join('');
+
+  $('grid').addEventListener('click', e=>{
+    const t = e.target.closest('.tile');
+    if (!t) return;
+    sel = (sel === +t.dataset.i) ? -1 : +t.dataset.i;
+    render();
+  });
+}
+
+function render(){
+  ITEMS.forEach((it,i)=>{
+    $('rp'+i).textContent = fmt(prices[i]);
+    $('cn'+i).textContent = counts[i];
+  });
+  document.querySelectorAll('.tile').forEach(t=>{
+    const i = +t.dataset.i;
+    t.classList.toggle('sel',   i === sel);
+    t.classList.toggle('has',   counts[i] > 0);
+    t.classList.toggle('empty', counts[i] < 1);
+  });
+
+  const b = $('btnSell');
+  if (sel < 0){
+    b.className = 'sell off';
+    b.innerHTML = 'เลือกสินค้าที่ต้องการขาย';
+  } else if (counts[sel] < 1){
+    b.className = 'sell off';
+    b.innerHTML = 'คุณไม่มี ' + ITEMS[sel].n;
+  } else {
+    b.className = 'sell';
+    b.innerHTML = 'ขาย ' + ITEMS[sel].n + ' ×' + counts[sel] +
+                  ' &nbsp;=&nbsp; <span class="money">' + fmt(counts[sel]*prices[sel]) + '</span>';
+  }
+}
+
+function toast(html){
+  const t = $('toast');
+  t.innerHTML = html;
+  t.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ย่อ/ขยายเวทีให้พอดีจอ (มือถือจอเล็กก็เห็นครบ) */
+function fit(){
+  const s = Math.min((innerWidth-16)/1000, (innerHeight-16)/620, 1.6);
+  $('stage').style.transform = 'scale(' + s + ')';
+}
+addEventListener('resize', fit);
+
+/* =====================================================================
+   รับข้อมูลจากเซิร์ฟเวอร์
+   รูปแบบ payload: ["ราคา,ราคา,...|จำนวน,จำนวน,..."]
+   ===================================================================== */
+function firstArg(a){
+  let v = a && a.length ? a[0] : '';
+  if (Array.isArray(v)) v = v[0];
+  return String(v === undefined ? '' : v);
+}
+function parseData(a){
+  const parts = firstArg(a).split('|');
+  const p = (parts[0]||'').split(',').map(x=>parseInt(x,10)||0);
+  const c = (parts[1]||'').split(',').map(x=>parseInt(x,10)||0);
+  prices = ITEMS.map((_,i)=>p[i]||0);
+  counts = ITEMS.map((_,i)=>c[i]||0);
+}
+
+function openMarket(a){
+  parseData(a);
+  sel = -1;
+  fit();
+  $('root').classList.add('show');
+  render();
+}
+function closeLocal(){
+  $('root').classList.remove('show');
+  $('toast').classList.remove('show');
+}
+
+cefOn('market:open',   (...a)=>openMarket(a));
+cefOn('market:update', (...a)=>{ parseData(a); render(); });
+cefOn('market:close',  ()=>closeLocal());
+// payload: ["1|จำนวน|เงิน"] = ขายสำเร็จ   ["0|0|0"] = ไม่มีของขาย
+cefOn('market:toast',  (...a)=>{
+  const p = firstArg(a).split('|');
+  if (p[0] === '1') toast('ขายสำเร็จ ×' + (+p[1]) + ' &nbsp;ได้เงิน <b>' + fmt(+p[2]) + '</b>');
+  else              toast('คุณไม่มีสินค้านี้ให้ขาย');
+});
+
+/* =====================================================================
+   ปุ่มต่าง ๆ
+   ===================================================================== */
+$('btnSell').addEventListener('click', ()=>{
+  if (sel < 0 || counts[sel] < 1) return;
+  cefEmit('market:sell', String(sel));
+});
+$('btnClose').addEventListener('click', ()=>{
+  closeLocal();
+  cefEmit('market:close', '');
+});
+addEventListener('keydown', e=>{
+  if (e.key === 'Escape' && $('root').classList.contains('show')){
+    closeLocal();
+    cefEmit('market:close', '');
+  }
+});
+
+buildStatic();
+fit();
+
+/* เปิดดูตัวอย่างในเบราว์เซอร์ปกติ (ไม่มี cef) */
+if (!window.cef){
+  openMarket([ '182,156,116,178,156,288,210,197,295|12,0,5,30,8,0,3,0,2' ]);
+}
+</script>
+</body>
+</html>
