@@ -132,14 +132,27 @@ const ICON_URL = "";
 /* ---- ชั้นเชื่อมกับไคลเอนต์ CEF ----
    ถ้าหน้าอื่นของคุณ (index.html / twitter.html) เรียก emit/on ด้วยชื่ออื่น
    ให้แก้แค่สองฟังก์ชันนี้ที่เดียว */
+// รอให้ window.cef พร้อมก่อนค่อยผูก event (ถ้าผูกเร็วเกินไป handler จะหาย แล้วหน้าจะไม่รับราคา/จำนวนจากเซิร์ฟเวอร์)
+const _pendingOn = [];
+function _bindPending(){
+  if (!(window.cef && typeof cef.on === 'function')) return false;
+  while (_pendingOn.length){
+    const p = _pendingOn.shift();
+    try{ cef.on(p[0], p[1]); }catch(e){}
+  }
+  return true;
+}
+function cefOn(ev, fn){
+  _pendingOn.push([ev, fn]);
+  _bindPending();
+}
+if (!_bindPending()){
+  const _t = setInterval(()=>{ if (_bindPending()) clearInterval(_t); }, 100);
+  setTimeout(()=>clearInterval(_t), 30000);
+}
 function cefEmit(ev, arg){
   try{
     if (window.cef && typeof cef.emit === 'function') cef.emit(ev, arg === undefined ? '' : arg);
-  }catch(e){}
-}
-function cefOn(ev, fn){
-  try{
-    if (window.cef && typeof cef.on === 'function') cef.on(ev, fn);
   }catch(e){}
 }
 
@@ -293,8 +306,9 @@ addEventListener('keydown', e=>{
 buildStatic();
 fit();
 
-/* เปิดดูตัวอย่างในเบราว์เซอร์ปกติ (ไม่มี cef) */
-if (!window.cef){
+/* เปิดดูตัวอย่างในเบราว์เซอร์ปกติ: ต้องใส่ ?demo ท้ายลิงก์เท่านั้น
+   (เดิมจะเด้งข้อมูลตัวอย่างเองถ้า cef ยังไม่พร้อม ทำให้ราคา/จำนวนในเกมผิด) */
+if (/[?&]demo\b/.test(location.search)){
   openMarket([ '182,156,116,178,156,288,210,197,295|12,0,5,30,8,0,3,0,2' ]);
 }
 </script>
