@@ -153,6 +153,24 @@
   .card[data-mode="login"] .field[data-reg] { display: none; }
   .card[data-mode="login"] .mini[data-reg] { visibility: hidden; }   /* เก็บที่ไว้ให้ปุ่ม Confirm อยู่กึ่งกลาง */
 
+  /* ---- ช่องเลือกเพศ (ชาย / หญิง) ---- */
+  .field.gender { gap: .5em; padding: .45em .5em .45em 1.6em; cursor: default; }
+  .field.gender:active { background: var(--field); }
+  .gbtn {
+    flex: 1; height: 100%; border: 0; border-radius: .65em;
+    background: transparent; color: var(--dim);
+    font: 500 .95em/1 'Kanit', system-ui, sans-serif; cursor: pointer;
+    transition: background .12s ease, color .12s ease;
+  }
+  .gbtn:active { background: var(--field-hi); }
+  .gbtn.sel { background: linear-gradient(180deg, var(--red-hi), var(--red-deep)); color: #fff; }
+  .gbtn:focus-visible { outline: .14em solid var(--red-hi); outline-offset: .1em; }
+
+  /* โหมดสมัครมีช่อง 4 ช่อง ย่อระยะห่างให้พอดีการ์ด */
+  .card[data-mode="register"] .title  { margin-bottom: 1.1em; }
+  .card[data-mode="register"] .fields { gap: 1.05em; }
+  .card[data-mode="register"] .field  { height: 3em; }
+
   /* ---- โหมดพรีวิวในเบราว์เซอร์ (เปิดด้วย login.html#demo) ---- */
   body.demo { background: linear-gradient(160deg, #5b4638, #2b2a2f 60%, #1c2a22); }
 
@@ -204,6 +222,12 @@
           <span class="badge"><svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V9h14v11zM7 11h4v4H7z"/></svg></span>
           <span class="val" id="birthVal"></span>
         </button>
+
+        <div class="field gender" id="genderBox" data-reg role="group" aria-label="เลือกเพศ">
+          <span class="badge"><svg viewBox="0 0 24 24"><path d="M12 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm-1 9.9V16H9v2h2v2h2v-2h2v-2h-2v-2.100a6 6 0 1 0-2 0z"/></svg></span>
+          <button class="gbtn" id="genderM" type="button" data-g="1">ชาย</button>
+          <button class="gbtn" id="genderF" type="button" data-g="2">หญิง</button>
+        </div>
       </div>
 
       <div class="bottom">
@@ -232,11 +256,11 @@
   const ui = {
     title: $('#title'), name: $('#nameVal'), pass: $('#passVal'), birth: $('#birthVal'),
     status: $('#status'), confirm: $('#confirm'),
-    passBtn: $('#passBtn'), birthBtn: $('#birthBtn'), dialogBtn: $('#dialogBtn'), helpBtn: $('#helpBtn')
+    passBtn: $('#passBtn'), birthBtn: $('#birthBtn'), genderM: $('#genderM'), genderF: $('#genderF'), dialogBtn: $('#dialogBtn'), helpBtn: $('#helpBtn')
   };
 
   const DEMO = location.hash === '#demo';
-  const state = { mode: 'login', passLen: 0, birth: '', busy: false, busyTimer: 0 };
+  const state = { mode: 'login', passLen: 0, birth: '', gender: 0, busy: false, busyTimer: 0 };
 
   // ---- ส่ง event ไปเซิร์ฟเวอร์ (Pawn รับที่ IPacket:251 -> MsLogin_OnEvent) ----
   const emit = (name, ...args) => {
@@ -247,10 +271,11 @@
   };
 
   const TEXT = {
-    hint: 'รหัสผ่าน 5-32 ตัวอักษร / วันเกิดรูปแบบ วัน/เดือน/ปี ค.ศ. เช่น 1/1/1991',
+    hint: 'รหัสผ่าน 5-32 ตัวอักษร / วันเกิดรูปแบบ วัน/เดือน/ปี ค.ศ. เช่น 1/1/1991 / เลือกเพศตัวละคร',
     registered: 'สมัครสมาชิกสำเร็จ กดยืนยันเพื่อเข้าสู่ระบบ',
     needPass: 'กรุณาใส่รหัสผ่านก่อน',
     needBirth: 'กรุณาใส่วันเกิดก่อน',
+    needGender: 'กรุณาเลือกเพศก่อน',
     shortPass: 'รหัสผ่านต้องยาวอย่างน้อย 5 ตัวอักษร',
     errors: {
       1: (left) => 'รหัสผ่านไม่ถูกต้อง เหลืออีก ' + left + ' ครั้ง',
@@ -280,6 +305,9 @@
     if (state.birth) b.textContent = state.birth.split('/').join(' ');
     else { b.className = 'ph'; b.textContent = 'แตะเพื่อใส่วันเกิด'; }
     ui.birth.appendChild(b);
+
+    ui.genderM.classList.toggle('sel', state.gender === 1);
+    ui.genderF.classList.toggle('sel', state.gender === 2);
   };
 
   const setBusy = (on) => {
@@ -293,6 +321,9 @@
   // ---- ปุ่มต่างๆ ----
   ui.passBtn.addEventListener('click', () => emit('login:input', 'pass'));
   ui.birthBtn.addEventListener('click', () => emit('login:input', 'birth'));
+  const pickGender = (g) => { state.gender = g; setStatus(''); render(); emit('login:gender', String(g)); };
+  ui.genderM.addEventListener('click', () => pickGender(1));
+  ui.genderF.addEventListener('click', () => pickGender(2));
   ui.dialogBtn.addEventListener('click', () => emit('login:dialog'));
   ui.helpBtn.addEventListener('click', () => setStatus(TEXT.hint, 'hint'));
 
@@ -302,6 +333,7 @@
     if (state.mode === 'register') {
       if (state.passLen < 5) return fail(TEXT.shortPass);
       if (!state.birth) return fail(TEXT.needBirth);
+      if (!state.gender) return fail(TEXT.needGender);
     }
     setStatus('');
     setBusy(true);
@@ -315,13 +347,14 @@
 
   // ---- รับ event จากเซิร์ฟเวอร์ ----
   // login:show   [mode, name, justRegistered, passLen]
-  // login:field  [kind, value]      kind = pass (value = ความยาว) / birth (value = d/m/yyyy)
+  // login:field  [kind, value]      kind = pass (value = ความยาว) / birth (value = d/m/yyyy) / gender (1 ชาย, 2 หญิง)
   // login:error  [code, extra]
   // login:hide   []
   const onShow = (mode, name, justReg, passLen) => {
     state.mode = mode === 'register' ? 'register' : 'login';
     state.passLen = Number(passLen) || 0;
     state.birth = '';
+    state.gender = 0;
     ui.name.textContent = name || '-';
     setBusy(false);
     render();
@@ -332,6 +365,7 @@
   const onField = (kind, value) => {
     if (kind === 'pass') state.passLen = Number(value) || 0;
     if (kind === 'birth') state.birth = String(value || '');
+    if (kind === 'gender') state.gender = Number(value) || 0;
     setStatus('');
     render();
   };
@@ -376,6 +410,7 @@
       emit(name, arg) {
         if (name === 'login:input' && arg === 'pass') { const v = prompt('รหัสผ่าน (จำลอง)') || ''; onField('pass', v.length); }
         if (name === 'login:input' && arg === 'birth') { const v = prompt('วันเกิด เช่น 1/1/1991') || ''; onField('birth', v); }
+        if (name === 'login:gender') onField('gender', arg);
         if (name === 'login:submit') setTimeout(() => onError(1, 2), 500);
       }
     };
