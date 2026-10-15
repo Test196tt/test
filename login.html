@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Melvy Town - Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #d3141c;
+    --red-hi: #e5252d;
+    --red-deep: #84090f;
+    --card: #19191b;
+    --field: #2c2c2f;
+    --field-hi: #363639;
+    --line: #38383c;
+    --text: #ebe8e8;
+    --dim: #8f8c8e;
+    --ok: #52d68a;
+    --err: #ff6d6d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; background: transparent; }
+  body {
+    font-family: 'Kanit', 'Prompt', 'Noto Sans Thai', system-ui, sans-serif;
+    color: var(--text);
+    -webkit-user-select: none; user-select: none;
+  }
+
+  /* ---- ชั้นพื้นหลังเบลอเบาๆ ให้การ์ดเด่นขึ้นเหนือฉากเกม ---- */
+  #root {
+    position: fixed; inset: 0;
+    display: grid; place-items: center;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,.16) 0%, rgba(0,0,0,.5) 100%);
+    opacity: 0; visibility: hidden;
+    transition: opacity .2s ease, visibility 0s linear .2s;
+  }
+  #root.on { opacity: 1; visibility: visible; transition: opacity .2s ease; }
+
+  /* ---- การ์ด: ทุกขนาดคำนวณเป็น em จากความสูง จึงย่อ/ขยายตามหน้าจอมือถือได้ ---- */
+  .card {
+    --h: min(82vh, 470px, 58vw);
+    height: var(--h);
+    width: calc(var(--h) * 1.72);
+    font-size: calc(var(--h) / 26);
+    display: grid;
+    grid-template-columns: 1fr 1.04fr;
+    gap: 1em;
+    padding: .9em;
+    border-radius: 1.4em;
+    background: var(--card);
+    border: 1px solid var(--line);
+    box-shadow: 0 1.6em 4em rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  #root.on .card { animation: rise .28s cubic-bezier(.2,.8,.2,1); }
+  .card.shake { animation: shake .34s linear; }
+  @keyframes rise  { from { opacity: 0; transform: translateY(1.2em) scale(.97); } to { opacity: 1; transform: none; } }
+  @keyframes shake { 20% { transform: translateX(-.45em); } 40% { transform: translateX(.45em); } 60% { transform: translateX(-.3em); } 80% { transform: translateX(.3em); } }
+
+  /* ---- ฝั่งซ้าย: ภาพ + โลโก้ ---- */
+  .art {
+    position: relative; overflow: hidden;
+    border-radius: 1.1em;
+    background: linear-gradient(180deg, #3b2f3d 0%, #9a5f55 58%, #e0a67a 100%);
+  }
+  .art .scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .art.has-bg { background: #000 url("bg.webp") center / cover no-repeat; }
+  .art.has-bg .scene { display: none; }
+  .art::after {                       /* เงาไล่ลงด้านล่างให้โลโก้อ่านง่าย */
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.38) 100%);
+  }
+  .logo {
+    position: absolute; z-index: 1;
+    left: 50%; top: 54%; width: 86%;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 .4em .7em rgba(0,0,0,.55));
+  }
+
+  /* ---- ฝั่งขวา: ฟอร์ม ---- */
+  .form { display: flex; flex-direction: column; padding: .4em .5em .1em 0; min-width: 0; }
+  .title {
+    margin: .3em 0 1.7em;
+    text-align: center;
+    font-size: 1.08em; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--red);
+    text-shadow: 0 0 .9em rgba(211,20,28,.35);
+  }
+  .fields { display: grid; gap: 1.45em; }
+
+  .field {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 3.3em;
+    border: 0; border-radius: .9em;
+    background: var(--field);
+    color: var(--text);
+    font: 500 1em/1 'Kanit', system-ui, sans-serif;
+    text-align: center;
+    padding: 0 2.2em;
+    cursor: pointer;
+    transition: background .12s ease;
+  }
+  .field:active { background: var(--field-hi); }
+  .field.static { cursor: default; }
+  .field.static:active { background: var(--field); }
+  .field:focus-visible, .mini:focus-visible, .confirm:focus-visible { outline: .14em solid var(--red-hi); outline-offset: .14em; }
+  .field .ph  { color: var(--dim); font-weight: 400; }
+  .field .dots { letter-spacing: .22em; }
+  .field .val { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.4; }
+
+  .badge {
+    position: absolute; left: -.4em; top: -.5em;
+    width: 1.6em; height: 1.6em; border-radius: 50%;
+    display: grid; place-items: center;
+    background: linear-gradient(180deg, var(--red-hi), #98101a);
+    box-shadow: 0 .15em .5em rgba(0,0,0,.45);
+  }
+  .badge svg { width: .85em; height: .85em; fill: #fff; }
+
+  .bottom { margin-top: auto; }
+  .status {
+    min-height: 1.5em; margin-bottom: .55em;
+    text-align: center; font-size: .82em; line-height: 1.5; color: var(--err);
+  }
+  .status.ok   { color: var(--ok); }
+  .status.hint { color: var(--dim); }
+
+  .actions { display: flex; align-items: center; justify-content: center; gap: 1.1em; }
+  .confirm {
+    width: 10.2em; height: 3em; border: 0; border-radius: .85em;
+    background: linear-gradient(180deg, var(--red-hi) 0%, var(--red-deep) 100%);
+    color: #fff; font: 500 .95em/1 'Kanit', system-ui, sans-serif;
+    letter-spacing: .07em; text-transform: uppercase;
+    box-shadow: 0 .45em 1.1em rgba(170,10,20,.35), inset 0 1px 0 rgba(255,255,255,.18);
+    cursor: pointer;
+  }
+  .confirm:active { filter: brightness(.9); }
+  .confirm[disabled] { opacity: .6; cursor: default; }
+
+  .mini {
+    width: 2.1em; height: 2.1em; border: 0; border-radius: 50%;
+    display: grid; place-items: center; cursor: pointer;
+    background: var(--field);
+  }
+  .mini.red { background: linear-gradient(180deg, var(--red-hi), #98101a); }
+  .mini svg { width: 1em; height: 1em; fill: #cfcbcb; }
+  .mini.red svg { fill: #fff; }
+
+  /* โหมด login ซ่อนช่องที่ใช้เฉพาะตอนสมัคร */
+  .card[data-mode="login"] .field[data-reg] { display: none; }
+  .card[data-mode="login"] .mini[data-reg] { visibility: hidden; }   /* เก็บที่ไว้ให้ปุ่ม Confirm อยู่กึ่งกลาง */
+
+  /* ---- โหมดพรีวิวในเบราว์เซอร์ (เปิดด้วย login.html#demo) ---- */
+  body.demo { background: linear-gradient(160deg, #5b4638, #2b2a2f 60%, #1c2a22); }
+
+  @media (prefers-reduced-motion: reduce) {
+    #root, #root.on { transition: none; }
+    #root.on .card, .card.shake { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="root" aria-live="polite">
+  <main class="card" id="card" data-mode="login">
+
+    <section class="art" id="art">
+      <svg class="scene" viewBox="0 0 200 240" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <g fill="#2a2029" opacity=".5">
+          <rect x="92" y="120" width="16" height="120"/><rect x="108" y="138" width="14" height="102"/>
+          <rect x="122" y="104" width="12" height="136"/><rect x="134" y="146" width="18" height="94"/>
+          <rect x="152" y="128" width="14" height="112"/><rect x="74" y="150" width="18" height="90"/>
+          <rect x="166" y="158" width="20" height="82"/>
+        </g>
+        <g fill="none" stroke="#1d141d" stroke-linecap="round">
+          <path d="M34 240 C36 205 38 175 44 140" stroke-width="3.2"/>
+          <path d="M44 140 q-20 -6 -34 8 M44 140 q-10 -16 -28 -16 M44 140 q6 -18 24 -22 M44 140 q18 -8 32 4 M44 140 q14 6 20 20" stroke-width="2.4"/>
+          <path d="M14 240 C15 215 17 195 20 176" stroke-width="2.6"/>
+          <path d="M20 176 q-14 -4 -22 6 M20 176 q-6 -12 -20 -12 M20 176 q8 -12 20 -14 M20 176 q14 -2 22 8" stroke-width="2"/>
+        </g>
+        <rect y="226" width="200" height="14" fill="#201820" opacity=".7"/>
+      </svg>
+      <img class="logo" src="logo.webp" alt="Melvy Town">
+    </section>
+
+    <section class="form">
+      <h1 class="title" id="title">Login Player</h1>
+
+      <div class="fields">
+        <div class="field static" aria-label="ชื่อตัวละคร">
+          <span class="badge"><svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.4 0-8 2.2-8 5v3h16v-3c0-2.8-3.6-5-8-5z"/></svg></span>
+          <span class="val" id="nameVal">-</span>
+        </div>
+
+        <button class="field" id="passBtn" type="button" aria-label="ใส่รหัสผ่าน">
+          <span class="badge"><svg viewBox="0 0 24 24"><path d="M12 5C6.5 5 2.4 8.6 1 12c1.4 3.4 5.5 7 11 7s9.6-3.600 11-7c-1.400-3.400-5.500-7-11-7zm0 11.500a4.500 4.500 0 1 1 0-9 4.500 4.500 0 0 1 0 9zm0-7a2.500 2.500 0 1 0 0 5 2.500 2.500 0 0 0 0-5z"/></svg></span>
+          <span class="val" id="passVal"></span>
+        </button>
+
+        <button class="field" id="birthBtn" type="button" data-reg aria-label="ใส่วันเกิด">
+          <span class="badge"><svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V9h14v11zM7 11h4v4H7z"/></svg></span>
+          <span class="val" id="birthVal"></span>
+        </button>
+      </div>
+
+      <div class="bottom">
+        <p class="status" id="status"></p>
+        <div class="actions">
+          <button class="mini" id="dialogBtn" type="button" aria-label="ใช้หน้าต่างกรอกแบบเดิม" title="ใช้หน้าต่างกรอกแบบเดิม">
+            <svg viewBox="0 0 24 24"><path d="M20 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zM11 8h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zM7 15h10v2H7v-2zm9-7h2v2h-2V8zm0 3h2v2h-2v-2z"/></svg>
+          </button>
+          <button class="confirm" id="confirm" type="button">Confirm</button>
+          <button class="mini red" id="helpBtn" type="button" data-reg aria-label="คำแนะนำ">
+            <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 16h-2v-2h2v2zm1.800-6.200c-.8.800-1.300 1.200-1.300 2.200h-2c0-1.600.7-2.300 1.400-3 .5-.5.900-.8.900-1.400 0-.7-.6-1.200-1.300-1.200-.8 0-1.300.5-1.400 1.300h-2c.1-1.900 1.500-3.300 3.400-3.300 1.800 0 3.300 1.100 3.300 2.800 0 1-.5 1.700-1 2.600z"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const $ = (s) => document.querySelector(s);
+  const root = $('#root'), card = $('#card');
+  const ui = {
+    title: $('#title'), name: $('#nameVal'), pass: $('#passVal'), birth: $('#birthVal'),
+    status: $('#status'), confirm: $('#confirm'),
+    passBtn: $('#passBtn'), birthBtn: $('#birthBtn'), dialogBtn: $('#dialogBtn'), helpBtn: $('#helpBtn')
+  };
+
+  const DEMO = location.hash === '#demo';
+  const state = { mode: 'login', passLen: 0, birth: '', busy: false, busyTimer: 0 };
+
+  // ---- ส่ง event ไปเซิร์ฟเวอร์ (Pawn รับที่ IPacket:251 -> MsLogin_OnEvent) ----
+  const emit = (name, ...args) => {
+    try {
+      if (window.cef && typeof window.cef.emit === 'function') window.cef.emit(name, ...args);
+      else console.log('[emit]', name, args);
+    } catch (e) { console.error(e); }
+  };
+
+  const TEXT = {
+    hint: 'รหัสผ่าน 5-32 ตัวอักษร / วันเกิดรูปแบบ วัน/เดือน/ปี ค.ศ. เช่น 1/1/1991',
+    registered: 'สมัครสมาชิกสำเร็จ กดยืนยันเพื่อเข้าสู่ระบบ',
+    needPass: 'กรุณาใส่รหัสผ่านก่อน',
+    needBirth: 'กรุณาใส่วันเกิดก่อน',
+    shortPass: 'รหัสผ่านต้องยาวอย่างน้อย 5 ตัวอักษร',
+    errors: {
+      1: (left) => 'รหัสผ่านไม่ถูกต้อง เหลืออีก ' + left + ' ครั้ง',
+      2: () => 'ใส่รหัสผ่านผิดครบ 3 ครั้ง ระบบกำลังตัดการเชื่อมต่อ',
+      3: () => 'รหัสผ่านต้องยาวอย่างน้อย 5 ตัวอักษร',
+      4: () => 'วันเกิดไม่ถูกต้อง ตัวอย่าง 1/1/1991',
+      5: () => 'กรอกข้อมูลให้ครบก่อนกดยืนยัน',
+      6: () => 'รหัสผ่านยาวเกินไป (ไม่เกิน 32 ตัวอักษร)'
+    }
+  };
+
+  const setStatus = (msg, kind) => { ui.status.textContent = msg || ''; ui.status.className = 'status' + (kind ? ' ' + kind : ''); };
+
+  const render = () => {
+    const reg = state.mode === 'register';
+    card.dataset.mode = state.mode;
+    ui.title.textContent = reg ? 'Register Player' : 'Login Player';
+
+    ui.pass.innerHTML = '';
+    const p = document.createElement('span');
+    if (state.passLen > 0) { p.className = 'dots'; p.textContent = '\u2022'.repeat(Math.min(state.passLen, 14)); }
+    else { p.className = 'ph'; p.textContent = 'แตะเพื่อใส่รหัสผ่าน'; }
+    ui.pass.appendChild(p);
+
+    ui.birth.innerHTML = '';
+    const b = document.createElement('span');
+    if (state.birth) b.textContent = state.birth.split('/').join(' ');
+    else { b.className = 'ph'; b.textContent = 'แตะเพื่อใส่วันเกิด'; }
+    ui.birth.appendChild(b);
+  };
+
+  const setBusy = (on) => {
+    clearTimeout(state.busyTimer);
+    state.busy = on;
+    ui.confirm.disabled = on;
+    ui.confirm.textContent = on ? '...' : 'Confirm';
+    if (on) state.busyTimer = setTimeout(() => setBusy(false), 4000);   // กันค้างถ้าเซิร์ฟเวอร์ไม่ตอบ
+  };
+
+  // ---- ปุ่มต่างๆ ----
+  ui.passBtn.addEventListener('click', () => emit('login:input', 'pass'));
+  ui.birthBtn.addEventListener('click', () => emit('login:input', 'birth'));
+  ui.dialogBtn.addEventListener('click', () => emit('login:dialog'));
+  ui.helpBtn.addEventListener('click', () => setStatus(TEXT.hint, 'hint'));
+
+  ui.confirm.addEventListener('click', () => {
+    if (state.busy) return;
+    if (state.passLen < 1) return fail(TEXT.needPass);
+    if (state.mode === 'register') {
+      if (state.passLen < 5) return fail(TEXT.shortPass);
+      if (!state.birth) return fail(TEXT.needBirth);
+    }
+    setStatus('');
+    setBusy(true);
+    emit('login:submit');
+  });
+
+  function fail(msg) {
+    setStatus(msg);
+    card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+  }
+
+  // ---- รับ event จากเซิร์ฟเวอร์ ----
+  // login:show   [mode, name, justRegistered, passLen]
+  // login:field  [kind, value]      kind = pass (value = ความยาว) / birth (value = d/m/yyyy)
+  // login:error  [code, extra]
+  // login:hide   []
+  const onShow = (mode, name, justReg, passLen) => {
+    state.mode = mode === 'register' ? 'register' : 'login';
+    state.passLen = Number(passLen) || 0;
+    state.birth = '';
+    ui.name.textContent = name || '-';
+    setBusy(false);
+    render();
+    setStatus(Number(justReg) ? TEXT.registered : '', Number(justReg) ? 'ok' : '');
+    root.classList.add('on');
+  };
+
+  const onField = (kind, value) => {
+    if (kind === 'pass') state.passLen = Number(value) || 0;
+    if (kind === 'birth') state.birth = String(value || '');
+    setStatus('');
+    render();
+  };
+
+  const onError = (code, extra) => {
+    setBusy(false);
+    const fn = TEXT.errors[Number(code)];
+    fail(fn ? fn(Number(extra) || 0) : 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง');
+    if (Number(code) === 1 || Number(code) === 2) { state.passLen = 0; render(); }   // ฝั่งเซิร์ฟเวอร์ล้างรหัสผ่านให้แล้ว
+    if (Number(code) === 2) setBusy(true);
+  };
+
+  const onHide = () => { setBusy(false); root.classList.remove('on'); };
+
+  // ---- ภาพพื้นหลังเสริม: ถ้ามีไฟล์ bg.webp ข้างๆ หน้านี้จะใช้แทนภาพวาด ----
+  const probe = new Image();
+  probe.onload = () => $('#art').classList.add('has-bg');
+  probe.src = 'bg.webp';
+
+  // ---- เริ่มต้น: รอให้ตัว cef ของไคลเอนต์พร้อม แล้วลงทะเบียน event + แจ้งเซิร์ฟเวอร์ ----
+  function register() {
+    cef.on('login:show', onShow);
+    cef.on('login:field', onField);
+    cef.on('login:error', onError);
+    cef.on('login:hide', onHide);
+    emit('login:ready');
+  }
+
+  function boot(tries) {
+    if (window.cef && typeof window.cef.on === 'function') return register();
+    if (tries < 100) setTimeout(() => boot(tries + 1), 100);
+  }
+
+  render();
+
+  if (DEMO) {
+    // พรีวิวบนคอม: เปิด login.html#demo แล้วกดช่องต่างๆ ได้เลย
+    document.body.classList.add('demo');
+    const fake = { pass: 0, birth: '' };
+    window.cef = {
+      on() {},
+      emit(name, arg) {
+        if (name === 'login:input' && arg === 'pass') { const v = prompt('รหัสผ่าน (จำลอง)') || ''; onField('pass', v.length); }
+        if (name === 'login:input' && arg === 'birth') { const v = prompt('วันเกิด เช่น 1/1/1991') || ''; onField('birth', v); }
+        if (name === 'login:submit') setTimeout(() => onError(1, 2), 500);
+      }
+    };
+    onShow(location.search.includes('register') ? 'register' : 'login', '0xByte', 0, 0);
+  } else {
+    boot(0);
+  }
+})();
+</script>
+</body>
+</html>
