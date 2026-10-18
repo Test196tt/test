@@ -61,7 +61,7 @@ const $=id=>document.getElementById(id);
 let bag=[],safe=[],tier=1,cap=100,sel=null,K=1,ct,keyI="",keyS="";
 const img=i=>`<img src="${IMG}${IT[i][1]}.png" onerror="this.onerror=null;this.src=PH">`;
 const send=(e,v)=>{try{cef.emit(e,v)}catch(_){console.log(e,v);if(PREVIEW)mock(e,v)}};
-const parse=s=>(s||"").split(";").filter(Boolean).map(r=>{const p=r.split(":");return{i:Math.min(+p[0],IT.length-1),q:+p[1]}});
+const parse=s=>(s||"").split(";").filter(Boolean).map(r=>{const p=r.split(":");return{i:+p[0],q:+p[1]}}).filter(o=>o.i>0&&o.i<IT.length&&o.q>0);
 const sum=a=>a.reduce((n,o)=>n+o.q,0);
 function fit(){const w=$("wrap");K=Math.min(1,(innerWidth-12)/w.offsetWidth,(innerHeight-12)/w.offsetHeight);w.style.setProperty("--k",K)}
 function fill(g,list,side,key){
