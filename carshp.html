@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Car Shop</title>
+<style>
+:root{
+  --red:#1e6bff; --red-d:#0b3d9e; --red-l:#5a9bff;
+  --card:rgba(14,18,28,.88); --line:rgba(30,107,255,.55); --txt:#f4f1f2; --mut:#a7a0a3; --ok:#2ecc57;
+}
+*{box-sizing:border-box;margin:0;padding:0;user-select:none}
+html,body{height:100%;background:transparent;overflow:hidden;font-family:"Prompt","Sarabun","Segoe UI",Tahoma,sans-serif;color:var(--txt)}
+#app{position:fixed;inset:0;display:none}
+#app.on{display:block}
+
+/* ซ้าย: ข้อมูลรถ + สี + หมุน */
+.left{position:absolute;left:1.2vw;top:22vh;width:min(23vw,260px);display:flex;flex-direction:column;gap:1.4vh}
+.card{background:var(--card);border-radius:6px;overflow:hidden}
+.head{background:var(--red);display:flex;justify-content:space-between;padding:.9vh 1vw;font-weight:700;font-size:clamp(11px,1.3vw,15px)}
+.price{padding:1vh 1vw;font-size:clamp(14px,1.9vw,22px);font-weight:800;display:flex;align-items:center;gap:.6vw}
+.price i{width:1.6em;height:1.6em;border-radius:50%;background:#222;border:1px solid var(--red);display:grid;place-items:center;font-style:normal;font-size:.6em;color:var(--red-l)}
+.info{padding:.4vh 1vw 1.2vh;font-size:clamp(9px,1vw,12px);color:var(--mut)}
+.stats{display:flex;gap:.8vw;margin-top:.8vh}
+.stat{flex:1;display:flex;align-items:center;gap:.6vw;background:#0a0d14;border-radius:5px;padding:.6vh .6vw;color:var(--txt)}
+.stat b{display:block;font-size:clamp(11px,1.3vw,15px)}
+.stat span{font-size:clamp(8px,.85vw,10px);color:var(--mut)}
+.ico{width:2.4vw;min-width:26px;height:2.4vw;min-height:26px;border-radius:6px;background:#141a28;border:1px solid var(--line);display:grid;place-items:center;font-size:clamp(9px,1vw,12px);font-weight:700;color:var(--red-l)}
+.colors{padding:1.2vh 1vw 1.4vh}
+.colors h4{font-size:clamp(10px,1.1vw,13px);font-weight:600;margin-bottom:1vh}
+.dots{display:flex;gap:.7vw;flex-wrap:wrap}
+.dot{width:clamp(16px,1.9vw,24px);height:clamp(16px,1.9vw,24px);border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform .12s}
+.dot:hover{transform:scale(1.15)}
+.dot.sel{border-color:#fff;box-shadow:0 0 0 2px var(--red)}
+.rot{display:flex;align-items:center;gap:.8vw;padding-left:.2vw}
+.pill{background:var(--card);border-radius:6px;padding:.9vh 1.6vw;font-size:clamp(10px,1.1vw,13px);min-width:5.5vw;text-align:center}
+
+/* ปุ่มลูกศร (เหลี่ยมแดง) */
+.arrow{width:clamp(24px,2.5vw,32px);height:clamp(24px,2.5vw,32px);display:grid;place-items:center;cursor:pointer;
+  background:var(--card);border:2px solid var(--red);transform:rotate(45deg);border-radius:5px;transition:background .12s}
+.arrow span{transform:rotate(-45deg);font-size:clamp(12px,1.4vw,17px);color:#fff;font-weight:800;line-height:1}
+.arrow:hover,.arrow:active{background:var(--red)}
+
+/* กลาง: ปุ่มซื้อ */
+.buy{position:absolute;left:50%;bottom:23vh;transform:translateX(-50%);display:flex;align-items:center;gap:1vw}
+.buybtn{width:clamp(110px,14vw,170px);padding:1vh 0;text-align:center;border-radius:7px;cursor:pointer;
+  background:#0f2a17;border:2px solid var(--ok);color:var(--ok);font-weight:700;font-size:clamp(12px,1.4vw,16px);transition:all .12s}
+.buybtn:hover{background:var(--ok);color:#06210f}
+.buybtn.no{opacity:.45;filter:grayscale(1);pointer-events:none}
+
+/* ล่าง: แถบเลือกรถ 3 ช่อง */
+.list{position:absolute;left:50%;bottom:2.2vh;transform:translateX(-50%);display:flex;gap:1.2vw;width:min(78vw,820px)}
+.car{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:5px;cursor:pointer;position:relative;transition:transform .12s,border-color .12s}
+.car:hover{transform:translateY(-3px)}
+.car.sel{border-color:var(--red-l);box-shadow:0 0 0 1px var(--red-l),0 0 14px rgba(30,107,255,.5)}
+.pic{height:clamp(54px,11vh,100px);display:grid;place-items:center;background:radial-gradient(ellipse at 50% 70%,rgba(30,107,255,.18),transparent 70%)}
+.pic img{max-height:88%;max-width:70%;object-fit:contain}
+.pic .ph{font-size:clamp(18px,2.4vw,30px);font-weight:800;color:var(--red);opacity:.7}
+.name{background:#0a0d14;text-align:center;font-size:clamp(9px,1vw,12px);font-weight:600;padding:.9vh 0;border-top:1px solid var(--line)}
+.badge{position:absolute;left:-.7vw;bottom:-.9vh;width:clamp(18px,1.9vw,24px);height:clamp(18px,1.9vw,24px);transform:rotate(45deg);
+  background:var(--card);border:2px solid var(--red);border-radius:4px;display:grid;place-items:center}
+.badge span{transform:rotate(-45deg);font-size:clamp(9px,1vw,12px);font-weight:800;color:var(--red-l)}
+.close{position:absolute;right:1.2vw;top:2vh;display:flex;align-items:center;gap:.6vw;cursor:pointer;background:var(--card);border:2px solid var(--red);
+  color:#fff;font-weight:700;font-size:clamp(11px,1.2vw,14px);padding:.8vh 1.4vw;border-radius:6px;transition:background .12s}
+.close:hover{background:var(--red)}
+.close i{font-style:normal;font-size:1.3em;line-height:1}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="left">
+    <div class="card">
+      <div class="head"><span id="cName">-</span><span id="cType">Type: -</span></div>
+      <div class="price"><i>$</i><span id="cPrice">0</span></div>
+      <div class="info">Information
+        <div class="stats">
+          <div class="stat"><div class="ico">KG</div><div><span>Trunk Storage</span><b id="cKg">-</b></div></div>
+          <div class="stat"><div class="ico">SEAT</div><div><span>Car Seat</span><b id="cSeat">-</b></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card colors"><h4>Color</h4><div class="dots" id="dots"></div></div>
+    <div class="rot">
+      <div class="arrow" data-rot="-1"><span>&#8249;</span></div>
+      <div class="pill">หมุน</div>
+      <div class="arrow" data-rot="1"><span>&#8250;</span></div>
+    </div>
+  </div>
+
+  <div class="buy">
+    <div class="arrow" data-nav="-1"><span>&#8249;</span></div>
+    <div class="buybtn" id="buy">ซื้อ</div>
+    <div class="arrow" data-nav="1"><span>&#8250;</span></div>
+  </div>
+
+  <div class="list" id="list"></div>
+  <div class="close" id="closeBtn"><i>&#10005;</i>ปิด</div>
+</div>
+
+<script>
+// ---------- ข้อมูลรถ (ส่งจากเซิร์ฟเวอร์ด้วย carshop:open ถ้าไม่ส่งจะใช้ชุดนี้) ----------
+// [model, ชื่อ, ราคา, ประเภท, ความจุ(KG), ที่นั่ง]
+let CARS=[
+  [521,"FCR-900",35000,"BIKE",5,2],[562,"Elegy",250000,"SPORT",10,2],[477,"ZR-350",300000,"SPORT",10,2],
+  [506,"Super GT",500000,"SUPER",10,2],[541,"Bullet",750000,"SUPER",10,2],[402,"Buffalo",2500000,"MUSCLE",15,2],[411,"Infernus",3000000,"SUPER",10,2]
+];
+// สีรถ = ไอดีสี GTA SA (colorId) คู่กับสีที่แสดงบนจอ
+const COLORS=[[1,"#d9d9d9"],[3,"#d7263d"],[6,"#e6c229"],[86,"#26a83c"],[2,"#e8861c"],[79,"#2a63e6"],[126,"#a02bb8"]];
+let idx=0,col=0,PER=3,first=0,money=Infinity;
+
+const $=id=>document.getElementById(id);
+const fmt=n=>Number(n).toLocaleString("en-US");
+function send(ev,...a){ try{ if(window.cef&&cef.emit) cef.emit(ev,...a); }catch(e){} }
+
+function renderDots(){
+  $("dots").innerHTML=COLORS.map((c,i)=>`<div class="dot ${i==col?"sel":""}" style="background:${c[1]}" data-c="${i}"></div>`).join("");
+}
+function renderInfo(){
+  const c=CARS[idx]; if(!c) return;
+  $("cName").textContent=c[1]; $("cType").textContent="Type: "+c[3];
+  $("cPrice").textContent=fmt(c[2]); $("cKg").textContent=c[4]+" KG"; $("cSeat").textContent=c[5];
+  $("buy").classList.toggle("no",money<c[2]);
+}
+function renderList(){
+  if(idx<first) first=idx; if(idx>=first+PER) first=idx-PER+1;
+  const part=CARS.slice(first,first+PER);
+  $("list").innerHTML=part.map((c,k)=>`
+    <div class="car ${first+k==idx?"sel":""}" data-i="${first+k}">
+      <div class="pic"><img src="cars/${c[0]}.png" alt="" onerror="this.outerHTML='<div class=ph>${c[1]}</div>'"></div>
+      <div class="name">${c[1]} | ID ${c[0]}</div>
+      <div class="badge"><span>!</span></div>
+    </div>`).join("");
+}
+function render(){ renderInfo(); renderList(); renderDots(); }
+function select(i,notify=true){
+  idx=(i+CARS.length)%CARS.length; render();
+  if(notify) send("carshop:select",idx);
+}
+
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-i],[data-c],[data-nav],[data-rot],#buy,#closeBtn"); if(!t) return;
+  if(t.dataset.i!==undefined) select(+t.dataset.i);
+  else if(t.dataset.nav!==undefined) select(idx+ +t.dataset.nav);
+  else if(t.dataset.c!==undefined){ col=+t.dataset.c; renderDots(); send("carshop:color",COLORS[col][0]); }
+  else if(t.dataset.rot!==undefined) send("carshop:rotate",+t.dataset.rot);
+  else if(t.id==="closeBtn") send("carshop:close");
+  else if(t.id==="buy") send("carshop:buy",idx,COLORS[col][0]);
+});
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowLeft") select(idx-1);
+  if(e.key==="ArrowRight") select(idx+1);
+});
+
+// ---------- รับ event จากเซิร์ฟเวอร์ ----------
+const arg=a=>{ if(typeof a==="string"){ try{a=JSON.parse(a)}catch(e){} } return a; };
+function bind(){
+  if(!(window.cef&&cef.on)) return false;
+  cef.on("carshop:open",a=>{ a=arg(a); if(a&&a.cars) CARS=a.cars; if(a&&a.money!==undefined) money=a.money; idx=0;col=0;first=0; $("app").classList.add("on"); render(); });
+  cef.on("carshop:close",()=>$("app").classList.remove("on"));
+  cef.on("carshop:money",a=>{ money=+arg(a); renderInfo(); });
+  send("carshop:shown");
+  return true;
+}
+if(!bind()){ // เปิดในเบราว์เซอร์ธรรมดา = โหมดพรีวิว
+  $("app").classList.add("on"); idx=4; render();
+}
+</script>
+</body>
+</html>
