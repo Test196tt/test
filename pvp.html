@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --red:#e10613; --red-hi:#ff2a36; --red-dk:#7a0008;
+  --red:#1f6bff; --red-hi:#4d94ff; --red-dk:#0b2f9e;
   --bg:#070708; --panel:#0e0e11; --panel2:#15151a; --line:#2a2a31;
   --txt:#f4f4f6; --mut:#8c8c96; --blk:#1b1b20;
 }
@@ -18,16 +18,16 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden;font-fam
 
 /* ---------- ฉากหลัง + หน้าต่างหลัก ---------- */
 #overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(ellipse at center,rgba(120,0,8,.35) 0%,rgba(0,0,0,.88) 70%)}
+  background:radial-gradient(ellipse at center,rgba(10,40,130,.35) 0%,rgba(0,0,0,.88) 70%)}
 #panel{position:relative;width:min(900px,94vw);max-height:92vh;background:linear-gradient(160deg,#101014 0%,#09090b 100%);
   border:1px solid var(--line);border-top:3px solid var(--red);border-radius:6px;
-  box-shadow:0 0 0 1px #000,0 20px 70px rgba(225,6,19,.28),inset 0 0 60px rgba(225,6,19,.05);
+  box-shadow:0 0 0 1px #000,0 20px 70px rgba(31,107,255,.28),inset 0 0 60px rgba(31,107,255,.05);
   display:flex;flex-direction:column;overflow:hidden}
 #panel::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.05;
   background:repeating-linear-gradient(135deg,#fff 0 2px,transparent 2px 14px)}
 header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line);position:relative}
 .logo{display:flex;align-items:baseline;gap:10px;font-weight:800;letter-spacing:3px;font-size:clamp(20px,3.4vw,28px)}
-.logo b{color:var(--red-hi);text-shadow:0 0 14px rgba(255,42,54,.6)}
+.logo b{color:var(--red-hi);text-shadow:0 0 14px rgba(77,148,255,.6)}
 .logo small{font-size:12px;font-weight:500;letter-spacing:2px;color:var(--mut)}
 #btnClose{width:42px;height:42px;border:1px solid var(--line);background:var(--blk);color:var(--txt);font-size:22px;cursor:pointer;border-radius:4px;font-family:inherit}
 #btnClose:active{background:var(--red)}
@@ -43,7 +43,7 @@ h2 span{color:var(--red-hi)}
   transition:.15s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .btn:active{transform:scale(.98)}
 .btn.red{background:linear-gradient(180deg,var(--red-hi),var(--red) 60%,var(--red-dk));border-color:var(--red-hi);
-  box-shadow:0 0 18px rgba(225,6,19,.45)}
+  box-shadow:0 0 18px rgba(31,107,255,.45)}
 .btn.ghost:hover,.btn.ghost:active{border-color:var(--red);color:var(--red-hi)}
 .btn[disabled]{opacity:.35;pointer-events:none}
 .row{display:flex;gap:12px;flex-wrap:wrap}
@@ -52,7 +52,7 @@ h2 span{color:var(--red-hi)}
 .big{flex:1 1 260px;min-height:190px;border:1px solid var(--line);background:var(--panel2);border-radius:6px;cursor:pointer;
   position:relative;overflow:hidden;padding:22px;display:flex;flex-direction:column;justify-content:flex-end;gap:4px;transition:.18s;font-family:inherit;color:var(--txt);text-align:left}
 .big::after{content:"";position:absolute;right:-40px;top:-40px;width:170px;height:170px;border-radius:50%;
-  background:radial-gradient(circle,rgba(225,6,19,.55),transparent 65%);transition:.2s}
+  background:radial-gradient(circle,rgba(31,107,255,.55),transparent 65%);transition:.2s}
 .big:hover,.big:active{border-color:var(--red);transform:translateY(-3px)}
 .big:hover::after{transform:scale(1.25)}
 .big .ico{font-size:46px;line-height:1;margin-bottom:auto;z-index:1}
@@ -65,7 +65,7 @@ h2 span{color:var(--red-hi)}
 .mode .n{font-size:clamp(28px,6vw,44px);font-weight:800;letter-spacing:2px}
 .mode .n i{color:var(--red-hi);font-style:normal;margin:0 6px;font-size:.6em}
 .mode .s{font-size:12px;color:var(--mut);margin-top:4px}
-.mode.on{border-color:var(--red-hi);background:linear-gradient(180deg,rgba(225,6,19,.25),rgba(225,6,19,.05));box-shadow:0 0 22px rgba(225,6,19,.35)}
+.mode.on{border-color:var(--red-hi);background:linear-gradient(180deg,rgba(31,107,255,.25),rgba(31,107,255,.05));box-shadow:0 0 22px rgba(31,107,255,.35)}
 
 /* ---------- รายการห้อง ---------- */
 #rooms{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow-y:auto;margin-bottom:16px}
@@ -93,7 +93,7 @@ h2 span{color:var(--red-hi)}
 .team.red .ttl{color:var(--red-hi)} .team.blk .ttl{color:#c7c7d1}
 .slot{height:48px;border:1px dashed var(--line);border-radius:4px;margin-bottom:8px;display:flex;align-items:center;padding:0 12px;color:var(--mut);font-size:14px;cursor:pointer;gap:8px}
 .slot.fill{border-style:solid;color:var(--txt);cursor:default;background:var(--blk);font-weight:500}
-.slot.me{border-color:var(--red-hi);box-shadow:inset 0 0 14px rgba(225,6,19,.25)}
+.slot.me{border-color:var(--red-hi);box-shadow:inset 0 0 14px rgba(31,107,255,.25)}
 .slot.empty-slot:active{border-color:var(--red-hi);color:var(--red-hi)}
 .crown{color:#ffc83d}
 .tip{font-size:12px;color:var(--mut);text-align:center;margin-top:10px}
@@ -115,7 +115,7 @@ h2 span{color:var(--red-hi)}
 #banner{position:fixed;left:0;right:0;top:34%;text-align:center;pointer-events:none;animation:pop .5s ease}
 #banner .t{font-size:clamp(46px,10vw,96px);font-weight:800;letter-spacing:8px;text-shadow:0 0 40px currentColor}
 #banner .s{font-size:clamp(14px,2.4vw,22px);letter-spacing:4px;color:var(--mut)}
-#banner.win .t{color:#3ddc84} #banner.lose .t{color:var(--red-hi)} #banner.draw .t{color:#ffc83d}
+#banner.win .t{color:#3ddc84} #banner.lose .t{color:#ff4d5e} #banner.draw .t{color:#ffc83d}
 @keyframes pop{from{opacity:0;transform:scale(1.4)}to{opacity:1;transform:none}}
 
 @media (max-width:640px){

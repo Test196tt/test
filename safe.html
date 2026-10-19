@@ -4,7 +4,7 @@
 <title>Safe</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--g1:#2c2d31;--g2:#222326;--g3:#17181a;--gl:#3d3e44;--red:#e0243a;--red2:#8e1423;--tx:#ececee;--mu:#9a9ca3}
+:root{--g1:#2c2d31;--g2:#222326;--g3:#17181a;--gl:#3d3e44;--red:#1f6bff;--red2:#0b2f9e;--tx:#ececee;--mu:#9a9ca3}
 *{box-sizing:border-box;margin:0}
 html,body{height:100%;background:transparent;font-family:Kanit,"Noto Sans Thai",Tahoma,sans-serif;color:var(--tx);overflow:hidden;user-select:none}
 #app{display:none;position:fixed;inset:0;align-items:center;justify-content:center}
@@ -30,7 +30,7 @@ html,body{height:100%;background:transparent;font-family:Kanit,"Noto Sans Thai",
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;height:310px;overflow-y:auto;align-content:start;padding-right:3px}
 .grid::-webkit-scrollbar{width:4px}.grid::-webkit-scrollbar-thumb{background:var(--red);border-radius:3px}
 .s{position:relative;height:58px;background:var(--g3);border:1px solid transparent;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer}
-.s:hover{border-color:var(--red2)}.s.sel{border-color:var(--red);box-shadow:0 0 12px #e0243a55}
+.s:hover{border-color:var(--red2)}.s.sel{border-color:var(--red);box-shadow:0 0 12px #1f6bff55}
 .s img{width:28px;height:28px;object-fit:contain;pointer-events:none;margin-top:6px}
 .s .q{position:absolute;top:3px;width:100%;text-align:center;font-size:9px;color:var(--mu)}
 .s .n{font-size:9px;margin-top:1px;max-width:94%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -38,7 +38,7 @@ html,body{height:100%;background:transparent;font-family:Kanit,"Noto Sans Thai",
 .pop{position:absolute;z-index:5;display:none;gap:4px;padding:4px;background:var(--g2);border:1px solid var(--red);border-radius:9px;box-shadow:0 6px 20px #000a}
 .pop.on{display:flex}
 .pop button{background:var(--red);color:#fff;border:0;border-radius:6px;padding:6px 10px;font:500 12px Kanit,sans-serif;cursor:pointer;white-space:nowrap}
-.pop button:hover{background:#ff3a50}
+.pop button:hover{background:#4d94ff}
 .foot{padding:0 14px 10px;font-size:11px;color:var(--mu);display:flex;justify-content:space-between}
 </style></head><body>
 <div id="app"><div class="wrap" id="wrap">
@@ -56,7 +56,7 @@ html,body{height:100%;background:transparent;font-family:Kanit,"Noto Sans Thai",
 // [ชื่อ, ไฟล์รูป, หมวด] เรียงตาม index ของ itemData ใน main.pwn (เหมือน inventory.html)
 const IT=[["ไม่พบข้อมูล","item_0","u"],["ปูน","item_1","u"],["สายไฟ","item_2","u"],["องุ่น","item_3","f"],["แตงโม","item_4","f"],["ข้าว","item_5","f"],["เห็ด","item_6","f"],["แร่เหลือง","item_7","u"],["แร่เขียว","item_8","u"],["แร่ฟ้า","item_9","u"],["แร่แดง","item_10","u"],["แร่","item_11","u"],["สนับ","item_12","w"],["ไม้สนุ๊ก","item_13","w"],["ไม้เบสบอล","item_14","w"],["ไม้กอล์ฟ","item_15","w"],["คาตานะ","item_16","w"],["มีด","Ko","w"],["ไม้เบสบอลเทียร์2","item_14","w"],["ไม้เบสบอลเทียร์3","item_14","w"],["ไม้เบสบอลเทียร์4","item_14","w"],["ไม้เบสบอลเทียร์5","item_14","w"],["คาตานะเทียร์2","item_16","w"],["คาตานะเทียร์3","item_16","w"],["มีดเทียร์2","Ko","w"],["มีดเทียร์3","Ko","w"],["มีดเทียร์4","Ko","w"],["มือถือ","item_17","u"],["พิซซ่า","item_18","f"],["น้ำเปล่า","item_19","f"],["วิทยุ","reo","u"],["เกราะ","ga","u"],["aed","aed","u"],["แหวนแก๊ง","va","s"],["ยาปั้ม","ya","u"],["ปืนยิงสตั้น","te","w"],["Boombox","boom","u"],["ฉลาม","sar","u"],["อาหารฉลาม","ag","f"],["ฉลามโต","sar","u"],["โทเคนฮาโลวีน","hallo","u"],["แฟชั่นฟักทอง","funk","s"],["กุญแจตู้เซฟ","safekey","u"],["กุญแจตู้เซฟเทียร์2","safekey","u"],["กุญแจตู้เซฟเทียร์3","safekey","u"]];
 const IMG="items/",PREVIEW=false;
-const PH="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect x="6" y="6" width="36" height="36" rx="9" fill="#2c2d31" stroke="#e0243a" stroke-width="2"/><path d="M24 13l9 11-9 11-9-11z" fill="#e0243a"/></svg>');
+const PH="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect x="6" y="6" width="36" height="36" rx="9" fill="#2c2d31" stroke="#1f6bff" stroke-width="2"/><path d="M24 13l9 11-9 11-9-11z" fill="#1f6bff"/></svg>');
 const $=id=>document.getElementById(id);
 let bag=[],safe=[],tier=1,cap=100,sel=null,K=1,ct,keyI="",keyS="";
 const img=i=>`<img src="${IMG}${IT[i][1]}.png" onerror="this.onerror=null;this.src=PH">`;
