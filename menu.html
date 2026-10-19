@@ -6,8 +6,8 @@
 <title>Melvy Town Menu</title>
 <style>
 :root{
-  --red:#e5222f;          /* สีแดงหลัก (แทนสีน้ำเงินเดิม) */
-  --red2:#ff4455;         /* แดงสว่าง ตอนชี้เมาส์ */
+  --red:#1e6bff;          /* สีน้ำเงินหลัก */
+  --red2:#5a9bff;         /* แดงสว่าง ตอนชี้เมาส์ */
   --bar:rgba(34,34,38,.92);
   --u:calc(100vh / 432);  /* 1 หน่วย = 1 พิกเซลของภาพตัวอย่าง (จอสูง 432) ปรับตามจอให้อัตโนมัติ */
   --k:1;                  /* ขนาดรวมของเมนู (1 = ปกติ, 1.2 = ใหญ่ขึ้น) */
@@ -43,7 +43,7 @@ html,body{margin:0;height:100%;background:transparent;overflow:hidden;
   transform:rotate(45deg);box-shadow:0 0 0 calc(1*var(--u)) #09080a;transition:border-color .15s,box-shadow .15s}
 .L .dia{left:calc(108*var(--u) - 12*var(--u) - 1*var(--u))}
 .R .dia{left:calc(-12*var(--u) + 1*var(--u))}
-.btn:hover .dia{border-color:var(--red2);box-shadow:0 0 0 calc(1*var(--u)) #09080a,0 0 calc(7*var(--u)) rgba(255,50,70,.65)}
+.btn:hover .dia{border-color:var(--red2);box-shadow:0 0 0 calc(1*var(--u)) #09080a,0 0 calc(7*var(--u)) rgba(70,140,255,.7)}
 .ic{position:absolute;top:50%;width:calc(15*var(--u));height:calc(15*var(--u));margin-top:calc(-7.5*var(--u));fill:var(--red);pointer-events:none}
 .L .ic{left:calc(108*var(--u) - 7.5*var(--u))}
 .R .ic{left:calc(-7.5*var(--u))}
