@@ -30,6 +30,7 @@ h2{font-size:18px;margin:6px 0 10px}
 .row{display:flex;justify-content:space-between;padding:9px 12px;background:#1c1c1e;border-radius:10px;margin-bottom:6px;font-size:14px}
 .row b{color:#55efc4}
 .list{overflow:auto;flex:1}
+.mecard{background:#1c1c1e;border-radius:16px;padding:26px 14px;text-align:center;margin-top:14px}.mecard .lb{font-size:12px;color:#9aa4ad;margin-bottom:8px}.mecard .nm{font-size:28px;font-weight:600;color:#55efc4;letter-spacing:3px;word-break:break-all}
 #s-call{align-items:center;justify-content:space-between;padding:70px 16px 36px;background:linear-gradient(170deg,#16202b,#000 75%)}
 .avatar{width:96px;height:96px;border-radius:50%;background:#2c3e50;display:flex;align-items:center;justify-content:center;font-size:48px;margin:0 auto 14px}
 .cname{font-size:22px;font-weight:600;text-align:center;word-break:break-word}
@@ -74,6 +75,11 @@ h2{font-size:18px;margin:6px 0 10px}
     <div class="cb end" onclick="act('hangup')"><i>&#128245;</i><span id="b-end">วางสาย</span></div>
    </div>
   </div>
+  <div class="screen" id="s-me">
+   <div class="back" onclick="show('home')">&lsaquo; กลับ</div>
+   <h2>เบอร์ของฉัน</h2>
+   <div class="mecard"><div class="lb">หมายเลขโทรศัพท์</div><div class="nm" id="menum">-</div></div>
+  </div>
   <div class="screen" id="s-price">
    <div class="back" onclick="show('home')">&lsaquo; กลับ</div>
    <h2>ราคาสินค้า</h2>
@@ -105,7 +111,8 @@ var APPS=[
  {id:'twitter', n:'Twitter',  i:'🐦',c:'#1da1f2'},
  {id:'gps',     n:'GPS',      i:'📍',c:'#e74c3c'},
  {id:'prices',  n:'ราคาสินค้า',i:'🏷️',c:'#f39c12'},
- {id:'transfer',n:'โอนเงิน',  i:'💸',c:'#16a085'}
+ {id:'transfer',n:'โอนเงิน',  i:'💸',c:'#16a085'},
+ {id:'me',      n:'เบอร์ฉัน',  i:'📱',c:'#9b59b6'}
 ];
 // ชื่อสินค้า (ลำดับต้องตรงกับที่ server ส่งมา) - ชื่อไทยอยู่ฝั่งเว็บเพื่อเลี่ยงปัญหา encoding
 var ITEMS=['องุ่น','แตงโม','ข้าว','เห็ด','แร่เหลือง','แร่เขียว','แร่ฟ้า','แร่แดง','ฉลามโต'];
@@ -119,13 +126,14 @@ $('keys').innerHTML=['1','2','3','4','5','6','7','8','9','✖','0','✔'].map(fu
 }).join('');
 
 function show(s){
-  ['home','pad','price','call'].forEach(function(x){$('s-'+x).classList.toggle('on',x===s)});
+  ['home','pad','price','call','me'].forEach(function(x){$('s-'+x).classList.toggle('on',x===s)});
 }
-function act(a,p){C.emit('phone:act',a+'|'+(p||''));if(a==='close'&&C.set_focus)C.set_focus(false)}      // ส่งเป็นสตริงเดียว "action|ข้อมูล"
+function act(a,p){if(a==='close'&&cs===2)return;C.emit('phone:act',a+'|'+(p||''));if(a==='close'&&C.set_focus)C.set_focus(false)}      // ส่งเป็นสตริงเดียว "action|ข้อมูล"
 function tap(id){
   if(id==='call'||id==='sms'){mode=id;buf='';$('num').innerHTML='&nbsp;';$('err').textContent='';
     $('pad-title').textContent=id==='call'?'โทร':'ส่งข้อความ (ใส่เบอร์)';show('pad');}
   else if(id==='prices'){show('price')}
+  else if(id==='me'){show('me')}
   else act(id);
 }
 function key(k){
@@ -140,12 +148,13 @@ function fmt(n){return '$'+Number(n).toLocaleString('en-US')}
 // phone:open  (ราคา 9 ค่า คั่นด้วย , )   phone:close   phone:error (รหัส)
 function openPhone(prices){
   var p=String(prices||'').split(',');
+  $('menum').textContent=(p[9]&&p[9]!=='0')?p[9]:'-';
   $('prices').innerHTML=ITEMS.map(function(n,i){return '<div class="row"><span>'+n+'</span><b>'+fmt(p[i]||0)+'</b></div>'}).join('');
   show(cs>0?'call':'home');$('phone').classList.add('show');
 }
 C.on('phone:open',openPhone);
 // โหมดทดลองในเบราว์เซอร์: เปิดลิงก์แล้วต่อท้าย ?demo  (ในเกมจะไม่ใช้)
-if(/[?&]demo/.test(location.search))openPhone('150,120,80,200,500,700,900,1200,600');
+if(/[?&]demo/.test(location.search))openPhone('150,120,80,200,500,700,900,1200,600,0987654321');
 C.on('phone:close',function(){
   $('phone').classList.remove('show');$('pill').classList.remove('on');
   cs=0;clearInterval(ctimer);ctimer=null;if(C.set_focus)C.set_focus(false)});
