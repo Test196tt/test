@@ -27,13 +27,18 @@ html,body{width:100%;height:100%;background:transparent;font-family:"Segoe UI",T
 .fld{background:#1c1c1e;border-radius:10px;padding:11px;margin-bottom:10px;font-size:13px;color:#ddd;cursor:pointer;word-break:break-all;min-height:44px}
 .fld small{display:block;color:#888;font-size:11px;margin-bottom:3px}
 #pv{width:100%;max-height:180px;object-fit:cover;border-radius:10px;display:none;margin-bottom:10px}
+#dms,#chat{flex:1;overflow:auto;display:none}#dms{padding:10px}#chat{flex-direction:column;overflow:hidden}
+.th{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid #1d1d1d;cursor:pointer;font-size:13px}.th .av{width:36px;height:36px;flex:none}.tb{flex:1;min-width:0}.tl2{color:#888;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bdg{background:#0095f6;border-radius:10px;padding:1px 7px;font-size:11px}
+.ch{flex:none;padding:8px 12px;font-weight:600;font-size:14px;border-bottom:1px solid #262626}#msgs{flex:1;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:6px}.bb{max-width:80%;padding:8px 12px;border-radius:16px;font-size:13px;word-break:break-word}.bb.me{align-self:flex-end;background:#0095f6}.bb.ot{align-self:flex-start;background:#262626}#chat .fld{flex:none;margin:8px 10px}
 .go{width:100%;padding:12px;border:0;border-radius:10px;background:#0095f6;color:#fff;font-size:15px;font-weight:600;cursor:pointer}
 </style></head><body>
 <div id="phone">
  <div class="notch"></div>
  <div class="status-bar"><span id="clock">--:--</span><span style="font-size:10px;opacity:.8">LTE</span></div>
- <div class="top"><span class="logo">Instagram</span><span id="bt" onclick="toggle()">&#10133;</span></div>
+ <div class="top"><span class="logo">Instagram</span><span><span id="dm" onclick="dmBtn()" style="cursor:pointer;font-size:18px;margin-right:12px">&#9993;</span><span id="bt" onclick="toggle()">&#10133;</span></span></div>
  <div id="feed"></div>
+ <div id="dms"><div class="fld" onclick="C.emit('ig:key','dmto')"><small>ข้อความใหม่</small>แตะเพื่อพิมพ์ชื่อผู้เล่น</div><div id="tl"></div></div>
+ <div id="chat"><div class="ch" id="cn"></div><div id="msgs"></div><div class="fld" onclick="C.emit('ig:dmkey',cur)"><small>ข้อความ</small>แตะเพื่อพิมพ์</div></div>
  <div id="new">
   <div class="fld" onclick="C.emit('ig:key','img')"><small>ลิงก์รูปภาพ (https://...)</small><span id="v-img">แตะเพื่อใส่ลิงก์</span></div>
   <img id="pv" alt="">
@@ -51,15 +56,26 @@ var C={
 };
 (function wait(){if(window.cef&&window.cef.on){_q.forEach(function(x){window.cef.on(x[0],x[1])});_q=[]}else setTimeout(wait,50)})();
 var $=function(i){return document.getElementById(i)},mode='feed';
-function view(v){mode=v;$('feed').style.display=v==='feed'?'block':'none';$('new').style.display=v==='new'?'block':'none';$('bt').innerHTML=v==='new'?'&#10006;':'&#10133;'}
-function toggle(){view(mode==='feed'?'new':'feed')}
+var T={},cur='',seq=0;
+function view(v){mode=v;['feed','new','dms'].forEach(function(x){$(x).style.display=x===v?'block':'none'});$('chat').style.display=v==='chat'?'flex':'none';$('bt').innerHTML=v==='feed'?'&#10133;':'&#10006;'}
+function toggle(){view(mode==='feed'?'new':mode==='chat'?'dms':'feed');if(mode==='dms')renderTl()}
+function dmBtn(){view(mode==='dms'?'feed':'dms');renderTl()}
+function badge(){var u=0;for(var k in T)u+=T[k].u;$('dm').textContent=u?'\u2709 '+u:'\u2709'}
+function renderTl(){var l=$('tl');l.innerHTML='';var ks=Object.keys(T);if(!ks.length){l.appendChild(mk('div','empty','ยังไม่มีข้อความ'));return}
+ ks.sort(function(a,b){return T[b].t-T[a].t}).forEach(function(k){var t=T[k],m=t.m[t.m.length-1],r=mk('div','th'),b=mk('div','tb');
+  b.appendChild(mk('b','',k));b.appendChild(mk('div','tl2',(m.mine?'คุณ: ':'')+m.x));r.appendChild(mk('div','av',k.charAt(0).toUpperCase()));r.appendChild(b);
+  if(t.u)r.appendChild(mk('span','bdg',t.u));r.onclick=function(){openChat(k)};l.appendChild(r)})}
+function renderChat(){var b=$('msgs');b.innerHTML='';(T[cur]?T[cur].m:[]).forEach(function(m){b.appendChild(mk('div','bb '+(m.mine?'me':'ot'),m.x))});b.scrollTop=b.scrollHeight}
+function openChat(n){n=String(n);cur=n;T[n]=T[n]||{m:[],u:0,t:0};T[n].u=0;$('cn').textContent=n;renderChat();view('chat');badge()}
+function addDm(p,mine,x,live){p=String(p);mine=Number(mine);var t=T[p]=T[p]||{m:[],u:0,t:0};t.m.push({mine:mine,x:String(x)});t.t=++seq;
+ var here=mode==='chat'&&cur===p;if(!mine&&live!=0&&!here)t.u++;if(here)renderChat();if(mode==='dms')renderTl();badge()}
 function clearFeed(){$('feed').innerHTML='<div class="empty" id="empty">ยังไม่มีโพสต์</div>'}
 function mk(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!==undefined)e.textContent=x;return e}
 function setStat(id,n){var e=$('l'+id);if(e)e.textContent=n+' ถูกใจ'}
 function setMine(id,m){var e=$('h'+id);if(e)e.textContent=Number(m)?'\u2764\uFE0F':'\uD83E\uDD0D'}
 function addPost(id,name,cap,url,likes,liked){
   var d=mk('div','post'),h=mk('div','ph');d.id='p'+id;name=String(name);
-  h.appendChild(mk('div','av',name.charAt(0).toUpperCase()));h.appendChild(mk('span','',name));d.appendChild(h);
+  h.appendChild(mk('div','av',name.charAt(0).toUpperCase()));h.appendChild(mk('span','',name));h.style.cursor='pointer';h.onclick=function(){openChat(name)};d.appendChild(h);
   if(url){var im=mk('img');im.src=url;im.onerror=function(){im.style.display='none'};d.appendChild(im)}
   var pa=mk('div','pa'),hb=mk('span');hb.id='h'+id;hb.onclick=function(){C.emit('ig:like',String(id))};pa.appendChild(hb);d.appendChild(pa);
   var lk=mk('div','lk');lk.id='l'+id;d.appendChild(lk);
@@ -67,10 +83,10 @@ function addPost(id,name,cap,url,likes,liked){
   var f=$('feed');if($('empty'))$('empty').style.display='none';f.insertBefore(d,f.firstChild);
   setStat(id,likes);setMine(id,liked);
 }
-function openIg(){clearFeed();$('phone').classList.add('show');view('feed')}
+function openIg(){T={};seq=0;badge();clearFeed();$('phone').classList.add('show');view('feed')}
 function closeIg(){$('phone').classList.remove('show');C.emit('ig:close');C.set_focus(false)}
 // ---- event จาก server ----
-C.on('ig:open',openIg);
+C.on('ig:open',openIg);C.on('ig:dm',addDm);C.on('ig:dmopen',openChat);
 C.on('ig:post',addPost);                                   // id, ชื่อ, คำบรรยาย, ลิงก์รูป, ไลก์, เราไลก์แล้ว(0/1)
 C.on('ig:stat',setStat);                                   // id, จำนวนไลก์
 C.on('ig:mine',setMine);                                   // id, 0/1
