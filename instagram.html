@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Instagram</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;user-select:none}
+html,body{width:100%;height:100%;background:transparent;font-family:"Segoe UI",Tahoma,sans-serif;overflow:hidden}
+#phone{position:absolute;bottom:50px;right:50px;width:330px;height:680px;background:#000;border-radius:45px;border:10px solid #222;box-shadow:0 25px 50px -12px rgba(0,0,0,.8);overflow:hidden;display:none;flex-direction:column;color:#fff;z-index:100}
+#phone.show{display:flex}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:28px;background:#222;border-bottom-left-radius:18px;border-bottom-right-radius:18px;z-index:102}
+.status-bar{height:40px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:12px 30px 0;font-size:13px;font-weight:500}
+.home-indicator{flex:none;height:5px;width:110px;background:#fff;border-radius:10px;margin:15px auto 10px;opacity:.3;cursor:pointer}
+.top{flex:none;display:flex;justify-content:space-between;align-items:center;padding:6px 14px;border-bottom:1px solid #262626}
+.logo{font-size:22px;font-weight:700;font-style:italic;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf);-webkit-background-clip:text;background-clip:text;color:transparent}
+#bt{cursor:pointer;font-size:22px}
+#feed,#new{flex:1;overflow:auto}
+#new{display:none;padding:14px}
+.post{border-bottom:1px solid #1d1d1d;padding-bottom:8px}
+.ph{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:13px;font-weight:600}
+.av{width:28px;height:28px;border-radius:50%;background:linear-gradient(45deg,#feda75,#d62976,#962fbf);display:flex;align-items:center;justify-content:center;font-size:13px}
+.post img{width:100%;max-height:300px;object-fit:cover;background:#111;display:block}
+.pa{padding:8px 12px 2px;font-size:22px}
+.pa span{cursor:pointer}
+.lk{font-size:12px;font-weight:600;padding:0 12px}
+.cp{font-size:13px;padding:2px 12px;word-break:break-word}
+.empty{text-align:center;color:#888;margin-top:60px;font-size:13px}
+.fld{background:#1c1c1e;border-radius:10px;padding:11px;margin-bottom:10px;font-size:13px;color:#ddd;cursor:pointer;word-break:break-all;min-height:44px}
+.fld small{display:block;color:#888;font-size:11px;margin-bottom:3px}
+#pv{width:100%;max-height:180px;object-fit:cover;border-radius:10px;display:none;margin-bottom:10px}
+.go{width:100%;padding:12px;border:0;border-radius:10px;background:#0095f6;color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+</style></head><body>
+<div id="phone">
+ <div class="notch"></div>
+ <div class="status-bar"><span id="clock">--:--</span><span style="font-size:10px;opacity:.8">LTE</span></div>
+ <div class="top"><span class="logo">Instagram</span><span id="bt" onclick="toggle()">&#10133;</span></div>
+ <div id="feed"></div>
+ <div id="new">
+  <div class="fld" onclick="C.emit('ig:key','img')"><small>ลิงก์รูปภาพ (https://...)</small><span id="v-img">แตะเพื่อใส่ลิงก์</span></div>
+  <img id="pv" alt="">
+  <div class="fld" onclick="C.emit('ig:key','cap')"><small>คำบรรยาย</small><span id="v-cap">แตะเพื่อพิมพ์</span></div>
+  <button class="go" onclick="C.emit('ig:post');view('feed')">โพสต์</button>
+ </div>
+ <div class="home-indicator" onclick="closeIg()"></div>
+</div>
+<script>
+var _q=[];
+var C={
+  emit:function(){var c=window.cef;if(c&&c.emit)c.emit.apply(c,arguments);else console.log('emit',[].slice.call(arguments))},
+  set_focus:function(f){var c=window.cef;if(c&&c.set_focus)c.set_focus(f)},
+  on:function(n,f){var c=window.cef;if(c&&c.on)c.on(n,f);else _q.push([n,f])}
+};
+(function wait(){if(window.cef&&window.cef.on){_q.forEach(function(x){window.cef.on(x[0],x[1])});_q=[]}else setTimeout(wait,50)})();
+var $=function(i){return document.getElementById(i)},mode='feed';
+function view(v){mode=v;$('feed').style.display=v==='feed'?'block':'none';$('new').style.display=v==='new'?'block':'none';$('bt').innerHTML=v==='new'?'&#10006;':'&#10133;'}
+function toggle(){view(mode==='feed'?'new':'feed')}
+function clearFeed(){$('feed').innerHTML='<div class="empty" id="empty">ยังไม่มีโพสต์</div>'}
+function mk(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!==undefined)e.textContent=x;return e}
+function setStat(id,n){var e=$('l'+id);if(e)e.textContent=n+' ถูกใจ'}
+function setMine(id,m){var e=$('h'+id);if(e)e.textContent=Number(m)?'\u2764\uFE0F':'\uD83E\uDD0D'}
+function addPost(id,name,cap,url,likes,liked){
+  var d=mk('div','post'),h=mk('div','ph');d.id='p'+id;name=String(name);
+  h.appendChild(mk('div','av',name.charAt(0).toUpperCase()));h.appendChild(mk('span','',name));d.appendChild(h);
+  if(url){var im=mk('img');im.src=url;im.onerror=function(){im.style.display='none'};d.appendChild(im)}
+  var pa=mk('div','pa'),hb=mk('span');hb.id='h'+id;hb.onclick=function(){C.emit('ig:like',String(id))};pa.appendChild(hb);d.appendChild(pa);
+  var lk=mk('div','lk');lk.id='l'+id;d.appendChild(lk);
+  if(cap){var c=mk('div','cp'),b=mk('b','',name+' ');c.appendChild(b);c.appendChild(document.createTextNode(cap));d.appendChild(c)}
+  var f=$('feed');if($('empty'))$('empty').style.display='none';f.insertBefore(d,f.firstChild);
+  setStat(id,likes);setMine(id,liked);
+}
+function openIg(){clearFeed();$('phone').classList.add('show');view('feed')}
+function closeIg(){$('phone').classList.remove('show');C.emit('ig:close');C.set_focus(false)}
+// ---- event จาก server ----
+C.on('ig:open',openIg);
+C.on('ig:post',addPost);                                   // id, ชื่อ, คำบรรยาย, ลิงก์รูป, ไลก์, เราไลก์แล้ว(0/1)
+C.on('ig:stat',setStat);                                   // id, จำนวนไลก์
+C.on('ig:mine',setMine);                                   // id, 0/1
+C.on('ig:input',function(t,v){                             // ช่องร่างโพสต์: t = img / cap
+  v=String(v||'');
+  if(t==='img'){$('v-img').textContent=v||'แตะเพื่อใส่ลิงก์';var p=$('pv');if(v){p.src=v;p.style.display='block'}else p.style.display='none'}
+  else $('v-cap').textContent=v||'แตะเพื่อพิมพ์'});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeIg()});
+function fit(){$('phone').style.zoom=Math.min(1,(innerHeight-20)/710)}
+fit();addEventListener('resize',fit);
+function tick(){var d=new Date();$('clock').textContent=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
+tick();setInterval(tick,20000);
+// โหมดทดลองในเบราว์เซอร์: เปิดลิงก์แล้วต่อท้าย ?demo
+if(/[?&]demo/.test(location.search)){openIg();addPost(1,'Somchai Jaidee','ทดสอบโพสต์แรก','',3,0);addPost(2,'Mali Rakdee','อากาศดีจัง','',12,1)}
+</script></body></html>
