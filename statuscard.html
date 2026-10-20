@@ -9,11 +9,11 @@
 
     <style>
         :root {
-            --gold-high: #ff4d5a;
-            --gold-light: #e0202f;
-            --gold-mid: #8f0f1b;
-            --gold-dark: #3a0509;
-            --subtle-glow: rgba(255, 45, 60, 0.14);
+            --gold-high: #4aa8ff;
+            --gold-light: #1060f0;
+            --gold-mid: #0b3d9e;
+            --gold-dark: #06173d;
+            --subtle-glow: rgba(30, 120, 255, 0.16);
         }
 
         * {
@@ -49,7 +49,7 @@
             padding: 2.5px;
             border-radius: 20px;
             box-shadow:
-                inset 0 1.5px 2px rgba(255, 90, 100, 0.35),
+                inset 0 1.5px 2px rgba(110, 175, 255, 0.35),
                 inset 0 -1.5px 2px rgba(0, 0, 0, 0.9);
             width: 480px;
             max-width: 95vw;
@@ -60,7 +60,7 @@
 
         .card-container {
             background-color: #0c0a0b;
-            background-image: linear-gradient(135deg, rgba(38,10,14,0.94) 0%, rgba(18,8,10,0.96) 50%, rgba(8,8,9,0.98) 100%);
+            background-image: linear-gradient(135deg, rgba(10,22,46,0.94) 0%, rgba(8,14,30,0.96) 50%, rgba(8,8,9,0.98) 100%);
             background-size: cover;
             background-position: center;
             border-radius: 17.5px;
@@ -128,7 +128,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid rgba(255, 60, 75, 0.24);
+            border-bottom: 1px solid rgba(40, 130, 255, 0.24);
             padding-bottom: 6px;
             z-index: 2;
         }
@@ -218,7 +218,7 @@
         .photo-box {
             width: 125px;
             height: 142px;
-            background: radial-gradient(circle, #2a0d11 0%, #0b0b0d 100%);
+            background: radial-gradient(circle, #0c1a33 0%, #0b0b0d 100%);
             border: 2px dashed var(--gold-mid);
             border-radius: 12px;
             padding: 2px;
@@ -359,7 +359,7 @@
             background: rgba(9, 10, 12, 0.85);
             border-radius: 8px;
             padding: 6px;
-            border: 1px solid rgba(255, 60, 75, 0.18);
+            border: 1px solid rgba(40, 130, 255, 0.18);
             z-index: 2;
         }
 
@@ -399,7 +399,7 @@
             font-size: 9.5px;
             font-weight: 900;
             color: var(--gold-high);
-            background: rgba(255, 60, 75, 0.15);
+            background: rgba(40, 130, 255, 0.15);
             border: 0.5px solid var(--gold-mid);
             padding: 1px 4px;
             border-radius: 4px;
@@ -433,7 +433,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid rgba(255, 60, 75, 0.18);
+            border-bottom: 1px solid rgba(40, 130, 255, 0.18);
             padding-bottom: 6px;
         }
 
@@ -490,7 +490,7 @@
             border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.2s;
         }
 
-        .toggle-switch.active { background: linear-gradient(90deg, #ff4d5a, #c8101f); }
+        .toggle-switch.active { background: linear-gradient(90deg, #4aa8ff, #0a50d0); }
         .toggle-switch.active::after { transform: translateX(16px); }
 
         /* ------------------ แผงเมนูย่อยเลือกประเภทการเปลี่ยนรูป ------------------ */
@@ -586,7 +586,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid rgba(255, 60, 75, 0.18);
+            border-bottom: 1px solid rgba(40, 130, 255, 0.18);
             padding-bottom: 6px;
         }
 
@@ -645,7 +645,7 @@
             font-size: 9.5px;
             font-weight: 700;
             color: var(--gold-high);
-            background: rgba(255, 60, 75, 0.18);
+            background: rgba(40, 130, 255, 0.18);
             border: 0.5px solid var(--gold-mid);
             padding: 1px 6px;
             border-radius: 4px;
@@ -700,7 +700,7 @@
 
         .card-frame {
             box-shadow:
-                inset 0 1px 1px rgba(255, 90, 100, 0.38),
+                inset 0 1px 1px rgba(110, 175, 255, 0.38),
                 inset 0 -1px 2px rgba(0, 0, 0, 0.90) !important;
         }
 
@@ -847,7 +847,7 @@
             padding: 6px 10px; font-family: 'Kanit', sans-serif; font-size: 10.5px;
             outline: none; user-select: text; -webkit-user-select: text;
         }
-        .url-input:focus { border-color: var(--gold-high); box-shadow: 0 0 6px rgba(255,60,75,0.35); }
+        .url-input:focus { border-color: var(--gold-high); box-shadow: 0 0 6px rgba(40,130,255,0.35); }
         .url-input::placeholder { color: #6d6f76; }
         .url-msg { font-size: 9px; color: #8c8f98; min-height: 12px; }
         .url-msg.ok { color: #2ed573; }
