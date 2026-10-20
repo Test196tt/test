@@ -42,16 +42,35 @@ function icon(s,d){ // d.i = ลิงก์รูป หรือ อีโม�
  if(!d||!d.n){s.classList.add("empty");box.innerHTML="";s.title="";return}
  s.classList.remove("empty");s.title=d.n;
  const v=d.i||"";
- box.innerHTML=/^(https?:|\/|\.|file:|data:)|\.(png|webp|jpg|svg)$/i.test(v)?`<img class="ic" src="${v}" draggable="false">`:(v||[...d.n].slice(0,2).join(""));
+ const fb=[...d.n.split("_").pop()].slice(0,2).join("").toUpperCase();
+ box.textContent="";
+ if(/^(https?:|\/|\.|file:|data:)|\.(png|webp|jpg|svg)$/i.test(v)){const im=new Image();im.className="ic";im.draggable=false;im.onerror=()=>{box.textContent=fb};im.src=v;box.appendChild(im)}
+ else box.textContent=v||fb;
 }
 // รับจากเซิร์ฟเวอร์: hotbar:update = {"show":1,"slots":[{"n":"ชื่อไอเทม","i":"ลิงก์รูป"}, ...7 ช่อง]}
 function upd(o){
  if(o.slots)[...el.children].forEach((s,i)=>icon(s,o.slots[i]));
- if(o.show&&!shown){shown=true;fit();el.classList.remove("off");el.classList.add("on")}
- else if(o.show===0&&shown||o.show===false&&shown){shown=false;el.classList.remove("on");el.classList.add("off")}
+ if(o.show&&!shown){shown=true;sfx("open");fit();el.classList.remove("off");el.classList.add("on")}
+ else if(o.show===0&&shown||o.show===false&&shown){shown=false;sfx("close");el.classList.remove("on");el.classList.add("off")}
 }
 // hotbar:use = [slot] -> เล่นอนิเมชั่นกดช่อง (เรียกตอนผู้เล่นกดปุ่มลัด)
-function use(n){const s=el.children[n-1];if(!s)return;s.classList.remove("use");void s.offsetWidth;s.classList.add("use")}
+let AC=null;const VOL=.3; // เสียงสไตล์ FiveM สังเคราะห์ด้วย WebAudio (ปรับความดัง VOL 0-1, ตั้ง 0 = ปิดเสียง)
+function sfx(t){
+ if(!VOL)return;
+ try{
+  AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+  if(AC.state=="suspended")AC.resume();
+  const n=AC.currentTime;
+  const tone=(f1,f2,d,at,type,v)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=type||"sine";
+   o.frequency.setValueAtTime(f1,n+at);o.frequency.exponentialRampToValueAtTime(f2,n+at+d);
+   g.gain.setValueAtTime(.0001,n+at);g.gain.exponentialRampToValueAtTime(VOL*(v||1),n+at+.006);g.gain.exponentialRampToValueAtTime(.0001,n+at+d);
+   o.connect(g);g.connect(AC.destination);o.start(n+at);o.stop(n+at+d+.03)};
+  if(t=="select"){tone(1500,2300,.09,0,"sine");tone(750,1150,.06,0,"triangle",.5);tone(3000,3600,.03,0,"sine",.25)}
+  else if(t=="open"){tone(520,880,.12,0,"sine",.7);tone(1040,1320,.08,.03,"sine",.3)}
+  else if(t=="close"){tone(880,520,.1,0,"sine",.6)}
+ }catch(_){}
+}
+function use(n){const s=el.children[n-1];if(!s)return;if(!s.classList.contains("empty"))sfx("select");s.classList.remove("use");void s.offsetWidth;s.classList.add("use")}
 const norm=(...a)=>{let x=a[0];if(typeof x=="string")try{x=JSON.parse(x)}catch(_){}return x};
 let bound=false;
 function bind(){
