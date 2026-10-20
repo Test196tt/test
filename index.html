@@ -30,6 +30,24 @@ h2{font-size:18px;margin:6px 0 10px}
 .row{display:flex;justify-content:space-between;padding:9px 12px;background:#1c1c1e;border-radius:10px;margin-bottom:6px;font-size:14px}
 .row b{color:#55efc4}
 .list{overflow:auto;flex:1}
+#s-call{align-items:center;justify-content:space-between;padding:70px 16px 36px;background:linear-gradient(170deg,#16202b,#000 75%)}
+.avatar{width:96px;height:96px;border-radius:50%;background:#2c3e50;display:flex;align-items:center;justify-content:center;font-size:48px;margin:0 auto 14px}
+.cname{font-size:22px;font-weight:600;text-align:center;word-break:break-word}
+.cstat{font-size:14px;color:#9aa4ad;text-align:center;margin-top:6px;letter-spacing:1px}
+.cbtns{display:flex;gap:46px;justify-content:center}
+.cb{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;cursor:pointer;color:#ccc}
+.cb i{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-style:normal}
+.cb:active i{transform:scale(.92)}
+.cb.ans i{background:#2ecc71}.cb.end i{background:#e74c3c}
+.ring .avatar{animation:pulse 1.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(46,204,113,.6)}100%{box-shadow:0 0 0 26px rgba(46,204,113,0)}}
+#pill{position:absolute;top:70px;right:16px;width:220px;padding:10px 14px;background:rgba(18,20,26,.94);border:1px solid #333;border-radius:22px;color:#fff;display:none;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.6);pointer-events:none;z-index:200}
+#pill.on{display:flex}
+#pill .pi{width:34px;height:34px;border-radius:50%;background:#2ecc71;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none}
+#pill.r .pi{animation:pulse 1.2s infinite}
+#pill .pt{min-width:0}
+#pill .pn{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pill .ps{font-size:11px;color:#9aa4ad}
 </style></head><body>
 <div id="phone">
  <div class="notch"></div>
@@ -43,6 +61,17 @@ h2{font-size:18px;margin:6px 0 10px}
    <div class="pad" id="keys"></div>
    <div class="err" id="err"></div>
   </div>
+  <div class="screen" id="s-call">
+   <div style="width:100%">
+    <div class="avatar">&#128100;</div>
+    <div class="cname" id="c-name"></div>
+    <div class="cstat" id="c-stat"></div>
+   </div>
+   <div class="cbtns">
+    <div class="cb ans" id="b-ans" onclick="act('answer')"><i>&#128222;</i>รับสาย</div>
+    <div class="cb end" onclick="act('hangup')"><i>&#128245;</i><span id="b-end">วางสาย</span></div>
+   </div>
+  </div>
   <div class="screen" id="s-price">
    <div class="back" onclick="show('home')">&lsaquo; กลับ</div>
    <h2>ราคาสินค้า</h2>
@@ -52,6 +81,7 @@ h2{font-size:18px;margin:6px 0 10px}
  <div class="home-indicator" onclick="act('close')"></div>
 </div>
 
+<div id="pill"><div class="pi">&#128222;</div><div class="pt"><div class="pn" id="p-name"></div><div class="ps" id="p-stat"></div></div></div>
 <script>
 // ---- สะพานเชื่อม CEF (ถ้าเปิดไฟล์ในเบราว์เซอร์ธรรมดาจะใช้ mock ให้ทดสอบหน้าตาได้) ----
 // Android WebView ฉีด window.cef หลังโหลดหน้าเสร็จ (onPageFinished) จึงต้องหยิบมาใช้ตอนเรียก ไม่ใช่ตอนโหลดสคริปต์
@@ -64,6 +94,7 @@ var C={
 (function wait(){if(window.cef&&window.cef.on){_q.forEach(function(x){window.cef.on(x[0],x[1])});_q=[]}else setTimeout(wait,50)})();
 var $=function(i){return document.getElementById(i)};
 var mode='call', buf='';
+var cs=0, cname='', csince=0, ctimer=null, cfocus=true;
 
 var APPS=[
  {id:'call',    n:'โทร',      i:'📞',c:'#2ecc71'},
@@ -86,7 +117,7 @@ $('keys').innerHTML=['1','2','3','4','5','6','7','8','9','✖','0','✔'].map(fu
 }).join('');
 
 function show(s){
-  ['home','pad','price'].forEach(function(x){$('s-'+x).classList.toggle('on',x===s)});
+  ['home','pad','price','call'].forEach(function(x){$('s-'+x).classList.toggle('on',x===s)});
 }
 function act(a,p){C.emit('phone:act',a+'|'+(p||''));if(a==='close'&&C.set_focus)C.set_focus(false)}      // ส่งเป็นสตริงเดียว "action|ข้อมูล"
 function tap(id){
@@ -108,13 +139,46 @@ function fmt(n){return '$'+Number(n).toLocaleString('en-US')}
 function openPhone(prices){
   var p=String(prices||'').split(',');
   $('prices').innerHTML=ITEMS.map(function(n,i){return '<div class="row"><span>'+n+'</span><b>'+fmt(p[i]||0)+'</b></div>'}).join('');
-  show('home');$('phone').classList.add('show');
+  show(cs>0?'call':'home');$('phone').classList.add('show');
 }
 C.on('phone:open',openPhone);
 // โหมดทดลองในเบราว์เซอร์: เปิดลิงก์แล้วต่อท้าย ?demo  (ในเกมจะไม่ใช้)
 if(/[?&]demo/.test(location.search))openPhone('150,120,80,200,500,700,900,1200,600');
-C.on('phone:close',function(){$('phone').classList.remove('show');if(C.set_focus)C.set_focus(false)});
-C.on('phone:error',function(code){$('err').textContent=(code==1?'เบอร์นี้ไม่ได้ออนไลน์อยู่':'ข้อมูลไม่ถูกต้อง')});
+C.on('phone:close',function(){
+  $('phone').classList.remove('show');$('pill').classList.remove('on');
+  cs=0;clearInterval(ctimer);ctimer=null;if(C.set_focus)C.set_focus(false)});
+
+// ---- สาย: phone:call  "state|ชื่อ|focus"   state 0=ว่าง 1=กำลังโทร 2=สายเข้า 3=กำลังคุย ----
+function mmss(ms){var t=Math.floor(ms/1000),m=Math.floor(t/60),x=t%60;return ('0'+m).slice(-2)+':'+('0'+x).slice(-2)}
+function statText(){
+  if(cs===1)return 'กำลังโทร…';
+  if(cs===2)return cfocus?'สายเรียกเข้า':'สายเรียกเข้า · /pickup';
+  if(cs===3)return mmss(Date.now()-csince);
+  return '';
+}
+function renderCall(){
+  var t=statText();
+  $('c-name').textContent=cname;$('c-stat').textContent=t;
+  $('p-name').textContent=cname;$('p-stat').textContent=t;
+  $('b-ans').style.display=(cs===2)?'flex':'none';
+  $('b-end').textContent=(cs===2)?'ปฏิเสธ':'วางสาย';
+  $('s-call').classList.toggle('ring',cs===2);
+  $('pill').classList.toggle('r',cs===2);
+}
+C.on('phone:call',function(a){
+  var p=String(a||'').split('|'),st=parseInt(p[0],10)||0;
+  cname=p[1]||'';cfocus=(p[2]==='1');
+  if(st===cs&&st!==0){}else if(st===3)csince=Date.now();
+  cs=st;
+  clearInterval(ctimer);ctimer=null;
+  if(st===0){$('pill').classList.remove('on');if($('phone').classList.contains('show'))show('home');return}
+  ctimer=setInterval(renderCall,500);renderCall();
+  if(cfocus){$('pill').classList.remove('on');$('phone').classList.add('show');show('call')}
+  else{$('phone').classList.remove('show');$('pill').classList.add('on')}
+});
+C.on('phone:error',function(code){
+  var m={1:'เบอร์นี้ไม่ได้ออนไลน์อยู่',3:'คุณกำลังใช้สายอยู่',4:'สายไม่ว่าง'};
+  $('err').textContent=m[code]||'ข้อมูลไม่ถูกต้อง'});
 
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape')act('close');
