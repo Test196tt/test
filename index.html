@@ -135,6 +135,7 @@ function tap(id){
     $('pad-title').textContent=id==='call'?'โทร':'ส่งข้อความ (ใส่เบอร์)';show('pad');}
   else if(id==='prices'){show('price')}
   else if(id==='me'){show('me')}
+  else if(id==='ig'&&!(window.cef&&window.cef.emit)){window.open('instagram.html?open','_blank')}  // เปิดในเบราว์เซอร์ธรรมดา: เปิดหน้า IG เปิดหน้าเปล่า
   else act(id);
 }
 function key(k){
@@ -154,7 +155,7 @@ function openPhone(prices){
   show(cs>0?'call':'home');$('phone').classList.add('show');
 }
 C.on('phone:open',openPhone);
-// โหมดทดลองในเบราว์เซอร์: เปิดลิงก์แล้วต่อท้าย ?demo  (ในเกมจะไม่ใช้)
+// เปิดหน้าเปล่าในเบราว์เซอร์: เปิดลิงก์แล้วต่อท้าย ?demo  (ในเกมจะไม่ใช้)
 if(/[?&]demo/.test(location.search))openPhone('150,120,80,200,500,700,900,1200,600,0987654321');
 C.on('phone:close',function(){
   $('phone').classList.remove('show');$('pill').classList.remove('on');

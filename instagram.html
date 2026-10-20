@@ -100,5 +100,5 @@ fit();addEventListener('resize',fit);
 function tick(){var d=new Date();$('clock').textContent=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
 tick();setInterval(tick,20000);
 // โหมดทดลองในเบราว์เซอร์: เปิดลิงก์แล้วต่อท้าย ?demo
-if(/[?&]demo/.test(location.search)){openIg();addPost(1,'Somchai Jaidee','ทดสอบโพสต์แรก','',3,0);addPost(2,'Mali Rakdee','อากาศดีจัง','',12,1)}
+if(/[?&](open|demo)/.test(location.search)){openIg()}
 </script></body></html>
