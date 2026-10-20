@@ -44,7 +44,7 @@ function icon(s,d){ // d.i = ลิงก์รูป หรือ อีโม�
  const v=d.i||"";
  const fb=[...d.n.split("_").pop()].slice(0,2).join("").toUpperCase();
  box.textContent="";
- if(/^(https?:|\/|\.|file:|data:)|\.(png|webp|jpg|svg)$/i.test(v)){const im=new Image();im.className="ic";im.draggable=false;im.onerror=()=>{box.textContent=fb};im.src=v;box.appendChild(im)}
+ if(/^(https?:|\/|\.|file:|data:)|\.(png|webp|jpg|svg)$/i.test(v)){const im=new Image();im.className="ic";im.draggable=false;im.onerror=()=>{im.onerror=null;im.src=PH};im.src=v;box.appendChild(im)}
  else box.textContent=v||fb;
 }
 // รับจากเซิร์ฟเวอร์: hotbar:update = {"show":1,"slots":[{"n":"ชื่อไอเทม","i":"ลิงก์รูป"}, ...7 ช่อง]}
@@ -54,22 +54,42 @@ function upd(o){
  else if(o.show===0&&shown||o.show===false&&shown){shown=false;sfx("close");el.classList.remove("on");el.classList.add("off")}
 }
 // hotbar:use = [slot] -> เล่นอนิเมชั่นกดช่อง (เรียกตอนผู้เล่นกดปุ่มลัด)
-let AC=null;const VOL=.3; // เสียงสไตล์ FiveM สังเคราะห์ด้วย WebAudio (ปรับความดัง VOL 0-1, ตั้ง 0 = ปิดเสียง)
-function sfx(t){
- if(!VOL)return;
- try{
-  AC=AC||new(window.AudioContext||window.webkitAudioContext)();
-  if(AC.state=="suspended")AC.resume();
-  const n=AC.currentTime;
-  const tone=(f1,f2,d,at,type,v)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=type||"sine";
-   o.frequency.setValueAtTime(f1,n+at);o.frequency.exponentialRampToValueAtTime(f2,n+at+d);
-   g.gain.setValueAtTime(.0001,n+at);g.gain.exponentialRampToValueAtTime(VOL*(v||1),n+at+.006);g.gain.exponentialRampToValueAtTime(.0001,n+at+d);
-   o.connect(g);g.connect(AC.destination);o.start(n+at);o.stop(n+at+d+.03)};
-  if(t=="select"){tone(1500,2300,.09,0,"sine");tone(750,1150,.06,0,"triangle",.5);tone(3000,3600,.03,0,"sine",.25)}
-  else if(t=="open"){tone(520,880,.12,0,"sine",.7);tone(1040,1320,.08,.03,"sine",.3)}
-  else if(t=="close"){tone(880,520,.1,0,"sine",.6)}
- }catch(_){}
+const PH="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect x="6" y="6" width="36" height="36" rx="9" fill="#202020" stroke="#0879cb" stroke-width="2"/><path d="M24 13l9 11-9 11-9-11z" fill="#0879cb"/></svg>');
+// ---------- เสียง (สร้างด้วย Web Audio ไม่ต้องมีไฟล์) ----------
+const SFX={on:true,vol:.5};   // on=false ปิดเสียงทั้งหมด, vol 0-1 ปรับความดัง
+let ac,nb;
+function actx(){
+ if(!ac){try{ac=new(window.AudioContext||window.webkitAudioContext)()}catch(_){return null}}
+ if(ac.state==="suspended")ac.resume().catch(()=>{});
+ return ac;
 }
+function noise(c){
+ if(!nb){nb=c.createBuffer(1,c.sampleRate*.5,c.sampleRate);const d=nb.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+ return nb;
+}
+function whoosh(up){ // เสียงลมวูบ: เปิด = ไล่ความถี่ขึ้น, ปิด = ไล่ลง
+ const c=actx();if(!c)return;const t=c.currentTime,s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();
+ s.buffer=noise(c);f.type="bandpass";f.Q.value=1.1;
+ f.frequency.setValueAtTime(up?450:2600,t);f.frequency.exponentialRampToValueAtTime(up?2800:380,t+.24);
+ g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(SFX.vol*.55,t+.06);g.gain.exponentialRampToValueAtTime(.001,t+.28);
+ s.connect(f);f.connect(g);g.connect(c.destination);s.start(t);s.stop(t+.3);
+}
+function tone(f1,f2,dur,type,v,delay){ // เสียงคลิก/ติ๊ก
+ const c=actx();if(!c)return;const t=c.currentTime+(delay||0),o=c.createOscillator(),g=c.createGain();
+ o.type=type||"sine";o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+ g.gain.setValueAtTime(SFX.vol*v,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);
+ o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur+.02);
+}
+const SND={
+ open(){whoosh(true);tone(880,1320,.08,"sine",.28,.14)},
+ close(){whoosh(false);tone(520,360,.07,"sine",.2,.02)},
+ sel(){tone(1300,1100,.035,"triangle",.2)},
+ hot(){tone(700,1150,.1,"sine",.3);tone(1150,1500,.08,"sine",.18,.07)},
+ use(){tone(620,940,.09,"triangle",.28)}
+};
+const play=n=>{if(SFX.on)try{SND[n]()}catch(_){}};
+document.addEventListener("pointerdown",()=>actx(),{once:true}); // ปลดล็อกเสียงเมื่อแตะครั้งแรก
+const sfx=t=>play(t=="select"?"use":t);
 function use(n){const s=el.children[n-1];if(!s)return;if(!s.classList.contains("empty"))sfx("select");s.classList.remove("use");void s.offsetWidth;s.classList.add("use")}
 const norm=(...a)=>{let x=a[0];if(typeof x=="string")try{x=JSON.parse(x)}catch(_){}return x};
 let bound=false;
