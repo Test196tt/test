@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hotbar</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#1e6bff;--blue2:#0f63c8}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:transparent;overflow:hidden;font-family:Kanit,"Noto Sans Thai",Tahoma,sans-serif;user-select:none}
+#hud{position:fixed;left:50%;bottom:8px;width:340px;height:60px;margin-left:-170px;transform-origin:50% 100%;transform:scale(var(--k,1))}
+#in{position:absolute;inset:0;opacity:0;display:flex;gap:4px;padding:5px;background:linear-gradient(#262628,#1b1b1d);border:2px solid var(--blue);border-radius:9px;box-shadow:0 0 0 1px #0008}
+#in.on{animation:bIn .45s cubic-bezier(.2,.9,.3,1.1) both}
+#in.off{animation:bOut .3s ease-in both}
+.s{position:relative;flex:1;border-radius:6px;background:#2c2c2f;border:1px solid #3a3a3e;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;transition:transform .12s,border-color .12s}
+.s:hover{border-color:var(--blue)}
+.s.use{animation:pop .28s ease-out;border-color:var(--blue)}
+.s.empty .ic{opacity:0}
+.k{position:absolute;left:0;top:0;width:18px;height:18px;background:linear-gradient(135deg,#2f8cff,var(--blue2));clip-path:polygon(0 0,100% 0,0 100%);color:#fff;font:600 9px/10px Kanit,sans-serif;padding:1px 0 0 3px}
+.ic{max-width:78%;max-height:78%;object-fit:contain;font-size:22px;line-height:1;color:#e8e8ec;text-align:center;font-weight:500}
+@keyframes bIn{from{opacity:0;transform:translateY(40px) scale(.85)}to{opacity:1;transform:none}}
+@keyframes bOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(24px) scale(.9)}}
+@keyframes pop{0%{transform:scale(1.18)}100%{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){#in{animation:none!important}#in.on{opacity:1}}
+</style></head><body>
+<div id="hud"><div id="in"></div></div>
+<script>
+const PREVIEW=false;
+const $=id=>document.getElementById(id);
+const KEYS=["1","2","3","4","5","6","7"];
+let shown=false,K=1;
+const el=$("in");
+el.innerHTML=KEYS.map((k,i)=>`<div class="s empty" data-i="${i+1}"><span class="k">${k}</span><div class="ic"></div></div>`).join("");
+el.addEventListener("click",e=>{const s=e.target.closest(".s");if(s&&!s.classList.contains("empty")&&window.cef&&cef.emit)cef.emit("hotbar:use",+s.dataset.i)});
+addEventListener("keydown",e=>{ // เบราว์เซอร์โฟกัสอยู่ตอนแถบเปิด: กด 1-7 = ใช้ช่อง, Esc/Alt = ปิด
+ if(!shown)return;
+ if(/^[1-7]$/.test(e.key)){use(+e.key);if(window.cef&&cef.emit)cef.emit("hotbar:use",+e.key)}
+ else if(e.key=="Escape"||e.key=="Alt"){e.preventDefault();if(window.cef&&cef.emit)cef.emit("hotbar:close")}
+});
+function fit(){K=Math.min(1,innerWidth*.96/340,innerHeight*.3/60);$("hud").style.setProperty("--k",K)}
+function icon(s,d){ // d.i = ลิงก์รูป หรือ อีโมจิ/ตัวอักษร ถ้าไม่มีใช้ 2 ตัวแรกของชื่อ
+ const box=s.querySelector(".ic");
+ if(!d||!d.n){s.classList.add("empty");box.innerHTML="";s.title="";return}
+ s.classList.remove("empty");s.title=d.n;
+ const v=d.i||"";
+ box.innerHTML=/^(https?:|\/|\.|file:|data:)|\.(png|webp|jpg|svg)$/i.test(v)?`<img class="ic" src="${v}" draggable="false">`:(v||[...d.n].slice(0,2).join(""));
+}
+// รับจากเซิร์ฟเวอร์: hotbar:update = {"show":1,"slots":[{"n":"ชื่อไอเทม","i":"ลิงก์รูป"}, ...7 ช่อง]}
+function upd(o){
+ if(o.slots)[...el.children].forEach((s,i)=>icon(s,o.slots[i]));
+ if(o.show&&!shown){shown=true;fit();el.classList.remove("off");el.classList.add("on")}
+ else if(o.show===0&&shown||o.show===false&&shown){shown=false;el.classList.remove("on");el.classList.add("off")}
+}
+// hotbar:use = [slot] -> เล่นอนิเมชั่นกดช่อง (เรียกตอนผู้เล่นกดปุ่มลัด)
+function use(n){const s=el.children[n-1];if(!s)return;s.classList.remove("use");void s.offsetWidth;s.classList.add("use")}
+const norm=(...a)=>{let x=a[0];if(typeof x=="string")try{x=JSON.parse(x)}catch(_){}return x};
+let bound=false;
+function bind(){
+ if(bound)return true;
+ if(!window.cef||!cef.on)return false;
+ cef.on("hotbar:update",(...a)=>upd(norm(...a)));
+ cef.on("hotbar:use",(...a)=>use(+norm(...a)));
+ return bound=true;
+}
+if(!bind()){const iv=setInterval(()=>{if(bind())clearInterval(iv)},100);addEventListener("load",bind)}
+addEventListener("resize",fit);fit();
+if(PREVIEW||location.hash=="#preview"){
+ const demo=[{n:"มีดซามูไร",i:"🗡️"},{n:"มีด",i:"🔪"},{n:"หมวกกันน็อค",i:"🪖"},{n:"หินเขียว",i:"💎"},{n:"พิซซ่า",i:"🍕"},{n:"เนื้อ",i:"🥩"},null];
+ let t0=Date.now(),last=-1;
+ setInterval(()=>{
+  const c=((Date.now()-t0)/1000)%9;
+  upd({show:c<7?1:0,slots:demo});
+  const u=Math.floor(c/1.1)+1;if(c<7&&u!==last&&u<=6){last=u;use(u)}if(c<1)last=-1;
+ },120);
+}
+</script></body></html>
