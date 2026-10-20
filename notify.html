@@ -4,10 +4,17 @@
 <meta charset="utf-8">
 <title>MELVY TOWN item notify</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&family=Orbitron:wght@800;900&display=swap" rel="stylesheet">
 <style>
+  :root{
+    --add:#0b5a96;        /* แถบด้านขวาตอนได้รับของ (สีน้ำเงินเดียวกับหลอดเลือด) */
+    --add-t:#3aa4f5;      /* ตัวหนังสือ ADDED */
+    --rem:#f92b2b;        /* แถบด้านขวาตอนของลดลง */
+    --rem-t:#f12a2a;      /* ตัวหนังสือ REMOVE */
+  }
   html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden;
     user-select:none;-webkit-user-select:none;pointer-events:none;
-    font-family:'Segoe UI','Noto Sans Thai','Noto Sans',Tahoma,Arial,sans-serif}
+    font-family:'Kanit','Segoe UI','Noto Sans Thai','Noto Sans',Tahoma,Arial,sans-serif}
 
   /* กองการ์ดอยู่ขวากลางจอ การ์ดใหม่ต่อท้ายด้านล่าง */
   #stack{
@@ -16,43 +23,49 @@
   }
 
   .n{
-    --c:#35ff7a;--c2:rgba(53,255,122,.5);--g:rgba(40,255,110,.26);--bg:#0b2a16;
+    --c:var(--add);--t:var(--add-t);
     position:relative;box-sizing:border-box;
-    width:clamp(150px,13vw,210px);padding:7px 11px 7px 8px;border-radius:12px;
-    display:flex;align-items:center;gap:9px;
-    background:linear-gradient(160deg,#0b0b0d 0%,#07140c 58%,var(--bg) 100%);
-    border:1px solid var(--c2);
-    box-shadow:0 0 16px var(--g),inset 0 0 14px rgba(0,0,0,.65);
+    width:clamp(170px,15vw,230px);height:clamp(52px,5.2vw,64px);
+    display:flex;align-items:stretch;border-radius:9px;overflow:hidden;
+    background:#222;box-shadow:0 3px 10px rgba(0,0,0,.45);
     opacity:0;transform:translateX(34px);
     transition:opacity .28s ease,transform .28s ease;
   }
-  .n.remove{
-    --c:#ff3b4a;--c2:rgba(255,45,60,.55);--g:rgba(255,30,50,.28);--bg:#2b0a0f;
-    background:linear-gradient(160deg,#0b0b0d 0%,#170709 58%,var(--bg) 100%);
-  }
+  .n.remove{--c:var(--rem);--t:var(--rem-t)}
   .n.in{opacity:1;transform:translateX(0)}
   .n.out{opacity:0;transform:translateX(34px)}
   .n.pop{animation:pop .22s ease}
   @keyframes pop{50%{transform:scale(1.06)}}
 
-  /* แถบสีด้านซ้าย */
-  .n::before{
-    content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0;
-    background:var(--c);box-shadow:0 0 8px var(--c);
-  }
-
+  /* กล่องรูปไอเทมด้านซ้าย + ป้ายเล็ก */
   .img{
-    flex:none;width:42px;height:42px;border-radius:9px;margin-left:4px;
+    position:relative;flex:none;align-self:center;margin:0 0 0 5px;
+    width:clamp(40px,3.8vw,50px);height:calc(100% - 10px);border-radius:7px;background:#141414;
     display:flex;align-items:center;justify-content:center;
-    background:rgba(0,0,0,.45);border:1px solid var(--c2);
   }
-  .img img{max-width:34px;max-height:34px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6))}
-  .img em{font-style:normal;font-size:20px}
+  .img img{max-width:70%;max-height:62%;object-fit:contain;margin-top:6px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}
+  .img em{font-style:normal;font-size:18px;margin-top:6px}
+  .img .tag{
+    position:absolute;left:3px;top:2px;padding:1px 5px;border-radius:5px;
+    background:#3a3a3a;color:#d4d4d4;font-size:6.5px;font-weight:500;line-height:1.3;
+  }
 
-  .tx{min-width:0;flex:1;line-height:1.1}
-  .tx small{display:block;font-size:9.5px;font-weight:800;letter-spacing:.09em;color:var(--c);opacity:.9}
-  .tx b{display:block;margin-top:2px;font-size:20px;font-weight:800;color:#fff;
-    text-shadow:0 0 10px var(--g)}
+  /* ตรงกลาง: หัวข้อ / คำอธิบาย / ช่องตัวเลข */
+  .tx{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0 4px;line-height:1}
+  .ttl{font-family:'Orbitron','Kanit',sans-serif;font-weight:900;font-size:clamp(10px,1vw,13px);letter-spacing:.06em;color:var(--t);
+    text-shadow:0 1px 0 rgba(0,0,0,.6)}
+  .sub{font-size:clamp(7px,.62vw,8.5px);color:#e3e3e3;font-weight:400}
+  .num{min-width:62%;text-align:center;padding:2px 8px;border-radius:5px;background:#161616;
+    font-size:clamp(9px,.85vw,11px);font-weight:600;color:#fff}
+
+  /* แถบสีด้านขวา + รอยบากสี่เหลี่ยมข้าวหลามตัด */
+  .side{position:relative;flex:none;width:clamp(22px,2.1vw,28px);background:var(--c)}
+  .side::before{
+    content:"";position:absolute;left:-9px;top:50%;width:17px;height:17px;
+    transform:translateY(-50%) rotate(45deg);background:var(--c);border-radius:3px;
+  }
+  .side b{position:absolute;left:-4px;top:50%;transform:translateY(-52%);width:14px;text-align:center;
+    font-size:15px;font-weight:700;line-height:1;color:rgba(255,255,255,.88)}
 </style>
 </head>
 <body>
@@ -101,7 +114,7 @@
       var o=cards[i];
       if(o.key===key&&!o.dead){
         o.qty+=qty;
-        o.num.textContent=(type==='add'?'+':'-')+o.qty;
+        o.num.textContent=o.qty;
         o.el.classList.remove('pop');void o.el.offsetWidth;o.el.classList.add('pop');
         arm(o);
         return;
@@ -112,19 +125,22 @@
     el.className='n '+type;
 
     var box=document.createElement('div');box.className='img';
+    var tag=document.createElement('span');tag.className='tag';tag.textContent='ไอเทม';
     var im=new Image();
-    im.onerror=function(){box.innerHTML='<em>\uD83D\uDCE6</em>';};   // ไม่มีรูป => กล่องแทน
+    im.onerror=function(){var em=document.createElement('em');em.textContent='\uD83D\uDCE6';box.replaceChild(em,im);};   // ไม่มีรูป => กล่องแทน
     im.src=IMG_BASE+name+'.png';
-    box.appendChild(im);
+    box.appendChild(im);box.appendChild(tag);
 
     var tx=document.createElement('div');tx.className='tx';
-    var sm=document.createElement('small');
-    sm.textContent=(type==='add'?'ได้รับไอเทม':'ไอเทมลดลง');
-    var num=document.createElement('b');
-    num.textContent=(type==='add'?'+':'-')+qty;
-    tx.appendChild(sm);tx.appendChild(num);
+    var ttl=document.createElement('div');ttl.className='ttl';ttl.textContent=(type==='add'?'ADDED':'REMOVE');
+    var sub=document.createElement('div');sub.className='sub';sub.textContent=(type==='add'?'จำนวนที่เพิ่มขึ้น':'จำนวนที่ลดลง');
+    var num=document.createElement('div');num.className='num';num.textContent=qty;
+    tx.appendChild(ttl);tx.appendChild(sub);tx.appendChild(num);
 
-    el.appendChild(box);el.appendChild(tx);
+    var side=document.createElement('div');side.className='side';
+    var ic=document.createElement('b');ic.textContent=(type==='add'?'+':'\u2212');side.appendChild(ic);
+
+    el.appendChild(box);el.appendChild(tx);el.appendChild(side);
     stack.appendChild(el);
 
     var c={el:el,key:key,qty:qty,num:num,timer:0,dead:false};
@@ -144,10 +160,10 @@
 
   // เปิดไฟล์นี้ในเบราว์เซอร์ด้วย #test เพื่อดูตัวอย่าง
   if(location.hash==='#test'){
-    document.body.style.background='#222';
-    push('add','item_11',5);
-    setTimeout(function(){push('remove','item_1',2);},500);
-    setTimeout(function(){push('add','item_3',10);},1000);
+    document.body.style.background='#5a5a52';
+    push('remove','item_1',100);
+    setTimeout(function(){push('add','item_11',100);},400);
+    setTimeout(function(){push('add','item_3',10);},800);
   }
 </script>
 </body>
