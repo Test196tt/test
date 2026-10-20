@@ -30,10 +30,10 @@ const KEYS=["1","2","3","4","5","6","7"];
 let shown=false,K=1;
 const el=$("in");
 el.innerHTML=KEYS.map((k,i)=>`<div class="s empty" data-i="${i+1}"><span class="k">${k}</span><div class="ic"></div></div>`).join("");
-el.addEventListener("click",e=>{const s=e.target.closest(".s");if(s&&!s.classList.contains("empty")&&window.cef&&cef.emit)cef.emit("hotbar:use",+s.dataset.i)});
+el.addEventListener("click",e=>{const s=e.target.closest(".s");if(s&&!s.classList.contains("empty")&&window.cef&&cef.emit)cef.emit("hotbar:slot"+s.dataset.i)});
 addEventListener("keydown",e=>{ // เบราว์เซอร์โฟกัสอยู่ตอนแถบเปิด: กด 1-7 = ใช้ช่อง, Esc/Alt = ปิด
  if(!shown)return;
- if(/^[1-7]$/.test(e.key)){use(+e.key);if(window.cef&&cef.emit)cef.emit("hotbar:use",+e.key)}
+ if(/^[1-7]$/.test(e.key)){use(+e.key);if(window.cef&&cef.emit)cef.emit("hotbar:slot"+e.key)}
  else if(e.key=="Escape"||e.key=="Alt"){e.preventDefault();if(window.cef&&cef.emit)cef.emit("hotbar:close")}
 });
 function fit(){K=Math.min(1,innerWidth*.96/340,innerHeight*.3/60);$("hud").style.setProperty("--k",K)}
