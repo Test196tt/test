@@ -4,71 +4,92 @@
 <meta charset="utf-8">
 <title>Crafting</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;user-select:none}
-html,body{width:100%;height:100%;overflow:hidden;background:transparent;font-family:'Segoe UI','Tahoma',sans-serif;color:#eee}
-:root{--r:#e11d2e;--r2:#7f0d17;--bg:#0b0b0d;--bg2:#141417;--ln:#2a2a30}
+html,body{width:100%;height:100%;overflow:hidden;background:transparent;font-family:'Kanit','Segoe UI','Tahoma',sans-serif;color:#fff}
+:root{--b1:#1678c8;--b2:#0b5a96;--b3:#083f66;   /* น้ำเงินเดียวกับหลอดเลือด */
+  --g1:#4a4a4a;--g2:#404040;--g3:#7a7a7a;--ln:#bdbdbd}
 #wrap{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:none}
 #wrap.on{display:flex;animation:in .25s ease}
 @keyframes in{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
-#panel{width:min(1020px,96vw);height:min(600px,92vh);background:linear-gradient(160deg,var(--bg2),var(--bg));border:1px solid var(--ln);position:relative;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(225,29,46,.25)}
-#panel:before,#panel:after{content:"";position:absolute;width:26px;height:26px;border:2px solid var(--r)}
-#panel:before{top:-2px;left:-2px;border-right:0;border-bottom:0}
-#panel:after{bottom:-2px;right:-2px;border-left:0;border-top:0}
-header{display:flex;align-items:center;gap:18px;padding:14px 20px;border-bottom:1px solid var(--ln);background:linear-gradient(90deg,rgba(225,29,46,.22),transparent 60%)}
-.logo{font-size:22px;font-weight:800;letter-spacing:3px}.logo b{color:var(--r)}
-.logo small{display:block;font-size:10px;letter-spacing:4px;color:#888;font-weight:400}
-.tabs{display:flex;gap:6px;margin-left:24px}
-.tab{padding:9px 22px;background:#1a1a1e;border:1px solid var(--ln);transform:skewX(-14deg);cursor:pointer;font-size:14px;transition:.15s}
-.tab span{display:inline-block;transform:skewX(14deg)}
-.tab:hover{border-color:var(--r)}
-.tab.on{background:var(--r);border-color:var(--r);box-shadow:0 0 16px rgba(225,29,46,.6)}
-.money{margin-left:auto;display:flex;gap:10px;font-size:13px}
-.money div{padding:6px 12px;background:#000;border:1px solid var(--ln)}
-.money b.rm{color:#ff5566}.money b.gm{color:#4ade80}
-#x{width:34px;height:34px;border:1px solid var(--ln);background:#1a1a1e;color:#fff;font-size:16px;cursor:pointer}
-#x:hover{background:var(--r);border-color:var(--r)}
-main{flex:1;display:flex;min-height:0}
-#list{width:46%;padding:16px;overflow:auto;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;align-content:start;border-right:1px solid var(--ln)}
-.card{padding:14px;background:#111114;border:1px solid var(--ln);cursor:pointer;position:relative;transition:.15s}
-.card:hover{border-color:var(--r);transform:translateY(-2px)}
-.card.on{border-color:var(--r);background:linear-gradient(160deg,rgba(225,29,46,.28),#111114);box-shadow:inset 0 0 0 1px var(--r)}
-.card .ic{font-size:34px}.card .nm{margin-top:6px;font-size:15px;font-weight:600}
-.card .sub{font-size:11px;color:#888;margin-top:2px}
-.card.no{opacity:.45}
-.tag{position:absolute;top:8px;right:8px;font-size:10px;padding:2px 7px;background:var(--r2);border:1px solid var(--r)}
-#detail{flex:1;padding:22px;display:flex;flex-direction:column;min-width:0}
-#detail h2{font-size:24px;letter-spacing:1px}#detail h2 i{font-style:normal;margin-right:10px}
-#detail .desc{color:#999;font-size:12px;margin:4px 0 14px}
-.sec{font-size:11px;letter-spacing:3px;color:var(--r);margin:10px 0 8px}
-.mats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.mat{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#000;border:1px solid var(--ln);border-left:3px solid var(--c)}
-.mat .n{flex:1;font-size:13px}.mat .q{font-size:13px;font-variant-numeric:tabular-nums}
-.ok{color:#4ade80}.bad{color:#ff4455}
-.chance{height:10px;background:#000;border:1px solid var(--ln);margin-top:4px}
-.chance div{height:100%;background:linear-gradient(90deg,var(--r2),var(--r));box-shadow:0 0 10px var(--r)}
-.dmg{display:flex;align-items:center;gap:12px;font-size:20px;font-weight:700}
-.dmg small{font-size:11px;color:#888;font-weight:400}.dmg em{color:var(--r);font-style:normal}
-#go{flex-shrink:0;margin-top:12px;padding:15px;border:0;background:var(--r);color:#fff;font-size:16px;font-weight:700;letter-spacing:3px;cursor:pointer;clip-path:polygon(14px 0,100% 0,calc(100% - 14px) 100%,0 100%);transition:.15s}
-#go:hover:not(:disabled){filter:brightness(1.2);box-shadow:0 0 24px var(--r)}
-#go:disabled{background:#2a2a30;color:#777;cursor:not-allowed}
-.body{flex:1;min-height:0;overflow-y:auto;padding-right:6px}
-.empty{margin:auto;color:#666;text-align:center}
-footer{padding:8px 20px;border-top:1px solid var(--ln);font-size:11px;color:#777;display:flex;justify-content:space-between}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:var(--r2)}
+#panel{width:min(920px,96vw);height:min(540px,92vh);background:var(--g1);border-radius:10px;overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.55)}
+
+header{flex:none;height:46px;display:flex;align-items:center;gap:14px;padding:0 12px 0 14px;background:linear-gradient(90deg,var(--b1),var(--b2))}
+.ttl{display:flex;align-items:center;gap:8px;font-size:22px;font-weight:500;letter-spacing:.3px;white-space:nowrap}
+.tabs{display:flex;gap:6px;margin-left:auto}
+.tab{padding:5px 14px;border-radius:14px;background:rgba(0,0,0,.25);font-size:12.5px;cursor:pointer;white-space:nowrap;transition:.15s}
+.tab:hover{background:rgba(0,0,0,.4)}
+.tab.on{background:#fff;color:var(--b2);font-weight:600}
+#x{flex:none;width:30px;height:30px;border:0;border-radius:8px;background:rgba(0,0,0,.28);color:#fff;font-size:14px;cursor:pointer}
+#x:hover{background:rgba(0,0,0,.5)}
+
+main{flex:1;display:flex;min-height:0;padding:6px 6px 0;gap:0}
+#list{flex:none;width:21%;display:flex;flex-direction:column;gap:5px;overflow-y:auto;padding-right:4px}
+.row{flex:none;height:44px;display:flex;align-items:center;gap:8px;padding:0 10px;border-radius:9px;cursor:pointer;
+  background:linear-gradient(90deg,var(--b1),var(--b2));border:2px solid transparent;position:relative;transition:.12s}
+.row:hover{filter:brightness(1.12)}
+.row.on{border-color:#fff;box-shadow:0 0 12px rgba(22,120,200,.8)}
+.row.no{opacity:.45}
+.row .ic{font-size:22px;line-height:1;flex:none}
+.row .nm{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.row .tg{font-size:10px;padding:1px 6px;border-radius:6px;background:rgba(0,0,0,.35)}
+.row .dot{width:8px;height:8px;border-radius:50%;background:#4ade80;box-shadow:0 0 6px #4ade80;flex:none}
+.row .dot.bad{background:#ff5566;box-shadow:0 0 6px #ff5566}
+
+.sep{flex:none;width:16px;background:#fff;margin:0 3px}
+.sep.l{clip-path:polygon(0 0,38% 0,38% 40%,100% 50%,38% 60%,38% 100%,0 100%)}
+.sep.r{clip-path:polygon(62% 0,100% 0,100% 100%,62% 100%,62% 60%,0 50%,62% 40%)}
+
+#detail{flex:none;width:31%;background:var(--g2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:8px 12px;min-height:0}
+.dia{flex:none;width:min(138px,22vh);height:min(138px,22vh);border:2px dashed var(--b1);border-radius:20px;transform:rotate(45deg);display:grid;place-items:center;margin:min(18px,3vh) 0 min(12px,2vh)}
+.dia span{transform:rotate(-45deg);font-size:min(60px,9vh);line-height:1}
+.dn{font-size:24px;font-weight:500;text-align:center}
+.pill{width:100%;padding:7px 12px;border-radius:7px;background:#555;font-size:12.5px;text-align:center}
+.pill em{font-style:normal;color:#7cc4ff;font-weight:600}
+.desc{font-size:10.5px;color:#aaa;text-align:center}
+#go{flex:none;min-width:70%;padding:9px 18px;border:0;border-radius:8px;background:linear-gradient(90deg,var(--b1),var(--b2));color:#fff;font:600 18px 'Kanit',sans-serif;cursor:pointer;transition:.15s}
+#go:hover:not(:disabled){filter:brightness(1.15);box-shadow:0 0 16px rgba(22,120,200,.7)}
+#go:disabled{background:#5d5d5d;color:#999;cursor:not-allowed;font-size:14px}
+.empty{margin:auto;color:#999;text-align:center;font-size:14px}
+
+#right{flex:1;min-width:0;position:relative;padding-top:6px;display:flex;flex-direction:column}
+.rtab{position:absolute;left:50%;top:-8px;transform:translateX(-50%);z-index:2;padding:5px 34px;border-radius:9px 9px 0 0;background:#8a8a8a;
+  font-size:17px;font-weight:500;white-space:nowrap}
+#mats{flex:1;min-height:0;margin-top:26px;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);gap:7px;padding:2px 2px 8px}
+.slot{border:1.5px dashed var(--ln);border-radius:7px;background:#4d4d4d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:0;padding:3px}
+.slot.f{border:1.5px solid var(--c);background:linear-gradient(180deg,#575757,#474747)}
+.gem{width:min(26px,4vh);height:min(26px,4vh);border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.85),var(--c) 48%,rgba(0,0,0,.45))}
+.slot svg{width:min(34px,5vh);height:auto}
+.sn{font-size:11px;line-height:1.1;text-align:center}
+.sq{font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums}
+.ok{color:#4ade80}.bad{color:#ff6070}
+
+footer{flex:none;height:42px;margin-top:0;background:var(--g3);display:flex;align-items:center;justify-content:flex-end;gap:60px;padding:0 56px 0 12px}
+.mny{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:500}
+.mny svg{width:34px;height:auto}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
 </style>
 </head>
 <body>
 <div id="wrap">
  <div id="panel">
   <header>
-   <div class="logo">คราฟ <b>อาวุธ</b></div>
+   <div class="ttl"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5 14 10"/><path d="M20.5 20.5 10 10"/><path d="M14.5 6.5a3.2 3.2 0 1 1 4 4"/><path d="M4 4l5 5"/><path d="M3.5 7.5 7.5 3.5"/></svg>Crafting Table</div>
    <div class="tabs" id="tabs"></div>
-   <div class="money"><div>เงินแดง <b class="rm" id="rm">0</b></div><div>เงินเขียว <b class="gm" id="gm">0</b></div></div>
-   <button id="x">✕</button>
+   <button id="x">&#10005;</button>
   </header>
-  <main><div id="list"></div><div id="detail"></div></main>
-  <footer><span>คลิกเลือกรายการ แล้วกดปุ่มเพื่อเริ่ม</span><span>[ESC] ปิดหน้าต่าง</span></footer>
+  <main>
+   <div id="list"></div>
+   <div class="sep l"></div>
+   <div id="detail"></div>
+   <div class="sep r"></div>
+   <div id="right"><div class="rtab">ไอเทมที่ต้องการ</div><div id="mats"></div></div>
+  </main>
+  <footer>
+   <div class="mny"><svg viewBox="0 0 40 24"><rect x="1" y="2" width="38" height="20" rx="3" fill="#3fa34d" stroke="#1d6b2a" stroke-width="2"/><circle cx="20" cy="12" r="6" fill="#1d6b2a"/><text x="20" y="16" text-anchor="middle" font-size="10" font-weight="700" fill="#c9f2cf" font-family="Arial">$</text></svg><b id="gm">0</b></div>
+   <div class="mny"><svg viewBox="0 0 40 24"><rect x="1" y="2" width="38" height="20" rx="3" fill="#e0322f" stroke="#8f1412" stroke-width="2"/><circle cx="20" cy="12" r="6" fill="#8f1412"/><text x="20" y="16" text-anchor="middle" font-size="10" font-weight="700" fill="#ffd0cf" font-family="Arial">$</text></svg><b id="rm">0</b></div>
+  </footer>
  </div>
 </div>
 <script>
@@ -96,36 +117,45 @@ let S={m:{},rm:0,gm:0,t:[0,0,0,0]},tab='w',sel=null;
 const $=id=>document.getElementById(id), fmt=n=>Number(n).toLocaleString('en-US');
 
 function have(r){return Object.keys(r.m).every(k=>(S.m[k]||0)>=r.m[k])&&S.rm>=r.rm&&S.gm>=r.gm}
-function tabs(){$('tabs').innerHTML=TABS.map(t=>`<div class="tab ${t[0]==tab?'on':''}" data-t="${t[0]}"><span>${t[1]}</span></div>`).join('');
+function tabs(){$('tabs').innerHTML=TABS.map(t=>`<div class="tab ${t[0]==tab?'on':''}" data-t="${t[0]}">${t[1]}</div>`).join('');
  document.querySelectorAll('.tab').forEach(e=>e.onclick=()=>{tab=e.dataset.t;sel=null;render()})}
 function ids(){return tab=='u'?[1,2,3,4]:Object.keys(R).filter(k=>R[k].g==tab).map(Number)}
 function render(){
  tabs();$('rm').textContent=fmt(S.rm);$('gm').textContent=fmt(S.gm);
  $('list').innerHTML=ids().map(id=>{
   const up=tab=='u',r=up?R[U[id].r]:R[id],t=S.t[id-1];
-  const sub=up?(t?`เทียร์ ${t} / ${U[id].max}`:'ไม่มีในกระเป๋า'):(have(r)?'วัตถุดิบครบ':'วัตถุดิบไม่พอ');
-  return `<div class="card ${sel==id?'on':''} ${up&&!t?'no':''}" data-id="${id}"><div class="ic">${r.i}</div><div class="nm">${r.n}</div><div class="sub">${sub}</div>${up&&t?`<div class="tag">T${t}</div>`:''}</div>`}).join('');
- document.querySelectorAll('.card').forEach(e=>e.onclick=()=>{sel=+e.dataset.id;render()});
+  const mark=up?(t?`<span class="tg">T${t}/${U[id].max}</span>`:''):`<span class="dot ${have(r)?'':'bad'}" title="${have(r)?'วัตถุดิบครบ':'วัตถุดิบไม่พอ'}"></span>`;
+  return `<div class="row ${sel==id?'on':''} ${up&&!t?'no':''}" data-id="${id}"><span class="ic">${r.i}</span><span class="nm">${r.n}</span>${mark}</div>`}).join('');
+ document.querySelectorAll('.row').forEach(e=>e.onclick=()=>{sel=+e.dataset.id;render()});
  detail();
+}
+const NOTE=c=>`<svg viewBox="0 0 40 24"><rect x="1" y="2" width="38" height="20" rx="3" fill="${c[0]}" stroke="${c[1]}" stroke-width="2"/><circle cx="20" cy="12" r="6" fill="${c[1]}"/></svg>`;
+function slots(list){
+ let h=list.map(m=>`<div class="slot f" style="--c:${m.c}">${m.note?NOTE(m.note):'<div class="gem"></div>'}<div class="sn">${m.n}</div><div class="sq ${m.has>=m.need?'ok':'bad'}">${fmt(m.has)}/${fmt(m.need)}</div></div>`);
+ while(h.length<16)h.push('<div class="slot"></div>');
+ $('mats').innerHTML=h.join('');
 }
 function detail(){
  const d=$('detail');
- if(!sel){d.innerHTML='<div class="empty">เลือกรายการทางซ้าย<br>เพื่อดูรายละเอียด</div>';return}
+ if(!sel){d.innerHTML='<div class="empty">เลือกรายการทางซ้าย<br>เพื่อดูรายละเอียด</div>';slots([]);return}
  const up=tab=='u',u=U[sel],r=up?R[u.r]:R[sel],t=S.t[sel-1];
- let ok=have(r),extra='',label='เริ่มคราฟ';
+ let ok=have(r),label=up?'ยืนยันอัพเกรด':'ยืนยัน',extra='',chance=up?null:(r.ch||100);
  if(up){
-  label='เริ่มอัพเกรด';
   if(!t){ok=false;label='ไม่มีอาวุธในกระเป๋า'}
   else if(t>=u.max){ok=false;label='เทียร์สูงสุดแล้ว'}
-  else extra=(u.dmg?`<div class="sec">DAMAGE</div><div class="dmg">${u.dmg[t-1]} <em>➜</em> ${u.dmg[t]} <small>เทียร์ ${t} ➜ ${t+1}</small></div>`:`<div class="sec">เทียร์</div><div class="dmg">${t} <em>➜</em> ${t+1} <small>กุญแจตู้เซฟ</small></div>`)+`
-   <div class="sec">โอกาสสำเร็จ ${u.ch[t-1]}%</div><div class="chance"><div style="width:${u.ch[t-1]}%"></div></div>`;
- }else extra=`<div class="sec">โอกาสสำเร็จ ${r.ch||100}%</div><div class="chance"><div style="width:${r.ch||100}%"></div></div>`;
- const row=(n,c,need,has)=>`<div class="mat" style="--c:${c}"><span class="n">${n}</span><span class="q ${has>=need?'ok':'bad'}">${fmt(has)} / ${fmt(need)}</span></div>`;
- let m=Object.keys(r.m).map(k=>row(MAT[k][0],MAT[k][1],r.m[k],S.m[k]||0)).join('');
- if(r.rm)m+=row('เงินแดง','#ff5566',r.rm,S.rm);
- m+=row('เงินเขียว','#4ade80',r.gm,S.gm);
- d.innerHTML=`<div class="body"><h2><i>${r.i}</i>${up?'อัพเกรด ':''}${r.n}</h2><div class="desc">${up?'ใช้วัตถุดิบเท่ากับตอนคราฟ หากล้มเหลวอาจเสียวัตถุดิบ':'ใช้เวลาคราฟประมาณ 40 วินาที'}</div>
-  <div class="sec">วัตถุดิบที่ใช้</div><div class="mats">${m}</div>${extra}</div>
+  else{
+   chance=u.ch[t-1];
+   extra=u.dmg?`<div class="pill">DAMAGE <em>${u.dmg[t-1]} ➜ ${u.dmg[t]}</em> · เทียร์ ${t} ➜ ${t+1}</div>`:`<div class="pill">เทียร์ <em>${t} ➜ ${t+1}</em> · กุญแจตู้เซฟ</div>`;
+  }
+ }
+ if(!ok&&label.indexOf('ยืนยัน')==0)label='วัตถุดิบไม่พอ';
+ const m=Object.keys(r.m).map(k=>({n:MAT[k][0],c:MAT[k][1],need:r.m[k],has:S.m[k]||0}));
+ if(r.rm)m.push({n:'เงินแดง',c:'#ff5566',need:r.rm,has:S.rm,note:['#e0322f','#8f1412']});
+ m.push({n:'เงินเขียว',c:'#4ade80',need:r.gm,has:S.gm,note:['#3fa34d','#1d6b2a']});
+ slots(m);
+ d.innerHTML=`<div class="dia"><span>${r.i}</span></div><div class="dn">${up?'อัพเกรด ':''}${r.n}</div>
+  <div class="pill">อัตราการสำเร็จ : <em>${chance==null?'-':chance}</em></div>${extra}
+  <div class="desc">${up?'ใช้วัตถุดิบเท่ากับตอนคราฟ หากล้มเหลวอาจเสียวัตถุดิบ':'ใช้เวลาคราฟประมาณ 40 วินาที'}</div>
   <button id="go" ${ok?'':'disabled'}>${label}</button>`;
  $('go').onclick=()=>{if(ok)send(up?'crafting:upgrade':'crafting:craft',sel)};
 }
@@ -186,7 +216,7 @@ window.craftingOpen=openUI;window.craftingClose=hide;
 
 /* โหมดทดลองในเบราว์เซอร์: เปิดไฟล์แล้วต่อท้าย ?demo (ในเกมไม่ใช้) */
 if(/[?&](demo|preview)/.test(location.search)||location.protocol=='file:'){
- document.body.style.background='#1c1c22 radial-gradient(circle at 30% 30%,#3a1a1e,#111)';
+ document.body.style.background='#1c1c22 radial-gradient(circle at 30% 30%,#10304d,#111)';
  openUI({m:{yel:60,red:30,blue:50,lime:40,wire:25},rm:5000,gm:90000,t:[2,1,0,1]});
 }
 </script>
