@@ -59,6 +59,7 @@ function bind(){
  if(!window.cef||!cef.on)return false;
  cef.on("hotbar:update",(...a)=>upd(norm(...a)));
  cef.on("hotbar:use",(...a)=>use(+norm(...a)));
+ if(cef.emit)cef.emit("hotbar:ready");
  return bound=true;
 }
 if(!bind()){const iv=setInterval(()=>{if(bind())clearInterval(iv)},100);addEventListener("load",bind)}
