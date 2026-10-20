@@ -31,7 +31,44 @@ html,body{width:100%;height:100%;background:transparent;font-family:"Segoe UI",T
 .th{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid #1d1d1d;cursor:pointer;font-size:13px}.th .av{width:36px;height:36px;flex:none}.tb{flex:1;min-width:0}.tl2{color:#888;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bdg{background:#0095f6;border-radius:10px;padding:1px 7px;font-size:11px}
 .ch{flex:none;padding:8px 12px;font-weight:600;font-size:14px;border-bottom:1px solid #262626}#msgs{flex:1;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:6px}.bb{max-width:80%;padding:8px 12px;border-radius:16px;font-size:13px;word-break:break-word}.bb.me{align-self:flex-end;background:#0095f6}.bb.ot{align-self:flex-start;background:#262626}#chat .fld{flex:none;margin:8px 10px}
 .go{width:100%;padding:12px;border:0;border-radius:10px;background:#0095f6;color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+
+#cam{position:fixed;inset:0;display:none;z-index:200;pointer-events:none;color:#fff}
+#cam.show{display:block}
+#cam .vf{position:absolute;inset:7% 22% 22% 22%}
+#cam .vf i{position:absolute;width:34px;height:34px;border:3px solid #fff;opacity:.85}
+#cam .vf i:nth-child(1){left:0;top:0;border-right:0;border-bottom:0}
+#cam .vf i:nth-child(2){right:0;top:0;border-left:0;border-bottom:0}
+#cam .vf i:nth-child(3){left:0;bottom:0;border-right:0;border-top:0}
+#cam .vf i:nth-child(4){right:0;bottom:0;border-left:0;border-top:0}
+#cam .hint{position:absolute;top:2.5%;left:0;right:0;text-align:center;font-size:15px;text-shadow:0 1px 4px #000}
+#cam .bar{position:absolute;left:0;right:0;bottom:4%;display:flex;justify-content:center;align-items:center;gap:18px;pointer-events:auto}
+#cam .cb{width:52px;height:52px;border-radius:50%;background:rgba(0,0,0,.55);border:2px solid rgba(255,255,255,.6);font-size:22px;color:#fff;cursor:pointer}
+#cam .cb:hover{background:rgba(255,255,255,.25)}
+#cam .shot{width:78px;height:78px;border-radius:50%;background:#fff;border:6px solid rgba(255,255,255,.45);background-clip:padding-box;cursor:pointer}
+#cam .shot:active{transform:scale(.92)}
+#cam .x{position:absolute;top:2.5%;right:3%;pointer-events:auto}
+#flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:300;transition:opacity .35s}
+.snap{position:relative;width:100%;height:230px;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;background:#111}
+.snap .bg{position:absolute;inset:0}
+.snap img{position:relative;height:96%;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.6))}
+.snap .tag{position:absolute;left:10px;bottom:8px;font-size:11px;background:rgba(0,0,0,.5);padding:2px 8px;border-radius:10px}
+.snap .ph2{position:absolute;right:10px;top:8px;font-size:11px;opacity:.9}
+.camgo{width:100%;padding:11px;border:1px solid #363636;border-radius:10px;background:#1c1c1e;color:#fff;font-size:14px;cursor:pointer;margin-bottom:10px}
 </style></head><body>
+<div id="flash"></div>
+<div id="cam">
+ <div class="hint">หมุนมุมกล้อง / ซูม / เปลี่ยนท่า แล้วกดชัตเตอร์</div>
+ <div class="vf"><i></i><i></i><i></i><i></i></div>
+ <button class="cb x" onclick="camAct('back')">&#10006;</button>
+ <div class="bar">
+  <button class="cb" onclick="camAct('left')">&#8630;</button>
+  <button class="cb" onclick="camAct('near')">&#10133;</button>
+  <button class="shot" onclick="shoot()"></button>
+  <button class="cb" onclick="camAct('far')">&#10134;</button>
+  <button class="cb" onclick="camAct('right')">&#8631;</button>
+  <button class="cb" onclick="camAct('pose')">&#128587;</button>
+ </div>
+</div>
 <div id="phone">
  <div class="notch"></div>
  <div class="status-bar"><span id="clock">--:--</span><span style="font-size:10px;opacity:.8">LTE</span></div>
@@ -40,8 +77,9 @@ html,body{width:100%;height:100%;background:transparent;font-family:"Segoe UI",T
  <div id="dms"><div class="fld" onclick="C.emit('ig:key','dmto')"><small>ข้อความใหม่</small>แตะเพื่อพิมพ์ชื่อผู้เล่น</div><div id="tl"></div></div>
  <div id="chat"><div class="ch" id="cn"></div><div id="msgs"></div><div class="fld" onclick="C.emit('ig:dmkey',cur)"><small>ข้อความ</small>แตะเพื่อพิมพ์</div></div>
  <div id="new">
+  <button class="camgo" onclick="camAct('open')">&#128247; ถ่ายรูปตัวละครในเกม</button>
   <div class="fld" onclick="C.emit('ig:key','img')"><small>ลิงก์รูปภาพ (https://...)</small><span id="v-img">แตะเพื่อใส่ลิงก์</span></div>
-  <img id="pv" alt="">
+  <img id="pv" alt=""><div id="pvs" style="display:none;border-radius:10px;overflow:hidden;margin-bottom:10px"></div>
   <div class="fld" onclick="C.emit('ig:key','cap')"><small>คำบรรยาย</small><span id="v-cap">แตะเพื่อพิมพ์</span></div>
   <button class="go" onclick="C.emit('ig:post');view('feed')">โพสต์</button>
  </div>
@@ -76,7 +114,7 @@ function setMine(id,m){var e=$('h'+id);if(e)e.textContent=Number(m)?'\u2764\uFE0
 function addPost(id,name,cap,url,likes,liked){
   var d=mk('div','post'),h=mk('div','ph');d.id='p'+id;name=String(name);
   h.appendChild(mk('div','av',name.charAt(0).toUpperCase()));h.appendChild(mk('span','',name));h.style.cursor='pointer';h.onclick=function(){openChat(name)};d.appendChild(h);
-  if(url){var im=mk('img');im.src=url;im.onerror=function(){im.style.display='none'};d.appendChild(im)}
+  if(url){if(String(url).indexOf('snap:')===0)d.appendChild(snapEl(url));else{var im=mk('img');im.src=url;im.onerror=function(){im.style.display='none'};d.appendChild(im)}}
   var pa=mk('div','pa'),hb=mk('span');hb.id='h'+id;hb.onclick=function(){C.emit('ig:like',String(id))};pa.appendChild(hb);d.appendChild(pa);
   var lk=mk('div','lk');lk.id='l'+id;d.appendChild(lk);
   if(cap){var c=mk('div','cp'),b=mk('b','',name+' ');c.appendChild(b);c.appendChild(document.createTextNode(cap));d.appendChild(c)}
@@ -85,6 +123,24 @@ function addPost(id,name,cap,url,likes,liked){
 }
 function openIg(){T={};seq=0;badge();clearFeed();$('phone').classList.add('show');view('feed')}
 function closeIg(){$('phone').classList.remove('show');C.emit('ig:close');C.set_focus(false)}
+
+// ---- กล้องถ่ายรูปตัวละคร ----
+// รูปที่ถ่ายเก็บเป็นสตริง  snap:สกิน:ชั่วโมง:นาที:ท่า:อินทีเรีย  (ASCII ล้วน) แล้วหน้าเว็บวาดเป็นการ์ดรูปให้
+var SKIN_URL='https://assets.open.mp/assets/images/skins/';   // เปลี่ยนเป็นโฮสต์รูปสกินของคุณได้
+var POSE=['\u0e22\u0e37\u0e19\u0e1b\u0e01\u0e15\u0e34','\u0e42\u0e1a\u0e01\u0e21\u0e37\u0e2d','\u0e0a\u0e35\u0e49\u0e1f\u0e49\u0e32','\u0e04\u0e38\u0e22\u0e41\u0e1a\u0e1a\u0e41\u0e01\u0e4a\u0e07'];
+function camAct(a){C.emit('ig:cam',a)}
+function shoot(){var f=$('flash');f.style.transition='none';f.style.opacity=1;setTimeout(function(){f.style.transition='opacity .35s';f.style.opacity=0},40);C.emit('ig:cam','shot')}
+function snapEl(str){
+  var a=String(str).split(':'),skin=+a[1]||0,h=+a[2]||0,m=+a[3]||0,pose=+a[4]||0;
+  var g=(h>=6&&h<17)?'linear-gradient(#5ab2ff,#bfe3ff)':(h>=17&&h<20)?'linear-gradient(#ff8a4c,#7a3d8f)':(h>=5&&h<6)?'linear-gradient(#3a4a8c,#f3a77a)':'linear-gradient(#0b1230,#1d2b5a)';
+  var d=mk('div','snap'),bg=mk('div','bg');bg.style.background=g;d.appendChild(bg);
+  var im=mk('img');im.src=SKIN_URL+skin+'.png';im.onerror=function(){im.style.display='none';var e=mk('div','',String.fromCodePoint(0x1F9CD));e.style.cssText='position:relative;font-size:90px;align-self:center';d.insertBefore(e,d.firstChild.nextSibling)};d.appendChild(im);
+  d.appendChild(mk('div','tag',('0'+h).slice(-2)+':'+('0'+m).slice(-2)+(POSE[pose]?' \u00b7 '+POSE[pose]:'')));
+  d.appendChild(mk('div','ph2',String.fromCodePoint(0x1F4F7)));
+  return d}
+C.on('ig:cam',function(on){
+  if(Number(on)){$('phone').classList.remove('show');$('cam').classList.add('show')}
+  else{$('cam').classList.remove('show');$('phone').classList.add('show');view('new')}});
 // ---- event จาก server ----
 C.on('ig:open',openIg);C.on('ig:dm',addDm);C.on('ig:dmopen',openChat);
 C.on('ig:post',addPost);                                   // id, ชื่อ, คำบรรยาย, ลิงก์รูป, ไลก์, เราไลก์แล้ว(0/1)
@@ -92,9 +148,11 @@ C.on('ig:stat',setStat);                                   // id, จำนว�
 C.on('ig:mine',setMine);                                   // id, 0/1
 C.on('ig:input',function(t,v){                             // ช่องร่างโพสต์: t = img / cap
   v=String(v||'');
-  if(t==='img'){$('v-img').textContent=v||'แตะเพื่อใส่ลิงก์';var p=$('pv');if(v){p.src=v;p.style.display='block'}else p.style.display='none'}
+  if(t==='img'){var p=$('pv'),ps=$('pvs');ps.style.display='none';ps.innerHTML='';
+    if(v.indexOf('snap:')===0){$('v-img').textContent='\uD83D\uDCF7 รูปจากกล้อง (แตะเพื่อเปลี่ยนเป็นลิงก์)';p.style.display='none';ps.appendChild(snapEl(v));ps.style.display='block'}
+    else{$('v-img').textContent=v||'แตะเพื่อใส่ลิงก์';if(v){p.src=v;p.style.display='block'}else p.style.display='none'}}
   else $('v-cap').textContent=v||'แตะเพื่อพิมพ์'});
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeIg()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){if($('cam').classList.contains('show'))camAct('back');else closeIg()}});
 function fit(){$('phone').style.zoom=Math.min(1,(innerHeight-20)/710)}
 fit();addEventListener('resize',fit);
 function tick(){var d=new Date();$('clock').textContent=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
