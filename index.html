@@ -33,6 +33,7 @@ h2{font-size:18px;margin:6px 0 10px}
 #s-call{align-items:center;justify-content:space-between;padding:70px 16px 36px;background:linear-gradient(170deg,#16202b,#000 75%)}
 .avatar{width:96px;height:96px;border-radius:50%;background:#2c3e50;display:flex;align-items:center;justify-content:center;font-size:48px;margin:0 auto 14px}
 .cname{font-size:22px;font-weight:600;text-align:center;word-break:break-word}
+.cnum{font-size:15px;color:#c9d1d9;text-align:center;margin-top:4px;letter-spacing:2px}
 .cstat{font-size:14px;color:#9aa4ad;text-align:center;margin-top:6px;letter-spacing:1px}
 .cbtns{display:flex;gap:46px;justify-content:center}
 .cb{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;cursor:pointer;color:#ccc}
@@ -65,6 +66,7 @@ h2{font-size:18px;margin:6px 0 10px}
    <div style="width:100%">
     <div class="avatar">&#128100;</div>
     <div class="cname" id="c-name"></div>
+    <div class="cnum" id="c-num"></div>
     <div class="cstat" id="c-stat"></div>
    </div>
    <div class="cbtns">
@@ -94,7 +96,7 @@ var C={
 (function wait(){if(window.cef&&window.cef.on){_q.forEach(function(x){window.cef.on(x[0],x[1])});_q=[]}else setTimeout(wait,50)})();
 var $=function(i){return document.getElementById(i)};
 var mode='call', buf='';
-var cs=0, cname='', csince=0, ctimer=null, cfocus=true;
+var cs=0, cnum='', cname='', csince=0, ctimer=null, cfocus=true;
 
 var APPS=[
  {id:'call',    n:'โทร',      i:'📞',c:'#2ecc71'},
@@ -152,14 +154,14 @@ C.on('phone:close',function(){
 function mmss(ms){var t=Math.floor(ms/1000),m=Math.floor(t/60),x=t%60;return ('0'+m).slice(-2)+':'+('0'+x).slice(-2)}
 function statText(){
   if(cs===1)return 'กำลังโทร…';
-  if(cs===2)return cfocus?'สายเรียกเข้า':'สายเรียกเข้า · /pickup';
+  if(cs===2)return 'สายเรียกเข้า';
   if(cs===3)return mmss(Date.now()-csince);
   return '';
 }
 function renderCall(){
   var t=statText();
-  $('c-name').textContent=cname;$('c-stat').textContent=t;
-  $('p-name').textContent=cname;$('p-stat').textContent=t;
+  $('c-name').textContent=cname;$('c-num').textContent=cnum;$('c-stat').textContent=t;
+  $('p-name').textContent=cname+(cnum?' · '+cnum:'');$('p-stat').textContent=t;
   $('b-ans').style.display=(cs===2)?'flex':'none';
   $('b-end').textContent=(cs===2)?'ปฏิเสธ':'วางสาย';
   $('s-call').classList.toggle('ring',cs===2);
@@ -167,7 +169,7 @@ function renderCall(){
 }
 C.on('phone:call',function(a){
   var p=String(a||'').split('|'),st=parseInt(p[0],10)||0;
-  cname=p[1]||'';cfocus=(p[2]==='1');
+  cname=p[1]||'';cnum=(p[2]&&p[2]!=='0')?p[2]:'';cfocus=(p[3]==='1');
   if(st===cs&&st!==0){}else if(st===3)csince=Date.now();
   cs=st;
   clearInterval(ctimer);ctimer=null;
