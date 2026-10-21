@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SafeCrack Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;0,600;1,600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:transparent;overflow:hidden;font-family:Kanit,"Noto Sans Thai",Tahoma,sans-serif;user-select:none;touch-action:manipulation}
+#box{--c:#ff8a1f;position:fixed;left:50%;top:50%;width:min(92vw,520px);transform:translate(-50%,-50%);border-radius:14px;background:linear-gradient(#262628,#1a1a1c);border:1px solid #ffffff14;box-shadow:0 10px 34px #000a;overflow:hidden;display:none}
+#box.show{display:block;animation:in .35s cubic-bezier(.2,.9,.3,1.15) both}
+#box::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c);box-shadow:0 0 10px var(--c)}
+@keyframes in{from{opacity:0;transform:translate(-50%,-46%) scale(.94)}to{opacity:1;transform:translate(-50%,-50%)}}
+.hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px 20px;gap:12px}
+.ti{font:italic 600 15px/18px Kanit,sans-serif;color:#f1f1f4;letter-spacing:.4px}
+.sub{font:400 11px/14px Kanit,sans-serif;color:#a9a9b0}
+.pips{display:flex;gap:7px}
+.pips i{width:16px;height:16px;border-radius:50%;background:#ffffff14;border:1px solid #ffffff22;transition:background .15s,box-shadow .15s}
+.pips i.cur{border-color:var(--c);box-shadow:0 0 8px var(--c)}
+.pips i.ok{background:#35d07f;border-color:#35d07f;box-shadow:0 0 8px #35d07f99}
+.pips i.bad{background:#e5262a;border-color:#e5262a;box-shadow:0 0 8px #e5262a99}
+#pad{position:relative;height:min(52vh,250px);margin:0 14px 14px 18px;border-radius:10px;background:radial-gradient(circle at 50% 50%,#ffffff0a,transparent 70%),#15151780;border:1px solid #ffffff0d;overflow:hidden}
+#msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:italic 600 26px/1 Kanit,sans-serif;color:#fff;text-shadow:0 2px 12px #000;pointer-events:none;opacity:0;transition:opacity .15s}
+#msg.on{opacity:1}
+#msg.ok{color:#35d07f}#msg.bad{color:#ff4b4f}
+#btn{position:absolute;width:108px;height:108px;margin:-54px 0 0 -54px;display:none;cursor:pointer}
+#btn.on{display:block;animation:pop .16s ease-out both}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+#btn svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+#ring{fill:none;stroke:var(--c);stroke-width:6;stroke-linecap:round;stroke-dasharray:326.7;stroke-dashoffset:0;transform:rotate(-90deg);transform-origin:50% 50%;filter:drop-shadow(0 0 5px var(--c))}
+#btn.on #ring{animation:ring var(--w,2s) linear forwards}
+@keyframes ring{to{stroke-dashoffset:326.7}}
+.core{position:absolute;left:50%;top:50%;width:70px;height:70px;margin:-35px 0 0 -35px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#5b6578,#2b303b 70%);border:2px solid #c4cddc99;box-shadow:0 4px 10px #000a;display:flex;align-items:center;justify-content:center}
+.core b{width:12px;height:12px;border-radius:50%;background:var(--c);box-shadow:0 0 10px var(--c)}
+.core::after{content:"";position:absolute;top:7px;width:4px;height:12px;border-radius:2px;background:#fff;opacity:.85}
+#btn:active .core{transform:scale(.92)}
+@media(prefers-reduced-motion:reduce){#box.show,#btn.on{animation:none}}
+</style></head><body>
+<div id="box">
+ <div class="hd">
+  <div><div class="ti">งัดตู้เซฟ</div><div class="sub" id="sub">เตรียมตัว...</div></div>
+  <div class="pips" id="pips"></div>
+ </div>
+ <div id="pad"><div id="msg"></div>
+  <div id="btn"><svg viewBox="0 0 108 108"><circle cx="54" cy="54" r="52" fill="#00000055"/><circle id="ring" cx="54" cy="54" r="52"/></svg><div class="core"><b></b></div></div>
+ </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const COL={citizen:"#ff8a1f",agency:"#1fb8d8",gang:"#e5262a"};
+let N=5,cur=null,hideT=0,msgT=0;
+
+// ส่ง event กลับเซิร์ฟเวอร์ (ถ้าหน้าอื่นของคุณเรียกชื่ออื่น แก้ที่ฟังก์ชันนี้ที่เดียว)
+function send(ev,arg){try{if(window.cef&&cef.emit)cef.emit(ev,String(arg))}catch(_){}}
+
+function msg(t,cls,ms){const m=$("msg");clearTimeout(msgT);m.textContent=t;m.className="on "+(cls||"");if(ms)msgT=setTimeout(()=>m.className="",ms)}
+function pips(){const p=$("pips");p.innerHTML="";for(let i=0;i<N;i++)p.appendChild(document.createElement("i"))}
+function btnOff(){const b=$("btn");b.classList.remove("on")}
+
+function start(o){
+ clearTimeout(hideT);cur=null;btnOff();
+ N=+o.n||5;$("box").style.setProperty("--c",COL[o.k]||COL.citizen);
+ pips();$("sub").textContent="เตรียมตัว...";msg("พร้อม?","",1300);
+ $("box").classList.add("show");
+}
+function round(o){
+ const p=$("pips").children;for(let i=0;i<p.length;i++)p[i].classList.toggle("cur",i==o.r-1);
+ $("sub").textContent="รอบที่ "+o.r+" / "+N+"  กดปุ่มให้ทัน!";
+ clearTimeout(msgT);$("msg").className="";
+ cur={id:o.id,r:o.r,done:false};
+ const b=$("btn");b.classList.remove("on");void b.offsetWidth;
+ b.style.left=o.x+"%";b.style.top=o.y+"%";b.style.setProperty("--w",o.w+"ms");
+ b.classList.add("on");
+}
+function tap(e){
+ e.preventDefault();
+ if(!cur||cur.done)return;
+ cur.done=true;btnOff();
+ send("scgame:press",cur.id);
+}
+function res(o){
+ const p=$("pips").children[o.r-1];
+ if(p){p.classList.remove("cur");p.classList.add(o.ok?"ok":"bad")}
+ if(cur)cur.done=true;btnOff();
+ if(o.ok)msg("ผ่าน","ok",500);else{msg("พลาด!","bad");$("sub").textContent="กดไม่ทัน การงัดล้มเหลว"}
+}
+function end(o){
+ cur=null;btnOff();
+ if(o&&o.ok){$("sub").textContent="งัดสำเร็จ";msg("งัดสำเร็จ!","ok");return}
+ clearTimeout(hideT);$("box").classList.remove("show");   // ยกเลิก/ถูกโจมตี = ปิดทันที
+}
+$("btn").addEventListener("pointerdown",tap);
+
+const norm=(...a)=>{let x=a[0];if(typeof x=="string")try{x=JSON.parse(x)}catch(_){}return x};
+let bound=false;
+function bind(){
+ if(bound)return true;
+ if(!window.cef||!cef.on)return false;
+ cef.on("scgame:start",(...a)=>start(norm(...a)||{}));
+ cef.on("scgame:round",(...a)=>round(norm(...a)||{}));
+ cef.on("scgame:res",(...a)=>res(norm(...a)||{}));
+ cef.on("scgame:end",(...a)=>end(norm(...a)||{}));
+ return bound=true;
+}
+if(!bind()){const iv=setInterval(()=>{if(bind())clearInterval(iv)},100);addEventListener("load",bind)}
+
+// ทดสอบในเบราว์เซอร์: เปิดไฟล์นี้ด้วย #preview  (จำลองฝั่งเซิร์ฟเวอร์เอง)
+if(location.hash=="#preview"){
+ const W=[2200,1900,1600,1400,1200];let r=0,id=0,t0=0,tm=0;
+ window.send=send;
+ window.cef={on(){},emit(ev,a){clearTimeout(tm);const ok=+a==id&&Date.now()-t0>=120;res({r,ok:ok?1:0});
+  if(!ok)return setTimeout(()=>end({ok:0}),1200);
+  if(r>=5)return(end({ok:1}),setTimeout(()=>{end({ok:0});setTimeout(go,800)},1200));
+  setTimeout(next,700)}};
+ const next=()=>{r++;id=1000+Math.floor(Math.random()*9000);t0=Date.now();
+  round({r,w:W[r-1],id,x:12+Math.random()*76,y:18+Math.random()*64});
+  tm=setTimeout(()=>{res({r,ok:0});setTimeout(()=>{end({ok:0});setTimeout(go,800)},1200)},W[r-1]+400)};
+ const go=()=>{r=0;start({k:"citizen",n:5});setTimeout(next,1500)};
+ go();
+}
+</script></body></html>
