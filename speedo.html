@@ -132,12 +132,28 @@ function bar(id,v){
 }
 // รับจากเซิร์ฟเวอร์: speedo:update = [speed, gear, fuel, hp%, show, tires]
 // ซ้าย = สภาพรถ (hp)  ขวา = น้ำมัน (fuel)
+const VOL=.35;let AC=null; // เสียงเตือนแบบ FiveM: ดึ๋ง ดึ๋ง ดึ๋ง (ปรับความดัง VOL 0-1, 0 = ปิดเสียง)
+function chime(){
+ if(!VOL)return;
+ try{
+  AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+  if(AC.state=="suspended")AC.resume();
+  const n=AC.currentTime;
+  for(let i=0;i<3;i++){const t=i*.3;
+   [[1318.5,1],[2637,.35],[3951,.12]].forEach(([f,v])=>{
+    const o=AC.createOscillator(),g=AC.createGain();o.type="sine";o.frequency.value=f;
+    g.gain.setValueAtTime(.0001,n+t);g.gain.exponentialRampToValueAtTime(VOL*v,n+t+.008);g.gain.exponentialRampToValueAtTime(.0001,n+t+.26);
+    o.connect(g);g.connect(AC.destination);o.start(n+t);o.stop(n+t+.3);
+   });
+  }
+ }catch(_){}
+}
 function upd(a){
  const [s,g,f,h,sh,t]=a.map(Number);
  tgt=s;gear(g);bar("hb",h);bar("fb",f);
  $("tire").classList.toggle("on",t>0);$("wh").classList.toggle("burst",t>0);
  const el=$("in");
- if(sh&&!shown){shown=true;cur=0;ch=th;cf=tf;fit();el.classList.remove("off");el.classList.add("on")}
+ if(sh&&!shown){shown=true;cur=0;ch=th;cf=tf;fit();el.classList.remove("off");el.classList.add("on");chime()}
  else if(!sh&&shown){shown=false;el.classList.remove("on");el.classList.add("off")}
 }
 const norm=(...a)=>{let x=a[0];if(a.length==1){if(typeof x=="string"&&x[0]=="[")try{x=JSON.parse(x)}catch(_){}if(Array.isArray(x))return x}return a};
