@@ -77,6 +77,38 @@
   var MAX=5;          // การ์ดสูงสุดพร้อมกัน
   var LIFE=5000;      // ms ที่การ์ดอยู่ (เท่าของเดิม 5 วินาที)
 
+  var VOL=0.35;       // ความดังเสียงแจ้งเตือน 0-1 (0 = ปิดเสียง)
+
+  // ---- เสียงแจ้งเตือนแบบ FiveM (สร้างด้วย Web Audio ไม่ต้องมีไฟล์เสียง) ----
+  var AC=null,lastSnd=0;
+  function actx(){
+    if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(_){return null;}}
+    if(AC.state==='suspended'){try{AC.resume();}catch(_){}}
+    return AC;
+  }
+  function note(f,t0,dur,v,type){
+    var o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+t0;
+    o.type=type||'sine';o.frequency.setValueAtTime(f,t);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0002,VOL*v),t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+dur+0.03);
+  }
+  function snd(type,merged){
+    if(!VOL)return;
+    var now=Date.now();if(now-lastSnd<70)return;lastSnd=now;
+    try{
+      if(!actx())return;
+      if(type==='add'){            // ได้ของ: ติ๊งสูงสองโน้ตขึ้น
+        if(merged){note(1318,0,0.12,0.5,'triangle');}
+        else{note(988,0,0.16,0.9,'sine');note(1480,0.09,0.26,0.8,'sine');}
+      }else{                       // ของลด: ตึ๊งต่ำสองโน้ตลง
+        note(520,0,0.14,0.9,'triangle');note(370,0.09,0.24,0.8,'triangle');
+      }
+    }catch(_){}
+  }
+  ['pointerdown','keydown','touchstart'].forEach(function(ev){window.addEventListener(ev,actx,{once:true});});
+
   var stack=document.getElementById('stack');
   var cards=[];       // {el,key,qty,timer}
 
@@ -104,7 +136,7 @@
   }
 
   function push(type,name,qty){
-    name=String(name||'').replace(/[^A-Za-z0-9_\-]/g,'');
+    name=String(name||'').split(':').pop().replace(/[^A-Za-z0-9_\-]/g,'');
     qty=+qty||0;
     if(!name||qty<=0)return;
     var key=type+':'+name;
@@ -117,6 +149,7 @@
         o.num.textContent=o.qty;
         o.el.classList.remove('pop');void o.el.offsetWidth;o.el.classList.add('pop');
         arm(o);
+        snd(type,true);
         return;
       }
     }
@@ -152,6 +185,7 @@
     void el.offsetWidth;
     el.classList.add('in');
     arm(c);
+    snd(type,false);
   }
 
   // notify:add / notify:remove -> ["ชื่อไฟล์รูป", จำนวน]

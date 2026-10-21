@@ -16,7 +16,8 @@ html,body{height:100%;background:transparent;overflow:hidden;font-family:Kanit,"
 .s.use{animation:pop .28s ease-out;border-color:var(--blue)}
 .s.empty .ic{opacity:0}
 .k{position:absolute;left:0;top:0;width:18px;height:18px;background:linear-gradient(135deg,#2f8cff,var(--blue2));clip-path:polygon(0 0,100% 0,0 100%);color:#fff;font:600 9px/10px Kanit,sans-serif;padding:1px 0 0 3px}
-.ic{max-width:78%;max-height:78%;object-fit:contain;font-size:22px;line-height:1;color:#e8e8ec;text-align:center;font-weight:500}
+.ic{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;color:#e8e8ec;text-align:center;font-weight:500}
+.ic img{max-width:78%;max-height:78%;object-fit:contain;pointer-events:none}
 @keyframes bIn{from{opacity:0;transform:translateY(40px) scale(.85)}to{opacity:1;transform:none}}
 @keyframes bOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(24px) scale(.9)}}
 @keyframes pop{0%{transform:scale(1.18)}100%{transform:scale(1)}}
@@ -26,6 +27,8 @@ html,body{height:100%;background:transparent;overflow:hidden;font-family:Kanit,"
 <script>
 const PREVIEW=false;
 const $=id=>document.getElementById(id);
+const IMGBASE="items/"; // โฟลเดอร์รูปเดียวกับ inventory.html (ไฟล์ items/item_N.png)
+const IMGMAP={"ไม่พบข้อมูล":"item_0","ปูน":"item_1","สายไฟ":"item_2","องุ่น":"item_3","แตงโม":"item_4","ข้าว":"item_5","เห็ด":"item_6","แร่เหลือง":"item_7","แร่เขียว":"item_8","แร่ฟ้า":"item_9","แร่แดง":"item_10","แร่":"item_11","สนับ":"item_12","ไม้สนุ๊ก":"item_13","ไม้เบสบอล":"item_14","ไม้กอล์ฟ":"item_15","คาตานะ":"item_16","มีด":"Ko","ไม้เบสบอลเทียร์2":"item_14","ไม้เบสบอลเทียร์3":"item_14","ไม้เบสบอลเทียร์4":"item_14","ไม้เบสบอลเทียร์5":"item_14","คาตานะเทียร์2":"item_16","คาตานะเทียร์3":"item_16","มีดเทียร์2":"Ko","มีดเทียร์3":"Ko","มีดเทียร์4":"Ko","มือถือ":"item_17","ตะกร้า":"item_0","พิซซ่า":"item_18","น้ำเปล่า":"item_19","วิทยุ":"reo","เกราะ":"ga","aed":"aed","แหวนแก๊ง":"va","ยาปั้ม":"ya","ปืนยิงสตั้น":"te","Boombox":"boom","ฉลาม":"sar","อาหารฉลาม":"ag","ฉลามโต":"sar","โทเคนฮาโลวีน":"hallo","แฟชั่นฟักทอง":"funk","กุญแจตู้เซฟ":"safekey","กุญแจตู้เซฟเทียร์2":"safekey","กุญแจตู้เซฟเทียร์3":"safekey","เงิน":"money","เงินแดง":"redmoney","กาชาปองสายฟรี":"gacha_free","เบ็ดตกปลา":"item_49","เหยื่อ":"item_50","ปลาทู":"item_51","ปลาเหลือง":"item_52","ปลาส้ม":"item_53","เต่า":"item_54","ปลาฉลาม":"item_55","กาชาปองสายเติม":"gacha_topup","แฟชั่นวงเวทไฟ":"firecircle","อุปกรณ์งัดตู้เซฟ":"safekit"};
 const KEYS=["1","2","3","4","5","6","7"];
 let shown=false,K=1;
 const el=$("in");
@@ -41,10 +44,14 @@ function icon(s,d){ // d.i = ลิงก์รูป หรือ อีโม�
  const box=s.querySelector(".ic");
  if(!d||!d.n){s.classList.add("empty");box.innerHTML="";s.title="";return}
  s.classList.remove("empty");s.title=d.n;
- const v=d.i||"";
+ let v=d.i||"";
+ if(!/^(https?:|\/|\.|file:|data:)|\.(png|webp|jpg|svg)$/i.test(v)&&(!v||/item_\d+|:/.test(v))){ // ไม่ได้ส่งลิงก์รูปมา (ว่าง/ชื่อ sprite) -> หาจากชื่อไอเทม
+  const mm=/item_\d+/.exec(v),key=mm?mm[0]:IMGMAP[d.n];
+  if(key)v=IMGBASE+key+".png";
+ }
  const fb=[...d.n.split("_").pop()].slice(0,2).join("").toUpperCase();
  box.textContent="";
- if(/^(https?:|\/|\.|file:|data:)|\.(png|webp|jpg|svg)$/i.test(v)){const im=new Image();im.className="ic";im.draggable=false;im.onerror=()=>{im.onerror=null;im.src=PH};im.src=v;box.appendChild(im)}
+ if(/^(https?:|\/|\.|file:|data:)|\.(png|webp|jpg|svg)$/i.test(v)){const im=new Image();im.draggable=false;im.onerror=()=>{im.onerror=null;im.src=PH};im.src=v;box.appendChild(im)}
  else box.textContent=v||fb;
 }
 // รับจากเซิร์ฟเวอร์: hotbar:update = {"show":1,"slots":[{"n":"ชื่อไอเทม","i":"ลิงก์รูป"}, ...7 ช่อง]}
