@@ -12,7 +12,7 @@ html,body{height:100%;background:transparent;overflow:hidden;font-family:Kanit,"
 .c.out{display:flex;animation:out .3s ease-in both}
 .c::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c);box-shadow:0 0 10px var(--c)}
 .c::after{content:"";position:absolute;inset:0;background:radial-gradient(90px 50px at 25% 40%,color-mix(in srgb,var(--c) 22%,transparent),transparent);pointer-events:none}
-.ic{width:42px;height:42px;flex:none;z-index:1;filter:drop-shadow(0 3px 4px #0009)}
+.ic{width:46px;height:46px;flex:none;z-index:1;filter:drop-shadow(0 3px 4px #0009)}
 .tx{flex:1;min-width:0;z-index:1;text-align:center}
 .nm{font:italic 600 13px/14px Kanit,sans-serif;letter-spacing:.5px;color:#f1f1f4;text-transform:uppercase}
 .st{font:400 8.5px/11px Kanit,sans-serif;color:#a9a9b0;white-space:nowrap}
@@ -36,13 +36,14 @@ html,body{height:100%;background:transparent;overflow:hidden;font-family:Kanit,"
 @keyframes blink{50%{opacity:.45}}
 @media(prefers-reduced-motion:reduce){.c,.c *{animation:none!important}}
 </style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="sh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".32"/></linearGradient></defs></svg>
 <div id="hud"></div>
 <script>
 const PREVIEW=false;
 const VOL=.3; // ความดังเสียงแจ้งเตือนตอนพร้อมเก็บ (0 = ปิดเสียง)
 const $=id=>document.getElementById(id);
 const DEF={citizen:["PEOPLE","#ff8a1f"],agency:["AGENCY","#1fb8d8"],gang:["GANG","#e5262a"],family:["FAMILY","#35c01e"]};
-const CRATE=`<svg class="ic" viewBox="0 0 64 60"><polygon points="6,20 32,10 58,20 32,30" fill="#6a6d52"/><polygon points="6,20 32,30 32,56 6,46" fill="#3f4231"/><polygon points="58,20 32,30 32,56 58,46" fill="#4d503b"/><polygon points="6,36 32,46 32,56 6,46" fill="var(--c)"/><polygon points="58,36 32,46 32,56 58,46" fill="var(--c)" opacity=".8"/><path d="M32 30V56M19 25V51M45 25V51" stroke="#00000055" stroke-width="2"/><path d="M20 15L32 20L44 15" fill="none" stroke="#2c2e22" stroke-width="2.5" stroke-linecap="round"/><rect x="26" y="3" width="12" height="7" rx="3" fill="none" stroke="#9a9d86" stroke-width="2"/></svg>`;
+const CRATE=`<svg class="ic" viewBox="0 0 64 64"><path d="M5 27C5 11 20 3 32 3S59 11 59 27Q51.5 21 45.5 27Q38.5 21 32 27Q25.5 21 18.5 27Q12.5 21 5 27Z" fill="var(--c)"/><path d="M32 3L18.5 25L32 25ZM32 3L45.5 25L59 27C59 20 56 14 50 9ZM32 3L5 27L18.5 25C12 17 12 11 20 7Z" fill="#fff" opacity=".22"/><path d="M5 27C5 11 20 3 32 3S59 11 59 27Q51.5 21 45.5 27Q38.5 21 32 27Q25.5 21 18.5 27Q12.5 21 5 27Z" fill="url(#sh)"/><path d="M32 3L18.5 26M32 3L45.5 26M32 3V26M32 3L5.5 26M32 3L58.5 26" stroke="#0003" stroke-width=".8" fill="none"/><path d="M5.5 27L21 43M18.5 26.5L22 43M32 27V43M45.5 26.5L42 43M58.5 27L43 43" stroke="#dfe2e8" stroke-opacity=".75" stroke-width=".9" fill="none"/><rect x="19" y="43" width="26" height="19" rx="3" fill="#5d6146"/><path d="M19 55H45V59A3 3 0 0 1 42 62H22A3 3 0 0 1 19 59Z" fill="var(--c)"/><rect x="19" y="43" width="26" height="19" rx="3" fill="url(#sh)"/><path d="M19 48H45" stroke="#0004" stroke-width="1.2"/><rect x="25" y="43" width="3" height="19" fill="#2b2d1f" opacity=".55"/><rect x="36" y="43" width="3" height="19" fill="#2b2d1f" opacity=".55"/><circle cx="26.5" cy="50.5" r="1" fill="#c9ccb4"/><circle cx="37.5" cy="50.5" r="1" fill="#c9ccb4"/></svg>`;
 const cards={};
 function card(k){
  if(cards[k])return cards[k];
