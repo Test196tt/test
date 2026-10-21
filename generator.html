@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;0,600;1,600&display=swap" rel="stylesheet">
+<style>
+:root{--r:#ff4040;--a:#4aa3ff;--g:#35c01e;--o:#1e6bff}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:transparent;overflow:hidden;font-family:Kanit,"Noto Sans Thai",Tahoma,sans-serif;user-select:none}
+#hud{position:fixed;left:10px;top:50%;width:200px;display:flex;flex-direction:column;gap:8px;transform-origin:0 50%;transform:translateY(-50%) scale(var(--k,1))}
+.cd{position:relative;display:none;border-radius:12px;background:linear-gradient(#262628,#1a1a1c);border:1px solid #ffffff14;box-shadow:0 4px 14px #0007;overflow:hidden}
+.cd::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--o);box-shadow:0 0 10px var(--o)}
+.cd.on{display:block;animation:in .45s cubic-bezier(.2,.9,.3,1.15) both}
+.cd.out{display:block;animation:out .3s ease-in both}
+#pn{padding:9px 10px 10px 14px}
+.hd{display:flex;align-items:center;gap:8px}
+.bolt{width:30px;height:30px;flex:none;border-radius:9px;background:#ffffff10;display:flex;align-items:center;justify-content:center}
+.bolt svg{width:18px;height:18px;filter:drop-shadow(0 0 5px var(--o))}
+.ti{flex:1;min-width:0}
+.ti b{display:block;font:italic 600 14px/15px Kanit,sans-serif;letter-spacing:.8px;color:#f1f1f4}
+.ti span{display:block;font:400 9px/11px Kanit,sans-serif;color:#a9a9b0}
+.ct{font:600 13px/20px Kanit,sans-serif;padding:0 8px;border-radius:9px;background:#ffffff14;color:#fff;font-variant-numeric:tabular-nums}
+.pg{height:3px;margin:8px 0 7px;background:#ffffff12;border-radius:2px;overflow:hidden}
+.pg i{display:block;height:100%;width:0;background:var(--g);box-shadow:0 0 6px var(--g);transition:width .5s}
+.rw{display:flex;align-items:center;gap:8px;height:27px;padding:0 6px;margin-top:3px;border-radius:8px;background:#ffffff08;border:1px solid transparent;transition:background .3s,border-color .3s}
+.no{width:17px;height:17px;border-radius:5px;background:#ffffff14;color:#fff;font:600 10px/17px Kanit,sans-serif;text-align:center}
+.nm{flex:1;font:500 11px/13px Kanit,sans-serif;color:#e2e2e6}
+.ch{display:flex;align-items:center;gap:5px;font:500 10px/13px Kanit,sans-serif;color:var(--c)}
+.ch::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 6px var(--c)}
+.rw.s0{--c:var(--r);background:#ff40400d;border-color:#ff404033}
+.rw.s0 .ch::before{animation:blink 1s infinite}
+.rw.s1{--c:var(--g)}.rw.s1 .nm{color:#9a9aa2}
+.rw.s2{--c:var(--a);background:#4aa3ff12;border-color:#4aa3ff55}
+.rw.s2 .ch::before{animation:blink .5s infinite}
+#rp{padding:8px 10px 9px 14px}
+.rt{display:flex;justify-content:space-between;align-items:baseline}
+.rt b{font:italic 600 12px/14px Kanit,sans-serif;letter-spacing:.6px;color:#f1f1f4}
+.rt span{font:600 15px/16px Kanit,sans-serif;color:var(--a);font-variant-numeric:tabular-nums}
+.rb{height:7px;margin:6px 0 7px;border-radius:4px;background:#ffffff14;overflow:hidden}
+.rb i{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,#1e6bff,#4aa3ff);box-shadow:0 0 8px #4aa3ff88;transition:width .45s linear}
+.ht{display:flex;align-items:center;gap:6px;font:400 9.5px/12px Kanit,sans-serif;color:#a9a9b0}
+.key{min-width:18px;height:18px;padding:0 4px;border-radius:5px;background:#ffffff1c;border:1px solid #ffffff30;border-bottom-width:2px;color:#fff;font:600 10px/15px Kanit,sans-serif;text-align:center}
+@keyframes in{from{opacity:0;transform:translateX(-46px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes out{to{opacity:0;transform:translateX(-40px) scale(.92)}}
+@keyframes blink{50%{opacity:.25}}
+@media(prefers-reduced-motion:reduce){.cd,.cd *{animation:none!important}}
+</style></head><body>
+<div id="hud">
+ <div class="cd" id="pn">
+  <div class="hd">
+   <div class="bolt"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6z" fill="#4aa3ff"/></svg></div>
+   <div class="ti"><b>GENERATOR</b><span id="sub">เครื่องปั่นไฟขัดข้อง</span></div>
+   <div class="ct" id="ct">0/5</div>
+  </div>
+  <div class="pg"><i id="pg"></i></div>
+  <div id="rows"></div>
+ </div>
+ <div class="cd" id="rp">
+  <div class="rt"><b>REPAIRING</b><span id="pc">0%</span></div>
+  <div class="rb"><i id="rb"></i></div>
+  <div class="ht"><span class="key">N</span>กดเพื่อยกเลิกการซ่อม</div>
+ </div>
+</div>
+<script>
+const PREVIEW=false;
+const SIZE=.55; // ขนาด UI (1 = เดิม, เล็กลง = ลดเลข เช่น .6)
+const VOL=.3; // ความดังเสียง (0 = ปิดเสียง)
+const $=id=>document.getElementById(id);
+const N=5,TXT=["ขัดข้อง","กำลังซ่อม","ซ่อมแล้ว"];
+$("rows").innerHTML=Array.from({length:N},(_,i)=>`<div class="rw s0"><span class="no">${i+1}</span><span class="nm">เครื่องที่ ${i+1}</span><span class="ch">${TXT[0]}</span></div>`).join("");
+const rows=[...$("rows").children],prev=Array(N).fill(-1);
+let shown=false,AC=null;
+function tone(f,t,d,v){
+ const n=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type="sine";o.frequency.value=f;
+ g.gain.setValueAtTime(.0001,n+t);g.gain.exponentialRampToValueAtTime(VOL*(v||1),n+t+.01);g.gain.exponentialRampToValueAtTime(.0001,n+t+d);
+ o.connect(g);g.connect(AC.destination);o.start(n+t);o.stop(n+t+d+.05);
+}
+function sfx(k){
+ if(!VOL)return;
+ try{
+  AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+  if(AC.state=="suspended")AC.resume();
+  if(k=="alert"){tone(660,0,.18);tone(880,.2,.18);tone(660,.4,.18);tone(880,.6,.22)}
+  else if(k=="fixed"){tone(880,0,.12);tone(1320,.1,.3)}
+ }catch(_){}
+}
+function show(el,on){
+ if(on){el.classList.remove("out");el.classList.add("on")}
+ else if(el.classList.contains("on")){el.classList.remove("on");el.classList.add("out");setTimeout(()=>{if(!el.classList.contains("on"))el.classList.remove("out")},300)}
+}
+// gen:update = {"on":1,"g":[s0..s4]}  s: 0=ขัดข้อง 1=ซ่อมแล้ว 2=กำลังซ่อม
+function upd(o){
+ if(!o)return;
+ const g=o.g||[];let fixed=0;
+ for(let i=0;i<N;i++){
+  const s=+g[i]||0,r=rows[i];
+  r.className="rw s"+s;r.querySelector(".ch").textContent=TXT[s];
+  if(s==1)fixed++;
+  if(s==1&&prev[i]==0||s==1&&prev[i]==2)sfx("fixed");
+  prev[i]=s;
+ }
+ $("ct").textContent=fixed+"/"+N;$("pg").style.width=fixed/N*100+"%";
+ const on=!!o.on;
+ if(on&&!shown)sfx("alert");
+ shown=on;show($("pn"),on);
+ if(!on)rep(-1);
+}
+// gen:rep = {"p":เปอร์เซ็นต์} (-1 = ซ่อน)
+function rep(p){
+ p=+p;
+ if(p>=0){$("pc").textContent=Math.round(p)+"%";$("rb").style.width=Math.min(100,p)+"%"}
+ show($("rp"),p>=0);
+}
+const norm=(...a)=>{let x=a[0];if(typeof x=="string")try{x=JSON.parse(x)}catch(_){}return x};
+let bound=false;
+function bind(){
+ if(bound)return true;
+ if(!window.cef||!cef.on)return false;
+ cef.on("gen:update",(...a)=>upd(norm(...a)));
+ cef.on("gen:rep",(...a)=>{const x=norm(...a);rep(x&&x.p!==undefined?x.p:x)});
+ return bound=true;
+}
+if(!bind()){const iv=setInterval(()=>{if(bind())clearInterval(iv)},100);addEventListener("load",bind)}
+function fit(){$("hud").style.setProperty("--k",Math.min(SIZE,innerHeight*.92/330,innerWidth*.5/210))}
+addEventListener("resize",fit);fit();
+if(PREVIEW||location.hash=="#preview"){
+ const t0=Date.now();
+ setInterval(()=>{
+  const t=((Date.now()-t0)/1000)%36;
+  const g=[t>14?1:0,t>22?1:0,t>29?1:0,t>6&&t<12?2:t>=12?1:0,0];
+  if(t>=3&&t<7)g[1]=2;
+  g[4]=t>33?1:0;
+  const rp=t>=14&&t<22?(t-14)/8*100:-1;
+  upd({on:t<35?1:0,g});
+  if(t<35)rep(rp);
+ },400);
+}
+</script></body></html>
