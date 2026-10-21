@@ -105,7 +105,7 @@ if(!bind()){const iv=setInterval(()=>{if(bind())clearInterval(iv)},100);addEvent
 
 // ทดสอบในเบราว์เซอร์: เปิดไฟล์นี้ด้วย #preview  (จำลองฝั่งเซิร์ฟเวอร์เอง)
 if(location.hash=="#preview"){
- const W=[2200,1900,1600,1400,1200];let r=0,id=0,t0=0,tm=0;
+ const W=[1100,950,800,700,600];let r=0,id=0,t0=0,tm=0;
  window.send=send;
  window.cef={on(){},emit(ev,a){clearTimeout(tm);const ok=+a==id&&Date.now()-t0>=120;res({r,ok:ok?1:0});
   if(!ok)return setTimeout(()=>end({ok:0}),1200);
