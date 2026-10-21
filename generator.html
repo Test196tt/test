@@ -66,7 +66,7 @@ const PREVIEW=false;
 const SIZE=.55; // ขนาด UI (1 = เดิม, เล็กลง = ลดเลข เช่น .6)
 const VOL=.3; // ความดังเสียง (0 = ปิดเสียง)
 const $=id=>document.getElementById(id);
-const N=5,TXT=["ขัดข้อง","กำลังซ่อม","ซ่อมแล้ว"];
+const N=5,TXT=["ขัดข้อง","ซ่อมแล้ว","กำลังซ่อม"];
 $("rows").innerHTML=Array.from({length:N},(_,i)=>`<div class="rw s0"><span class="no">${i+1}</span><span class="nm">เครื่องที่ ${i+1}</span><span class="ch">${TXT[0]}</span></div>`).join("");
 const rows=[...$("rows").children],prev=Array(N).fill(-1);
 let shown=false,AC=null;
