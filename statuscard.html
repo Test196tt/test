@@ -1,1237 +1,268 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MELVY TOWN status card</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        :root {
-            --gold-high: #4aa8ff;
-            --gold-light: #1060f0;
-            --gold-mid: #0b3d9e;
-            --gold-dark: #06173d;
-            --subtle-glow: rgba(30, 120, 255, 0.16);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background: transparent;
-            font-family: 'Kanit', sans-serif;
-            min-height: 100vh;
-            overflow: hidden;
-        }
-
-        .card-wrapper-top {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            z-index: 9999;
-        }
-
-        /* ------------------ กรอบหลักบัตร ------------------ */
-        .card-frame {
-            background: linear-gradient(180deg, var(--gold-high) 0%, var(--gold-light) 25%, var(--gold-mid) 75%, var(--gold-dark) 100%);
-            padding: 2.5px;
-            border-radius: 20px;
-            box-shadow:
-                inset 0 1.5px 2px rgba(110, 175, 255, 0.35),
-                inset 0 -1.5px 2px rgba(0, 0, 0, 0.9);
-            width: 480px;
-            max-width: 95vw;
-            position: relative;
-            animation: fadeInDown 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-            transition: background 0.3s ease;
-        }
-
-        .card-container {
-            background-color: #0c0a0b;
-            background-image: linear-gradient(135deg, rgba(10,22,46,0.94) 0%, rgba(8,14,30,0.96) 50%, rgba(8,8,9,0.98) 100%);
-            background-size: cover;
-            background-position: center;
-            border-radius: 17.5px;
-            padding: 14px 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            box-shadow: 
-                inset 0 0 16px var(--subtle-glow),
-                inset 0 2px 4px rgba(0, 0, 0, 0.9);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card-bg-overlay {
-            position: absolute;
-            inset: 0;
-            background-size: cover;
-            background-position: center;
-            opacity: 0.18;
-            pointer-events: none;
-            z-index: 1;
-            transition: background-image 0.3s ease;
-        }
-
-        .top-actions {
-            position: absolute;
-            top: 10px;
-            right: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            z-index: 10;
-        }
-
-        .btn-icon-top {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: #14171a;
-            border: 1px solid var(--gold-mid);
-            color: #888;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-icon-top:hover {
-            color: #fff;
-            border-color: var(--gold-high);
-            transform: scale(1.1);
-        }
-
-        .btn-icon-top.active {
-            color: #121417;
-            background: var(--gold-high);
-            border-color: #fff;
-        }
-
-        /* ส่วนหัวบัตร */
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid rgba(40, 130, 255, 0.24);
-            padding-bottom: 6px;
-            z-index: 2;
-        }
-
-        .header-brand {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-        }
-
-        .header-brand i {
-            color: var(--gold-light);
-            font-size: 16px;
-        }
-
-        .header-titles h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 11px;
-            font-weight: 900;
-            color: #ffffff;
-            letter-spacing: 0.8px;
-            line-height: 1;
-        }
-
-        .header-titles span {
-            font-size: 8px;
-            color: var(--gold-light);
-            font-weight: 600;
-        }
-
-        .header-money-group {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-right: 6px;
-        }
-
-        .header-money-pill {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 7px;
-            border-radius: 5px;
-            background: rgba(9, 10, 12, 0.85);
-        }
-
-        .header-money-pill.green {
-            border: 1px solid rgba(46, 213, 115, 0.35);
-            color: #2ed573;
-        }
-
-        .header-money-pill.red {
-            border: 1px solid rgba(255, 71, 87, 0.35);
-            color: #ff4757;
-        }
-
-        .header-money-pill i {
-            font-size: 9px;
-        }
-
-        .header-money-pill span {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 9.5px;
-            font-weight: 700;
-        }
-
-        .card-id-badge {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 10px;
-            font-weight: 900;
-            color: var(--gold-high);
-            background: rgba(9, 10, 12, 0.85);
-            padding: 2px 7px;
-            border-radius: 6px;
-            border: 1px solid var(--gold-mid);
-            margin-right: 48px;
-        }
-
-        /* ส่วนข้อมูล */
-        .card-body {
-            display: flex;
-            gap: 14px;
-            align-items: center;
-            z-index: 2;
-        }
-
-        .photo-box {
-            width: 125px;
-            height: 142px;
-            background: radial-gradient(circle, #0c1a33 0%, #0b0b0d 100%);
-            border: 2px dashed var(--gold-mid);
-            border-radius: 12px;
-            padding: 2px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.9);
-            flex-shrink: 0;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .photo-box.has-image {
-            border-style: solid;
-        }
-
-        .photo-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 9px;
-            display: none;
-        }
-
-        .photo-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            color: #718093;
-        }
-
-        .photo-placeholder i {
-            font-size: 24px;
-            color: var(--gold-light);
-        }
-
-        .photo-placeholder span {
-            font-size: 8.5px;
-            font-weight: 600;
-            color: #a4b0be;
-            text-align: center;
-        }
-
-        .info-grid {
-            flex: 1;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 6px 10px;
-        }
-
-        .info-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .info-item.full-width {
-            grid-column: span 2;
-        }
-
-        .info-label {
-            font-size: 8px;
-            color: #7f8c8d;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .info-value {
-            font-size: 11px;
-            font-weight: 700;
-            color: #ffffff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-shadow: 0 1px 2px #000;
-        }
-
-        .info-value.highlight {
-            color: var(--gold-high);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 10.5px;
-        }
-
-        .lic-single-badge {
-            margin-top: 1px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 1.5px 6px;
-            border-radius: 5px;
-            font-size: 8.5px;
-            font-weight: 700;
-            width: fit-content;
-        }
-
-        .lic-single-badge.has-lic {
-            background: rgba(46, 213, 115, 0.12);
-            border: 1px solid rgba(46, 213, 115, 0.5);
-            color: #2ed573;
-            text-shadow: 0 0 5px rgba(46, 213, 115, 0.4);
-        }
-
-        .lic-single-badge.no-lic {
-            background: rgba(255, 71, 87, 0.12);
-            border: 1px solid rgba(255, 71, 87, 0.4);
-            color: #ff4757;
-        }
-
-        .btn-show-card {
-            background: linear-gradient(180deg, var(--gold-high) 0%, var(--gold-light) 40%, var(--gold-mid) 100%);
-            border: none;
-            border-radius: 6px;
-            padding: 4px 8px;
-            color: #121417;
-            font-family: 'Kanit', sans-serif;
-            font-size: 9.5px;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            box-shadow: inset 0 1px 1px #fff, 0 2px 4px rgba(0,0,0,0.4);
-            width: 100%;
-        }
-
-        .btn-show-card:hover {
-            transform: scale(1.03);
-            filter: brightness(1.1);
-        }
-
-        /* หน่วยงานออนไลน์ */
-        .factions-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            background: rgba(9, 10, 12, 0.85);
-            border-radius: 8px;
-            padding: 6px;
-            border: 1px solid rgba(40, 130, 255, 0.18);
-            z-index: 2;
-        }
-
-        .faction-mini-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #14171d;
-            border: 1px solid #23272e;
-            padding: 4px 6px;
-            border-radius: 6px;
-        }
-
-        .faction-mini-info {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .faction-mini-info i {
-            font-size: 9.5px;
-        }
-
-        .icon-medic { color: #ff4757; }
-        .icon-admin { color: #ff8a00; }
-        .icon-cop   { color: #1e90ff; }
-        .icon-gov   { color: #ffd700; }
-
-        .faction-mini-title {
-            font-size: 8.5px;
-            color: #a4b0be;
-            font-weight: 600;
-        }
-
-        .faction-mini-count {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 9.5px;
-            font-weight: 900;
-            color: var(--gold-high);
-            background: rgba(40, 130, 255, 0.15);
-            border: 0.5px solid var(--gold-mid);
-            padding: 1px 4px;
-            border-radius: 4px;
-            line-height: 1;
-        }
-
-        /* ------------------ แผงเมนูตั้งค่าเดิม ------------------ */
-        .settings-frame {
-            background: linear-gradient(180deg, var(--gold-high) 0%, var(--gold-light) 25%, var(--gold-mid) 75%, var(--gold-dark) 100%);
-            padding: 2.5px;
-            border-radius: 16px;
-            width: 480px;
-            max-width: 95vw;
-            box-shadow: none;
-            display: none;
-            animation: fadeInDown 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-
-        .settings-frame.show { display: block; }
-
-        .settings-container {
-            background: linear-gradient(135deg, #1c0709 0%, #0b0b0d 100%);
-            border-radius: 13.5px;
-            padding: 12px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .settings-title {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid rgba(40, 130, 255, 0.18);
-            padding-bottom: 6px;
-        }
-
-        .settings-title span {
-            font-size: 11.5px;
-            font-weight: 700;
-            color: var(--gold-high);
-            letter-spacing: 0.5px;
-        }
-
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #090a0c;
-            border: 1px solid #23272e;
-            padding: 6px 12px;
-            border-radius: 8px;
-        }
-
-        .setting-info { display: flex; flex-direction: column; }
-        .setting-name { font-size: 11.5px; font-weight: 600; color: #d1d8e0; }
-        .setting-desc { font-size: 9px; color: #718093; }
-
-        .btn-setting-action {
-            background: linear-gradient(180deg, var(--gold-high) 0%, var(--gold-light) 40%, var(--gold-mid) 100%);
-            border: none;
-            border-radius: 6px;
-            padding: 4px 10px;
-            color: #121417;
-            font-family: 'Kanit', sans-serif;
-            font-size: 9.5px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: inset 0 1px 1px #fff;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.15s ease;
-        }
-
-        .btn-setting-action:hover {
-            filter: brightness(1.1);
-            transform: scale(1.03);
-        }
-
-        .toggle-switch {
-            width: 34px; height: 18px; background: #2f3640; border-radius: 10px;
-            position: relative; cursor: pointer; transition: background 0.2s;
-        }
-
-        .toggle-switch::after {
-            content: ''; width: 14px; height: 14px; background: #fff;
-            border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.2s;
-        }
-
-        .toggle-switch.active { background: linear-gradient(90deg, #4aa8ff, #0a50d0); }
-        .toggle-switch.active::after { transform: translateX(16px); }
-
-        /* ------------------ แผงเมนูย่อยเลือกประเภทการเปลี่ยนรูป ------------------ */
-        .image-choice-frame {
-            background: linear-gradient(180deg, var(--gold-high) 0%, var(--gold-light) 25%, var(--gold-mid) 75%, var(--gold-dark) 100%);
-            padding: 2.5px;
-            border-radius: 16px;
-            width: 480px;
-            max-width: 95vw;
-            box-shadow: none;
-            display: none;
-            animation: fadeInDown 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-
-        .image-choice-frame.show { display: block; }
-
-        .image-choice-container {
-            background: linear-gradient(135deg, #1c0709 0%, #0b0b0d 100%);
-            border-radius: 13.5px;
-            padding: 12px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .image-choice-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 2px;
-        }
-
-        .image-choice-btn {
-            background: #090a0c;
-            border: 1px solid #23272e;
-            border-radius: 10px;
-            padding: 12px 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .image-choice-btn:hover {
-            border-color: var(--gold-high);
-            background: linear-gradient(135deg, #1f232b 0%, #101215 100%);
-            transform: translateY(-2px);
-        }
-
-        .image-choice-btn i {
-            font-size: 20px;
-            color: var(--gold-light);
-        }
-
-        .image-choice-btn span {
-            font-size: 11px;
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        .image-choice-btn small {
-            font-size: 8.5px;
-            color: #8c9ba5;
-            text-align: center;
-        }
-
-        /* ------------------ แผงเลือกผู้เล่นใกล้เคียง ------------------ */
-        .share-frame {
-            background: linear-gradient(180deg, var(--gold-high) 0%, var(--gold-light) 25%, var(--gold-mid) 75%, var(--gold-dark) 100%);
-            padding: 2.5px;
-            border-radius: 16px;
-            width: 480px;
-            max-width: 95vw;
-            box-shadow: none;
-            display: none;
-            animation: fadeInDown 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-
-        .share-frame.show { display: block; }
-
-        .share-container {
-            background: linear-gradient(135deg, #1c0709 0%, #0b0b0d 100%);
-            border-radius: 13.5px;
-            padding: 12px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .share-title {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid rgba(40, 130, 255, 0.18);
-            padding-bottom: 6px;
-        }
-
-        .share-title span {
-            font-size: 11.5px;
-            font-weight: 700;
-            color: var(--gold-high);
-            letter-spacing: 0.5px;
-        }
-
-        .player-list {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            max-height: 160px;
-            overflow-y: auto;
-            padding-right: 4px;
-        }
-
-        .player-list::-webkit-scrollbar { width: 4px; }
-        .player-list::-webkit-scrollbar-track { background: #090a0c; border-radius: 4px; }
-        .player-list::-webkit-scrollbar-thumb { background: var(--gold-mid); border-radius: 4px; }
-
-        .player-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #090a0c;
-            border: 1px solid #23272e;
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .player-item:hover {
-            border-color: var(--gold-light);
-            background: linear-gradient(90deg, #181c24 0%, #101216 100%);
-            transform: translateX(3px);
-        }
-
-        .player-info-meta {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .player-name-text {
-            font-size: 11.5px;
-            font-weight: 600;
-            color: #ffffff;
-        }
-
-        .player-id-pill {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 9.5px;
-            font-weight: 700;
-            color: var(--gold-high);
-            background: rgba(40, 130, 255, 0.18);
-            border: 0.5px solid var(--gold-mid);
-            padding: 1px 6px;
-            border-radius: 4px;
-        }
-
-        .btn-select-player {
-            background: linear-gradient(180deg, var(--gold-high) 0%, var(--gold-light) 40%, var(--gold-mid) 100%);
-            border: none;
-            border-radius: 6px;
-            padding: 3px 10px;
-            color: #121417;
-            font-family: 'Kanit', sans-serif;
-            font-size: 9.5px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: inset 0 1px 1px #fff;
-        }
-
-        @keyframes fadeInDown {
-            0% { opacity: 0; transform: translateY(-20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        /* CEF confirmation panel for shared-card privacy */
-        .confirm-frame {
-            background: linear-gradient(180deg, var(--gold-high) 0%, var(--gold-light) 25%, var(--gold-mid) 75%, var(--gold-dark) 100%);
-            padding: 2.5px; border-radius: 16px; width: 480px; max-width: 95vw;
-            box-shadow: none; display: none;
-            animation: fadeInDown .3s cubic-bezier(.22,1,.36,1) forwards;
-        }
-        .confirm-frame.show { display:block; }
-        .confirm-container { background:linear-gradient(135deg,#1c0709 0%,#0b0b0d 100%); border-radius:13.5px; padding:16px; }
-        .confirm-title { color:var(--gold-high); font-weight:700; font-size:13px; margin-bottom:6px; }
-        .confirm-text { color:#d1d8e0; font-size:11px; margin-bottom:12px; }
-        .confirm-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-        .confirm-btn { border:0; border-radius:7px; padding:7px 10px; font-family:'Kanit',sans-serif; font-weight:700; cursor:pointer; }
-        .confirm-btn.accept { background:linear-gradient(180deg,var(--gold-high),var(--gold-light)); color:#121417; }
-        .confirm-btn.decline { background:#2a2e35; color:#ff6b78; border:1px solid #66333a; }
-        @media (pointer: coarse), (max-width: 600px) {
-            .btn-icon-top, .btn-show-card, .btn-setting-action, .image-choice-btn, .player-item, .confirm-btn { touch-action: manipulation; }
-            .image-choice-btn { min-height: 72px; }
-        }
-    
-        /* Final visual override: stronger orange, no glow outside frame */
-        .card-frame,
-        .settings-frame,
-        .image-choice-frame,
-        .share-frame,
-        .confirm-frame {
-            filter: none !important;
-        }
-
-        .card-frame {
-            box-shadow:
-                inset 0 1px 1px rgba(110, 175, 255, 0.38),
-                inset 0 -1px 2px rgba(0, 0, 0, 0.90) !important;
-        }
-
-        .settings-frame,
-        .image-choice-frame,
-        .share-frame,
-        .confirm-frame {
-            box-shadow: none !important;
-        }
-
-    
-        /* ===== FIXED LAYOUT: SETTINGS DIRECTLY UNDER ID CARD ===== */
-        .card-wrapper-top {
-            position: fixed !important;
-            top: 20px !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            width: 480px !important;
-            max-width: 95vw !important;
-            display: block !important;
-            height: auto !important;
-            z-index: 9999 !important;
-        }
-
-        #idCardBox {
-            position: relative !important;
-            display: block !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            margin: 0 !important;
-            transform: none;
-        }
-
-        #settingsPanel {
-            position: relative !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            min-width: 0 !important;
-            margin: 8px 0 0 0 !important;
-            top: auto !important;
-            right: auto !important;
-            bottom: auto !important;
-            left: auto !important;
-            transform: none !important;
-            display: none !important;
-        }
-
-        #settingsPanel.show {
-            display: block !important;
-            transform: none !important;
-            animation: settingsFadeIn .16s ease-out both !important;
-        }
-
-        #settingsPanel .settings-container {
-            box-sizing: border-box !important;
-            width: 100% !important;
-        }
-
-        @keyframes settingsFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Sub menus use the same lower position instead of appearing beside/behind card */
-        #imageChoicePanel,
-        #sharePanel,
-        #confirmPanel {
-            position: relative !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            margin: 8px 0 0 0 !important;
-            top: auto !important;
-            right: auto !important;
-            bottom: auto !important;
-            left: auto !important;
-            transform: none !important;
-        }
-
-        #imageChoicePanel.show,
-        #sharePanel.show,
-        #confirmPanel.show {
-            transform: none !important;
-        }
-
-    
-        /* Structural layout guarantee: card then settings in the SAME wrapper */
-        .card-wrapper-top {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: stretch !important;
-            width: 480px !important;
-            max-width: 95vw !important;
-            gap: 8px !important;
-        }
-
-        #idCardBox,
-        #settingsPanel {
-            width: 100% !important;
-            max-width: 100% !important;
-            position: relative !important;
-            inset: auto !important;
-            margin: 0 !important;
-        }
-
-        #settingsPanel {
-            display: none !important;
-            transform: none !important;
-        }
-
-        #settingsPanel.show {
-            display: block !important;
-            transform: none !important;
-            animation: settingsFadeIn .16s ease-out both !important;
-        }
-
-    
-        /* Sharper uploaded card images */
-        .photo-box img {
-            image-rendering: auto !important;
-            transform: translateZ(0);
-            backface-visibility: hidden;
-        }
-
-        .card-bg-overlay {
-            image-rendering: auto !important;
-        }
-
-
-        /* ===== แดง-ดำ + ฟอร์มใส่ลิงก์รูป ===== */
-        .btn-show-card, .btn-setting-action, .btn-select-player, .confirm-btn.accept {
-            color: #ffffff !important;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.6);
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.4) !important;
-        }
-        .btn-icon-top.active { color: #ffffff; }
-        .url-block { display: flex; flex-direction: column; gap: 5px; }
-        .url-block label { font-size: 10.5px; font-weight: 700; color: #ffffff; }
-        .url-block label i { color: var(--gold-high); margin-right: 3px; }
-        .url-row { display: flex; gap: 6px; align-items: stretch; }
-        .url-input {
-            flex: 1; min-width: 0;
-            background: #090a0c; color: #ffffff;
-            border: 1px solid var(--gold-mid); border-radius: 8px;
-            padding: 6px 10px; font-family: 'Kanit', sans-serif; font-size: 10.5px;
-            outline: none; user-select: text; -webkit-user-select: text;
-        }
-        .url-input:focus { border-color: var(--gold-high); box-shadow: 0 0 6px rgba(40,130,255,0.35); }
-        .url-input::placeholder { color: #6d6f76; }
-        .url-msg { font-size: 9px; color: #8c8f98; min-height: 12px; }
-        .url-msg.ok { color: #2ed573; }
-        .url-msg.err { color: #ff6b78; }
-
-        /* ===== ขนาด + ตำแหน่ง: ขนาดกลาง อยู่กลางบนจอ (ปรับขนาดที่ --card-scale ตัวเดียว: 1 = ขนาดเดิม, 0.8 = กลาง, 0.65 = เล็ก) ===== */
-        .card-wrapper-top {
-            --card-scale: 0.8;
-            top: 14px !important;
-            left: 50% !important;
-            transform: translateX(-50%) scale(var(--card-scale)) !important;
-            transform-origin: top center !important;
-        }
-
-        /* หัวข้อภาษาไทย (Orbitron ไม่มีตัวอักษรไทย จึงใช้ Kanit) */
-        .header-titles h3 { font-family: 'Kanit', sans-serif; font-size: 14px; letter-spacing: 0.3px; }
-
-        /* ===== หน้าสถานะ: ส่วนเพิ่ม ===== */
-        .info-value.kd b { color: #ff6b78; font-weight: 700; }
-        .header-money-group.hide { display: none; }
-        .empty-player-text { font-size: 10px; color: #8c8f98; text-align: center; padding: 10px 0; }
-        #linkRow { display: none; }
-        #linkRow.show { display: flex; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MELVY TOWN status card</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--b1:#2d9bff;--b2:#1560e8;--b3:#0b3d9e;--navy:#050d24;--glow:rgba(30,140,255,.55)}
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-tap-highlight-color:transparent}
+body{background:transparent;font-family:'Kanit',sans-serif;min-height:100vh;overflow:hidden}
+.wrap{--card-scale:.8;position:fixed;top:14px;left:50%;transform:translateX(-50%) scale(var(--card-scale));transform-origin:top center;width:600px;display:flex;flex-direction:column;gap:10px;z-index:9999}
+
+/* ---------- บัตร ---------- */
+.card{position:relative;width:600px;height:340px;animation:in .35s cubic-bezier(.22,1,.36,1) both}
+.frame{position:absolute;left:0;top:0;width:520px;height:340px;overflow:visible}
+.frame path{vector-effect:non-scaling-stroke}
+.bg{position:absolute;left:0;top:0;width:520px;height:340px;background-size:cover;background-position:center;opacity:.2;pointer-events:none;
+ clip-path:polygon(10px 24px,300px 24px,318px 48px,510px 48px,510px 310px,480px 336px,30px 336px,10px 316px)}
+.tab{position:absolute;left:46px;top:6px;width:96px;height:30px;display:flex;align-items:center;justify-content:center;
+ font:900 13px 'Orbitron',sans-serif;color:#fff;letter-spacing:1px;
+ background:linear-gradient(180deg,#143f9c,#071a4d);border:2px solid var(--b1);border-top-width:2px;
+ clip-path:polygon(0 0,100% 0,88% 100%,12% 100%);filter:drop-shadow(0 0 6px var(--glow))}
+.title{position:absolute;left:250px;top:8px;width:262px;height:44px;padding:4px 0 0 34px;
+ background:linear-gradient(180deg,#0f3a96,#06163f);border:2px solid var(--b1);
+ clip-path:polygon(0 0,100% 0,100% 100%,22px 100%,0 0);filter:drop-shadow(0 0 6px var(--glow))}
+.title h3{font-size:19px;font-weight:700;color:#fff;line-height:1.15}
+.title small{display:block;font-size:8.5px;color:#7fb6ff;margin-top:-2px;letter-spacing:.3px}
+.acts{position:absolute;top:-4px;right:-10px;display:flex;gap:6px;z-index:5}
+.dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;cursor:pointer;
+ background:#0b1f55;border:1px solid var(--b1);transition:.15s}
+.dot:hover{transform:scale(1.12)}.dot.on{background:var(--b1)}
+.dot.x{background:#e0393e;border-color:#ff7a7e}
+
+.photo{position:absolute;left:24px;top:62px;width:158px;height:196px;border:2px solid var(--b1);border-radius:14px;cursor:pointer;
+ background:radial-gradient(circle at 50% 40%,#0d2a66,#050d24 80%);box-shadow:0 0 10px var(--glow),inset 0 0 14px rgba(20,100,255,.35);
+ display:flex;align-items:center;justify-content:center;overflow:hidden}
+.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.ph{display:flex;flex-direction:column;align-items:center;gap:8px;color:#fff;font-weight:700;font-size:13px}
+.ph i{font-size:26px;color:#e6f1ff}
+.photo.has .ph{display:none}.photo.has img{display:block}
+.share{position:absolute;left:24px;top:272px;width:158px;height:32px;border:none;border-radius:8px;cursor:pointer;color:#fff;
+ font:700 11px 'Kanit',sans-serif;background:linear-gradient(180deg,#2d9bff,#1560e8 55%,#0b3d9e);box-shadow:inset 0 1px 1px rgba(255,255,255,.4),0 0 8px var(--glow);
+ display:flex;align-items:center;justify-content:center;gap:6px}
+.share:hover{filter:brightness(1.12)}
+
+.grid{position:absolute;left:204px;top:64px;width:290px;display:grid;grid-template-columns:1fr 1fr;gap:7px 12px}
+.f{display:flex;flex-direction:column;gap:2px;min-width:0}.f.w{grid-column:span 2}
+.f label{font-size:9px;color:#9cc4ff;font-weight:600;padding-left:2px}
+.f b{display:block;height:27px;line-height:27px;padding:0 10px;font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+ background:linear-gradient(90deg,#1a56d6,#0a2468 70%,#071845);border:1px solid #2b79f0;border-radius:7px 14px 7px 7px;text-shadow:0 1px 2px #000}
+.f b.num{font-family:'Orbitron',sans-serif;font-size:11px;color:#9fd0ff}
+.f b.g{color:#3df08a;border-color:#1c9a5a}.f b.r{color:#ff6b78;border-color:#a8333c}
+.f b em{font-style:normal;color:#ff6b78}
+.money.hide{display:none}
+
+.barcode{position:absolute;left:520px;top:50px;width:78px;height:280px;border-radius:10px;padding:10px 8px;
+ background:linear-gradient(180deg,#8fa3c4,#586c92);border:2px solid #2d4f96;display:flex;gap:6px;box-shadow:0 0 10px rgba(30,120,255,.35)}
+.bars{flex:1;display:flex;flex-direction:column;gap:2px;opacity:.9}.bars i{display:block;background:#07112b;width:100%}
+.barcode span{writing-mode:vertical-rl;font:900 18px 'Orbitron',sans-serif;color:#0a1d52;letter-spacing:2px;transform:rotate(180deg);align-self:center}
+
+/* ---------- แผงย่อย ---------- */
+.panel{display:none;width:520px;align-self:flex-start;margin-left:0;padding:2px;border-radius:14px;background:linear-gradient(180deg,var(--b1),var(--b3));animation:in .25s both}
+.panel.show{display:block}
+.pin{background:linear-gradient(135deg,#0a1d4d,#050d24);border-radius:12px;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.ph2{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(40,130,255,.3);padding-bottom:6px;font-size:12px;font-weight:700;color:#7fc0ff}
+.ph2 i.cl{cursor:pointer;color:#8aa}
+.row{display:flex;justify-content:space-between;align-items:center;background:#07122e;border:1px solid #1b3a7a;padding:7px 12px;border-radius:9px}
+.row div{display:flex;flex-direction:column}.row .n{font-size:12px;font-weight:600;color:#e3eeff}.row .d{font-size:9.5px;color:#7f9bc9}
+.btn{background:linear-gradient(180deg,#2d9bff,#1560e8 55%,#0b3d9e);border:none;border-radius:7px;padding:5px 11px;color:#fff;font:700 10.5px 'Kanit',sans-serif;cursor:pointer;display:flex;align-items:center;gap:4px;box-shadow:inset 0 1px 1px rgba(255,255,255,.35)}
+.btn:hover{filter:brightness(1.12)}
+.urlrow{display:none;gap:6px}.urlrow.show{display:flex}
+.urlrow input{flex:1;min-width:0;background:#050d24;color:#fff;border:1px solid var(--b2);border-radius:8px;padding:6px 10px;font:11px 'Kanit',sans-serif;outline:none;user-select:text;-webkit-user-select:text}
+.plist{display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;padding-right:4px}
+.plist::-webkit-scrollbar{width:4px}.plist::-webkit-scrollbar-thumb{background:var(--b3);border-radius:4px}
+.pi{display:flex;justify-content:space-between;align-items:center;background:#07122e;border:1px solid #1b3a7a;padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s}
+.pi:hover{border-color:var(--b1);transform:translateX(3px)}
+.pm{display:flex;align-items:center;gap:8px;color:#fff;font-size:12px;font-weight:600}
+.pid{font:700 9.5px 'Orbitron',sans-serif;color:#7fc0ff;background:rgba(40,130,255,.18);border:.5px solid var(--b3);padding:1px 6px;border-radius:4px}
+.empty{font-size:10px;color:#7f9bc9;text-align:center;padding:10px 0}
+.ct{color:#7fc0ff;font-weight:700;font-size:13px}.cx{color:#d6e4ff;font-size:11px}
+.ca{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn.no{background:#1a2238;color:#ff6b78;border:1px solid #66333a;justify-content:center;padding:8px}.ca .btn{justify-content:center;padding:8px}
+@keyframes in{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+</style>
 </head>
 <body>
+<div class="wrap">
 
-    <div class="card-wrapper-top">
-        <!-- 1. การ์ดสถานะตัวละคร -->
-        <div class="card-frame" id="idCardBox">
-            <div class="card-container">
-                <div class="card-bg-overlay" id="cardBgOverlay"></div>
+ <div class="card" id="idCardBox">
+  <svg class="frame" viewBox="0 0 520 340">
+   <defs><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a1f52"/><stop offset="1" stop-color="#040b20"/></linearGradient></defs>
+   <path d="M10 24H300L318 48H510V310L480 336H30L10 316Z" fill="url(#fg)" stroke="#2d9bff" stroke-width="2.5" style="filter:drop-shadow(0 0 6px rgba(30,140,255,.7))"/>
+   <path d="M18 32H296L314 56H502" fill="none" stroke="rgba(45,155,255,.25)" stroke-width="1"/>
+  </svg>
+  <div class="bg" id="cardBgOverlay"></div>
 
-                <div class="top-actions">
-                    <div class="btn-icon-top" id="btnSettingsToggle" onclick="toggleSettings()" title="ตั้งค่ารูปภาพ"><i class="fa-solid fa-gear"></i></div>
-                    <div class="btn-icon-top" onclick="hideCard()" title="ปิด (ESC)"><i class="fa-solid fa-xmark"></i></div>
-                </div>
+  <div class="tab" id="cardCitizenId">ID 0</div>
+  <div class="title"><h3>บัตรประจำตัวประชาชน</h3><small>Identification Card</small></div>
+  <div class="acts">
+   <div class="dot" id="btnSettingsToggle" onclick="toggleSettings()" title="ตั้งค่ารูปภาพ"><i class="fa-solid fa-gear"></i></div>
+   <div class="dot x" onclick="hideCard()" title="ปิด (ESC)"><i class="fa-solid fa-xmark"></i></div>
+  </div>
 
-                <!-- ส่วนหัว -->
-                <div class="card-header">
-                    <div class="header-brand">
-                        <i class="fa-solid fa-address-card"></i>
-                        <div class="header-titles">
-                            <h3>บัตรประชาชน</h3>
-                        </div>
-                    </div>
+  <div class="photo" id="photoBox" onclick="if(ownerView)askLink('photo')">
+   <div class="ph" id="photoPlaceholder"><i class="fa-solid fa-camera"></i><span>ใส่รูปภาพ</span></div>
+   <img id="cardPhoto" alt="">
+  </div>
+  <button class="share" id="btnShareCard" onclick="openShareModal()"><i class="fa-solid fa-share-nodes"></i> ยื่นให้ผู้อื่นดู</button>
 
-                    <div class="header-money-group" id="moneyGroup">
-                        <div class="header-money-pill green" title="เงินสด">
-                            <i class="fa-solid fa-money-bill-wave"></i>
-                            <span id="greenCashVal">$0</span>
-                        </div>
-                        <div class="header-money-pill red" title="เงินแดง">
-                            <i class="fa-solid fa-sack-dollar"></i>
-                            <span id="redCashVal">$0</span>
-                        </div>
-                    </div>
+  <div class="grid">
+   <div class="f w"><label>ชื่อ - นามสกุล</label><b id="cardName">-</b></div>
+   <div class="f"><label>อายุ</label><b id="cardAge">-</b></div>
+   <div class="f"><label>เพศ</label><b id="cardGender">-</b></div>
+   <div class="f"><label>วันเกิด</label><b id="cardBirth">-</b></div>
+   <div class="f"><label>เบอร์โทร</label><b class="num" id="cardPhone">-</b></div>
+   <div class="f"><label>ฆ่า / ตาย (K/D)</label><b id="cardKD">0 / 0</b></div>
+   <div class="f"><label>COIN</label><b class="num" id="cardCoin">0</b></div>
+   <div class="f money"><label>เงินสด</label><b class="g num" id="greenCashVal">$0</b></div>
+   <div class="f money"><label>เงินแดง</label><b class="r num" id="redCashVal">$0</b></div>
+  </div>
 
-                    <div class="card-id-badge" id="cardCitizenId">ID: 0</div>
-                </div>
+  <div class="barcode"><div class="bars" id="bars"></div><span>BARCODE</span></div>
+ </div>
 
-                <!-- ส่วนข้อมูล -->
-                <div class="card-body">
-                    <div class="photo-box" id="photoBox">
-                        <div class="photo-placeholder" id="photoPlaceholder">
-                            <i class="fa-solid fa-user-tie"></i>
-                            <span>ยังไม่มีรูปภาพ<br>ประจำตัว</span>
-                        </div>
-                        <img id="cardPhoto" alt="Photo">
-                    </div>
+ <div class="panel" id="settingsPanel"><div class="pin">
+  <div class="ph2"><span><i class="fa-solid fa-link"></i> ตั้งค่ารูปภาพบัตรด้วยลิงก์</span><i class="fa-solid fa-xmark cl" onclick="toggleSettings()"></i></div>
+  <div class="row"><div><span class="n">รูปประจำตัว</span><span class="d">วางลิงก์รูปถ่ายหน้าตรงของตัวละคร</span></div><button class="btn" onclick="askLink('photo')"><i class="fa-solid fa-link"></i> ใส่ลิงก์รูป</button></div>
+  <div class="row"><div><span class="n">พื้นหลังบัตร</span><span class="d">วางลิงก์รูปลายพื้นหลังของบัตร</span></div><button class="btn" onclick="askLink('bg')"><i class="fa-solid fa-link"></i> ใส่ลิงก์รูป</button></div>
+  <div class="urlrow" id="linkRow"><input id="linkIn" type="text" placeholder="วางลิงก์รูป https://..." onkeydown="if(event.key==='Enter')applyLocalLink()"><button class="btn" onclick="applyLocalLink()"><i class="fa-solid fa-check"></i> ตกลง</button></div>
+ </div></div>
 
-                    <div class="info-grid">
-                        <div class="info-item full-width">
-                            <span class="info-label">ชื่อ - นามสกุล (Name)</span>
-                            <span class="info-value" id="cardName">-</span>
-                        </div>
+ <div class="panel" id="sharePanel"><div class="pin">
+  <div class="ph2"><span><i class="fa-solid fa-users"></i> เลือกผู้เล่นที่ต้องการแสดงบัตรให้ดู</span><i class="fa-solid fa-xmark cl" onclick="closeShareModal()"></i></div>
+  <div class="plist" id="nearbyPlayerList"></div>
+ </div></div>
 
-                        <div class="info-item">
-                            <span class="info-label">เพศ (Gender)</span>
-                            <span class="info-value" id="cardGender">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">วันเกิด (Birthday)</span>
-                            <span class="info-value" id="cardBirth">-</span>
-                        </div>
+ <div class="panel" id="confirmPanel"><div class="pin" style="padding:16px">
+  <div class="ct"><i class="fa-solid fa-address-card"></i> มีผู้เล่นต้องการแสดงบัตรให้คุณดู</div>
+  <div class="cx" id="confirmText">ต้องการดูบัตรประชาชนหรือไม่?</div>
+  <div class="ca"><button class="btn" onclick="acceptCardRequest()">ยืนยันดูบัตร</button><button class="btn no" onclick="declineCardRequest()">ปฏิเสธ</button></div>
+ </div></div>
+</div>
 
-                        <div class="info-item">
-                            <span class="info-label">เบอร์โทร (Phone)</span>
-                            <span class="info-value highlight" id="cardPhone">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">ฆ่า / ตาย (K/D)</span>
-                            <span class="info-value kd" id="cardKD">0 / 0</span>
-                        </div>
+<script>
+let pendingKind='',ownerView=true;
+function $(id){return document.getElementById(id)}
+function num(v){return Number(v||0).toLocaleString()}
+function emit(name){const a=[].slice.call(arguments,1);try{if(typeof cef!=='undefined'&&cef&&typeof cef.emit==='function'){cef.emit.apply(cef,[name].concat(a));return true}}catch(e){}return false}
+function eventArgs(e){let d=e.detail;try{if(typeof d==='string')d=JSON.parse(d)}catch(_){d=[]}return Array.isArray(d)?d:[d]}
 
-                        <div class="info-item">
-                            <span class="info-label">ชั่วโมงเล่น (Hours)</span>
-                            <span class="info-value" id="cardHours">0</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">COIN</span>
-                            <span class="info-value highlight" id="cardCoin">0</span>
-                        </div>
+function closePanels(){['settingsPanel','sharePanel','confirmPanel'].forEach(i=>$(i).classList.remove('show'));$('btnSettingsToggle').classList.remove('on')}
+function toggleSettings(){if(!ownerView)return;$('sharePanel').classList.remove('show');const p=$('settingsPanel');p.classList.toggle('show');$('btnSettingsToggle').classList.toggle('on',p.classList.contains('show'))}
 
-                        <div class="info-item full-width">
-                            <button class="btn-show-card" id="btnShareCard" onclick="openShareModal()">
-                                <i class="fa-solid fa-share-nodes"></i> ยื่นให้ผู้อื่นดู
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+function setCardPhoto(url){
+  const img=$('cardPhoto'),box=$('photoBox');
+  if(!url){img.removeAttribute('src');box.classList.remove('has');return}
+  img.onload=()=>box.classList.add('has');img.onerror=()=>box.classList.remove('has');img.src=url;
+}
+function setCardBackground(url){$('cardBgOverlay').style.backgroundImage=url?'url('+JSON.stringify(String(url))+')':'none'}
 
-        <!-- 2. แผงตั้งค่ารูปภาพ (กดรูปเฟืองบนการ์ด) -->
-        <div class="settings-frame" id="settingsPanel">
-            <div class="settings-container">
-                <div class="settings-title">
-                    <span><i class="fa-solid fa-link"></i> ตั้งค่ารูปภาพบัตรด้วยลิงก์</span>
-                    <i class="fa-solid fa-xmark" style="cursor: pointer; color: #888;" onclick="toggleSettings()"></i>
-                </div>
+function askLink(kind){
+  if(emit('status:'+kind))return;
+  pendingKind=kind;$('settingsPanel').classList.add('show');$('linkRow').classList.add('show');$('linkIn').focus();
+}
+function applyLocalLink(){
+  const i=$('linkIn'),u=i.value.trim();
+  if(!/^https?:\/\/\S+$/i.test(u))return;
+  pendingKind==='photo'?setCardPhoto(u):setCardBackground(u);
+  i.value='';$('linkRow').classList.remove('show');
+}
 
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <span class="setting-name">รูปประจำตัว</span>
-                        <span class="setting-desc">วางลิงก์รูปถ่ายหน้าตรงของตัวละคร</span>
-                    </div>
-                    <button class="btn-setting-action" onclick="askLink('photo')">
-                        <i class="fa-solid fa-link"></i> ใส่ลิงก์รูป
-                    </button>
-                </div>
+function setOwnerMode(o){
+  ownerView=!!o;
+  $('btnSettingsToggle').style.display=ownerView?'flex':'none';
+  $('btnShareCard').style.display=ownerView?'':'none';
+  document.querySelectorAll('.money').forEach(e=>e.classList.toggle('hide',!ownerView));
+  $('photoBox').style.cursor=ownerView?'pointer':'default';
+}
 
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <span class="setting-name">พื้นหลังบัตร</span>
-                        <span class="setting-desc">วางลิงก์รูปลายพื้นหลังของบัตร</span>
-                    </div>
-                    <button class="btn-setting-action" onclick="askLink('bg')">
-                        <i class="fa-solid fa-link"></i> ใส่ลิงก์รูป
-                    </button>
-                </div>
+function calcAge(s){
+  const m=/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/.exec(String(s||'').trim());
+  if(!m)return '-';
+  let y=+m[3];if(y>2400)y-=543;
+  const n=new Date();let a=n.getFullYear()-y;
+  if(n.getMonth()+1<+m[2]||(n.getMonth()+1===+m[2]&&n.getDate()<+m[1]))a--;
+  return a>=0&&a<150?a+' ปี':'-';
+}
 
-                <!-- ใช้เฉพาะตอนเปิดทดสอบในเบราว์เซอร์ (ไม่มี cef) ในเกมจะเด้ง Dialog ของเซิร์ฟเวอร์แทน -->
-                <div class="url-row" id="linkRow">
-                    <input id="linkIn" class="url-input" type="text" placeholder="วางลิงก์รูป https://..." onkeydown="if(event.key==='Enter')applyLocalLink()">
-                    <button class="btn-setting-action" onclick="applyLocalLink()"><i class="fa-solid fa-check"></i> ตกลง</button>
-                </div>
-            </div>
-        </div>
+function drawBarcode(seed){
+  const el=$('bars');el.innerHTML='';let s=(Number(seed)||1)*2654435761>>>0;
+  for(let i=0;i<46;i++){s=(s*1664525+1013904223)>>>0;const b=document.createElement('i');b.style.height=(1+(s>>>24)%4)+'px';b.style.opacity=(s>>>20)%5?1:.35;el.appendChild(b)}
+}
 
-        <!-- 3. แผงเลือกผู้เล่นใกล้เคียง -->
-        <div class="share-frame" id="sharePanel">
-            <div class="share-container">
-                <div class="share-title">
-                    <span><i class="fa-solid fa-users"></i> เลือกผู้เล่นที่ต้องการแสดงบัตรให้ดู</span>
-                    <i class="fa-solid fa-xmark" style="cursor: pointer; color: #888;" onclick="closeShareModal()"></i>
-                </div>
-                <div class="player-list" id="nearbyPlayerList"></div>
-            </div>
-        </div>
+// [id,ชื่อ,เพศ,วันเกิด,เงิน,เงินแดง,ฆ่า,ตาย,ชั่วโมง,coin,โทร,รูป,พื้นหลัง,viewer]
+function fillStatus(a){
+  const G=['-','ชาย','หญิง'];
+  setOwnerMode(!Number(a[13]));closePanels();
+  $('cardCitizenId').innerText='ID '+(a[0]||0);
+  $('cardName').innerText=a[1]||'-';
+  $('cardGender').innerText=G[+a[2]]||'-';
+  $('cardBirth').innerText=a[3]||'-';
+  $('cardAge').innerText=calcAge(a[3]);
+  $('greenCashVal').innerText='$'+num(a[4]);
+  $('redCashVal').innerText='$'+num(a[5]);
+  $('cardKD').innerHTML=num(a[6])+' / <em>'+num(a[7])+'</em>';
+  $('cardCoin').innerText=num(a[9]);
+  $('cardPhone').innerText=a[10]||'-';
+  setCardPhoto(a[11]||'');setCardBackground(a[12]||'');drawBarcode(a[0]);
+  $('idCardBox').style.display='block';
+}
 
-        <!-- 4. ยืนยันก่อนดูบัตรของผู้เล่นอื่น -->
-        <div class="confirm-frame" id="confirmPanel">
-            <div class="confirm-container">
-                <div class="confirm-title"><i class="fa-solid fa-address-card"></i> มีผู้เล่นต้องการแสดงบัตรให้คุณดู</div>
-                <div class="confirm-text" id="confirmText">ต้องการดูบัตรประชาชนหรือไม่?</div>
-                <div class="confirm-actions">
-                    <button class="confirm-btn accept" onclick="acceptCardRequest()">ยืนยันดูบัตร</button>
-                    <button class="confirm-btn decline" onclick="declineCardRequest()">ปฏิเสธ</button>
-                </div>
-            </div>
-        </div>
-    </div>
+function hideCard(){$('idCardBox').style.display='none';closePanels();emit('status:close')}
 
-    <script>
-        let pendingKind = '';
-        let ownerView = true;
+function openShareModal(){
+  if(!ownerView)return;
+  $('settingsPanel').classList.remove('show');$('btnSettingsToggle').classList.remove('on');
+  $('nearbyPlayerList').innerHTML='<div class="empty">กำลังค้นหาผู้เล่นใกล้เคียง...</div>';
+  $('sharePanel').classList.add('show');
+  if(!emit('status:nearby'))renderNearbyPlayers([[3,'Demo Player'],[7,'Another Person']]);
+}
+function closeShareModal(){$('sharePanel').classList.remove('show')}
 
-        // ส่ง event กลับไปที่เซิร์ฟเวอร์ (ถ้าไม่มี cef = เปิดในเบราว์เซอร์ธรรมดา คืนค่า false)
-        function emit(name) {
-            const a = Array.prototype.slice.call(arguments, 1);
-            try {
-                if (typeof cef !== 'undefined' && cef && typeof cef.emit === 'function') {
-                    cef.emit.apply(cef, [name].concat(a));
-                    return true;
-                }
-            } catch (e) {}
-            return false;
-        }
+function renderNearbyPlayers(players){
+  const list=$('nearbyPlayerList');list.innerHTML='';
+  if(!players||!players.length){list.innerHTML='<div class="empty">ไม่พบผู้เล่นอื่นในบริเวณใกล้เคียง</div>';return}
+  players.forEach(p=>{
+    const it=document.createElement('div');it.className='pi';it.onclick=()=>selectTargetPlayer(p[0]);
+    const m=document.createElement('div');m.className='pm';
+    const pill=document.createElement('span');pill.className='pid';pill.textContent='ID: '+p[0];
+    const nm=document.createElement('span');nm.textContent=p[1];
+    m.appendChild(pill);m.appendChild(nm);
+    const b=document.createElement('button');b.className='btn';b.textContent='ยื่นให้ดู';
+    it.appendChild(m);it.appendChild(b);list.appendChild(it);
+  });
+}
+function selectTargetPlayer(id){closeShareModal();emit('status:show_to',String(id))}
+function acceptCardRequest(){$('confirmPanel').classList.remove('show');emit('status:accept')}
+function declineCardRequest(){$('confirmPanel').classList.remove('show');$('idCardBox').style.display='none';emit('status:decline')}
 
-        function eventArgs(e) {
-            let d = e.detail;
-            try { if (typeof d === 'string') d = JSON.parse(d); } catch (_) { d = []; }
-            return Array.isArray(d) ? d : [d];
-        }
+window.addEventListener('cef:status:data',e=>fillStatus(eventArgs(e)));
+window.addEventListener('cef:status:shared',e=>{const a=eventArgs(e);a[13]=1;fillStatus(a)});
+window.addEventListener('cef:status:photo',e=>setCardPhoto(String(eventArgs(e)[0]||'')));
+window.addEventListener('cef:status:bg',e=>setCardBackground(String(eventArgs(e)[0]||'')));
+window.addEventListener('cef:status:nearby',e=>renderNearbyPlayers(eventArgs(e)));
+window.addEventListener('cef:status:confirm',e=>{
+  const a=eventArgs(e);closePanels();$('idCardBox').style.display='none';
+  $('confirmText').textContent=String(a[1]||'Player')+' ต้องการแสดงบัตรประชาชนให้คุณดู ต้องการยืนยันหรือไม่?';
+  $('confirmPanel').classList.add('show');
+});
 
-        function num(v) { return Number(v || 0).toLocaleString(); }
-        function $(id) { return document.getElementById(id); }
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;e.preventDefault();
+  if($('confirmPanel').classList.contains('show')){declineCardRequest();return}
+  if($('sharePanel').classList.contains('show')){closeShareModal();return}
+  if($('settingsPanel').classList.contains('show')){$('settingsPanel').classList.remove('show');$('btnSettingsToggle').classList.remove('on');return}
+  hideCard();
+});
 
-        function closePanels() {
-            $('settingsPanel').classList.remove('show');
-            $('sharePanel').classList.remove('show');
-            $('confirmPanel').classList.remove('show');
-            $('btnSettingsToggle').classList.remove('active');
-        }
-
-        function toggleSettings() {
-            if (!ownerView) return;
-            const panel = $('settingsPanel');
-            $('sharePanel').classList.remove('show');
-            panel.classList.toggle('show');
-            $('btnSettingsToggle').classList.toggle('active', panel.classList.contains('show'));
-        }
-
-        function setCardPhoto(url) {
-            const img = $('cardPhoto'), ph = $('photoPlaceholder'), box = $('photoBox');
-            if (!url) {
-                img.removeAttribute('src'); img.style.display = 'none';
-                ph.style.display = 'flex'; box.classList.remove('has-image');
-                return;
-            }
-            img.onload = function () { img.style.display = 'block'; ph.style.display = 'none'; box.classList.add('has-image'); };
-            img.onerror = function () { img.style.display = 'none'; ph.style.display = 'flex'; box.classList.remove('has-image'); };
-            img.src = url;
-        }
-
-        function setCardBackground(url) {
-            $('cardBgOverlay').style.backgroundImage = url ? 'url(' + JSON.stringify(String(url)) + ')' : 'none';
-        }
-
-        // เปลี่ยนรูป: ในเกมให้เซิร์ฟเวอร์เด้ง Dialog ให้วางลิงก์ / ในเบราว์เซอร์ธรรมดาใช้ช่องกรอกในแผงตั้งค่า
-        function askLink(kind) {
-            if (emit('status:' + kind)) return;
-            pendingKind = kind;
-            $('linkRow').classList.add('show');
-            $('linkIn').focus();
-        }
-
-        function applyLocalLink() {
-            const input = $('linkIn');
-            const u = input.value.trim();
-            if (!/^https?:\/\/\S+$/i.test(u)) return;
-            if (pendingKind === 'photo') setCardPhoto(u); else setCardBackground(u);
-            input.value = '';
-            $('linkRow').classList.remove('show');
-        }
-
-        // บัตรของตัวเอง = มีปุ่มเฟือง/ยื่นให้คนอื่น/เห็นเงิน  บัตรที่คนอื่นยื่นให้ดู = อ่านอย่างเดียว
-        function setOwnerMode(owner) {
-            ownerView = !!owner;
-            $('btnSettingsToggle').style.display = ownerView ? 'flex' : 'none';
-            $('btnShareCard').parentNode.style.display = ownerView ? '' : 'none';
-            $('moneyGroup').classList.toggle('hide', !ownerView);
-        }
-
-        // [id,ชื่อ,เพศ,วันเกิด,เงิน,เงินแดง,ฆ่า,ตาย,ชั่วโมง,coin,โทร,รูป,พื้นหลัง,viewer]
-        function fillStatus(a) {
-            const G = ['-', 'ชาย', 'หญิง'];
-            setOwnerMode(!Number(a[13]));
-            closePanels();
-
-            $('cardCitizenId').innerText = 'ID: ' + (a[0] || 0);
-            $('cardName').innerText = a[1] || '-';
-            $('cardGender').innerText = G[+a[2]] || '-';
-            $('cardBirth').innerText = a[3] || '-';
-            $('greenCashVal').innerText = '$' + num(a[4]);
-            $('redCashVal').innerText = '$' + num(a[5]);
-            $('cardKD').innerHTML = num(a[6]) + ' / <b>' + num(a[7]) + '</b>';
-            $('cardHours').innerText = num(a[8]) + ' ชม.';
-            $('cardCoin').innerText = num(a[9]);
-            $('cardPhone').innerText = a[10] || '-';
-
-            setCardPhoto(a[11] || '');
-            setCardBackground(a[12] || '');
-            $('idCardBox').style.display = 'block';
-        }
-
-        function hideCard() {
-            $('idCardBox').style.display = 'none';
-            closePanels();
-            emit('status:close');
-        }
-
-        // ---------- ยื่นบัตรให้ผู้อื่นดู ----------
-        function openShareModal() {
-            if (!ownerView) return;
-            $('settingsPanel').classList.remove('show');
-            $('btnSettingsToggle').classList.remove('active');
-            $('nearbyPlayerList').innerHTML = '<div class="empty-player-text">กำลังค้นหาผู้เล่นใกล้เคียง...</div>';
-            $('sharePanel').classList.add('show');
-
-            // เปิดในเบราว์เซอร์ธรรมดา (ไม่มี cef) => แสดงรายชื่อตัวอย่าง
-            if (!emit('status:nearby')) renderNearbyPlayers([[3, 'Demo Player'], [7, 'Another Person']]);
-        }
-
-        function closeShareModal() { $('sharePanel').classList.remove('show'); }
-
-        // players = [[id,"ชื่อ"],...]  ใช้ textContent กันชื่อผู้เล่นแทรก HTML
-        function renderNearbyPlayers(players) {
-            const list = $('nearbyPlayerList');
-            list.innerHTML = '';
-
-            if (!players || players.length === 0) {
-                list.innerHTML = '<div class="empty-player-text">ไม่พบผู้เล่นอื่นในบริเวณใกล้เคียง</div>';
-                return;
-            }
-
-            players.forEach(function (p) {
-                const item = document.createElement('div');
-                item.className = 'player-item';
-                item.onclick = function () { selectTargetPlayer(p[0]); };
-
-                const meta = document.createElement('div');
-                meta.className = 'player-info-meta';
-                const pill = document.createElement('span');
-                pill.className = 'player-id-pill';
-                pill.textContent = 'ID: ' + p[0];
-                const nm = document.createElement('span');
-                nm.className = 'player-name-text';
-                nm.textContent = p[1];
-                meta.appendChild(pill); meta.appendChild(nm);
-
-                const btn = document.createElement('button');
-                btn.className = 'btn-select-player';
-                btn.textContent = 'ยื่นให้ดู';
-
-                item.appendChild(meta); item.appendChild(btn);
-                list.appendChild(item);
-            });
-        }
-
-        function selectTargetPlayer(id) {
-            closeShareModal();
-            emit('status:show_to', String(id));
-        }
-
-        function acceptCardRequest() {
-            $('confirmPanel').classList.remove('show');
-            emit('status:accept');
-        }
-
-        function declineCardRequest() {
-            $('confirmPanel').classList.remove('show');
-            $('idCardBox').style.display = 'none';
-            emit('status:decline');
-        }
-
-        // ---------- event จากเซิร์ฟเวอร์ ----------
-        window.addEventListener('cef:status:data', function (e) { fillStatus(eventArgs(e)); });
-        window.addEventListener('cef:status:shared', function (e) {
-            const a = eventArgs(e);
-            a[13] = 1;
-            fillStatus(a);
-        });
-        window.addEventListener('cef:status:photo', function (e) { setCardPhoto(String(eventArgs(e)[0] || '')); });
-        window.addEventListener('cef:status:bg', function (e) { setCardBackground(String(eventArgs(e)[0] || '')); });
-        window.addEventListener('cef:status:nearby', function (e) { renderNearbyPlayers(eventArgs(e)); });
-        window.addEventListener('cef:status:confirm', function (e) {
-            const a = eventArgs(e);
-            closePanels();
-            $('idCardBox').style.display = 'none';
-            $('confirmText').textContent = String(a[1] || 'Player') + ' ต้องการแสดงบัตรประชาชนให้คุณดู ต้องการยืนยันหรือไม่?';
-            $('confirmPanel').classList.add('show');
-        });
-
-        document.addEventListener('keydown', function (e) {
-            if (e.key !== 'Escape') return;
-            e.preventDefault();
-
-            if ($('confirmPanel').classList.contains('show')) { declineCardRequest(); return; }
-            if ($('sharePanel').classList.contains('show')) { closeShareModal(); return; }
-            if ($('settingsPanel').classList.contains('show')) {
-                $('settingsPanel').classList.remove('show');
-                $('btnSettingsToggle').classList.remove('active');
-                return;
-            }
-            hideCard();
-        });
-
-        // ตัวอย่าง: เปิดไฟล์นี้ด้วย #test
-        if (location.hash === '#test') {
-            document.body.style.background = '#1b1d22';
-            fillStatus([12, 'Somchai Rakdee', 1, '01/05/1998', 152000, 25000, 34, 12, 126, 50, '0891234', '', '', 0]);
-        }
-    </script>
+drawBarcode(0);
+if(location.hash==='#test'){
+  document.body.style.background='#1b1d22';
+  fillStatus([12,'Somchai Rakdee',1,'01/05/1998',152000,25000,34,12,126,50,'0891234','','',0]);
+}
+</script>
 </body>
 </html>
