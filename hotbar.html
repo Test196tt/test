@@ -45,6 +45,7 @@ function icon(s,d){ // d.i = ลิงก์รูป หรือ อีโม�
  if(!d||!d.n){s.classList.add("empty");box.innerHTML="";s.title="";return}
  s.classList.remove("empty");s.title=d.n;
  let v=d.i||"";
+ if(IMGMAP[d.n])v=IMGBASE+IMGMAP[d.n]+".png"; // ชื่อไอเทมตรงกับตาราง -> ใช้ชื่อไฟล์จริง
  if(!/^(https?:|\/|\.|file:|data:)|\.(png|webp|jpg|svg)$/i.test(v)&&(!v||/item_\d+|:/.test(v))){ // ไม่ได้ส่งลิงก์รูปมา (ว่าง/ชื่อ sprite) -> หาจากชื่อไอเทม
   const mm=/item_\d+/.exec(v),key=mm?mm[0]:IMGMAP[d.n];
   if(key)v=IMGBASE+key+".png";
