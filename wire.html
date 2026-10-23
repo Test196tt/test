@@ -91,7 +91,7 @@ h1{font:700 clamp(22px,5.4vmin,34px)/1.1 var(--head);color:#fff}
 
         <div class="stage" id="sLoad">
           <p class="msg ok">จกสำเร็จ</p>
-          <div class="big" id="left">01:00</div>
+          <div class="big" id="left">02:00</div>
           <div class="bar"><b id="bar"></b></div>
         </div>
       </div>
@@ -220,7 +220,7 @@ h1{font:700 clamp(22px,5.4vmin,34px)/1.1 var(--head);color:#fff}
     var fake=function(n,a){
       if(n==='wire:tap'){
         if(Date.now()-st.t0<100||+a!==st.slot) return send('wire:fail',1);
-        if(st.n>=6) return send('wire:load',60);
+        if(st.n>=6) return send('wire:load',120);
         setTimeout(round,350);
       } else if(n==='wire:miss') send('wire:fail',2);
       else if(n==='wire:retry'){ st.n=0; send('wire:start'); setTimeout(round,900); }
