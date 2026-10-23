@@ -2,137 +2,136 @@
 <html lang="th"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Speedo</title>
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--red:#1e6bff}
+:root{--blue:#1d6fd0;--blue2:#2aa8ff;--dim:#1a1e26;--lbl:#3c4350}
 *{box-sizing:border-box;margin:0}
 html,body{height:100%;background:transparent;overflow:hidden;font-family:Kanit,"Noto Sans Thai",Tahoma,sans-serif;user-select:none}
-#hud{position:fixed;left:50%;bottom:8px;width:250px;height:82px;margin-left:-125px;transform-origin:50% 100%;transform:scale(var(--k,1))}
+#hud{position:fixed;left:50%;bottom:8px;width:300px;height:93px;margin-left:-150px;transform-origin:50% 100%;transform:scale(var(--k,1))}
 #in{position:absolute;inset:0;opacity:0}
 svg{width:100%;height:100%;overflow:visible}
-g,#gr{transform-box:fill-box;transform-origin:center}
-.t{transform-box:view-box;transform-origin:0 0}
-.gl{transform-origin:100% 50%}.gr{transform-origin:0 50%}
+.gl,.gr,.gc,#gt{transform-box:fill-box}
+.gl{transform-origin:100% 50%}.gr{transform-origin:0 50%}.gc,#gt{transform-origin:50% 50%}
 #in.on{animation:spIn .45s cubic-bezier(.2,.9,.3,1.1) both}
 #in.off{opacity:1}
-#in.off .gl{animation:fold .5s .1s ease-in both}
-#in.on .wx{animation:wxi .25s .8s ease-out both}
-#in.off .wx{animation:wxo .12s ease-in both}
-#in.off .gr{animation:fold .5s .1s ease-in both}
-#in.off .gc{animation:wco .3s .6s ease-in both}
-#in.on .gl{animation:wl .6s .3s cubic-bezier(.2,.9,.3,1.12) both}
-#in.on .gr{animation:wr .6s .3s cubic-bezier(.2,.9,.3,1.12) both}
+#in.on .gl,#in.on .gr{animation:wl .6s .3s cubic-bezier(.2,.9,.3,1.12) both}
 #in.on .gc{animation:wc .35s .02s cubic-bezier(.2,.9,.3,1.1) both}
+#in.off .gl,#in.off .gr{animation:fold .5s .1s ease-in both}
+#in.off .gc{animation:wco .3s .6s ease-in both}
 @keyframes spIn{from{opacity:0;transform:translateY(40px) scale(.85)}to{opacity:1;transform:none}}
 @keyframes fold{from{opacity:1;transform:none}70%{opacity:1}to{opacity:0;transform:scaleX(.12)}}
 @keyframes wco{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-14px) scale(.8)}}
 @keyframes wl{from{opacity:0;transform:scaleX(.12)}30%{opacity:1}to{opacity:1;transform:none}}
-@keyframes wr{from{opacity:0;transform:scaleX(.12)}30%{opacity:1}to{opacity:1;transform:none}}
 @keyframes wc{from{opacity:0;transform:translateY(-22px) scale(.8)}to{opacity:1;transform:none}}
-@keyframes wxi{from{opacity:0}to{opacity:1}}
-@keyframes wxo{to{opacity:0}}
-@keyframes pop{0%{transform:scale(1.6)}100%{transform:scale(1)}}
-@keyframes blink{50%{opacity:.25}}
-#gr.pop{animation:pop .28s ease-out}
-.low{animation:blink .8s infinite}
-#tire{display:none}#tire.on{display:inline;animation:blink .8s infinite}
-#rpm.hide{display:none}
-#wh.burst rect{fill:#4aa3ff;animation:blink .8s infinite}
+@keyframes pop{0%{transform:scale(1.5)}100%{transform:scale(1)}}
+@keyframes blink{from{opacity:1}to{opacity:.3}}
+#gt.pop{animation:pop .28s ease-out}
+.low{animation:blink .6s infinite alternate}
+#tireI{opacity:.9}
+#tireI.on{animation:blink .6s infinite alternate;stroke:var(--blue2)}
+#wh.burst rect{fill:var(--blue2);animation:blink .6s infinite alternate}
 @media(prefers-reduced-motion:reduce){#in,#in *{animation:none!important}#in.on{opacity:1}#in.off{opacity:0}}
 </style></head><body>
 <div id="hud"><div id="in">
-<svg viewBox="30 10 1065 350">
+<svg viewBox="40 25 1280 395">
  <defs>
-  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#262628"/><stop offset="1" stop-color="#1b1b1d"/></linearGradient>
-  <linearGradient id="bl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f8cff"/><stop offset="1" stop-color="#0f63c8"/></linearGradient>
-  <linearGradient id="car" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b9b9bd"/><stop offset=".5" stop-color="#f0f0f2"/><stop offset="1" stop-color="#b9b9bd"/></linearGradient>
-  <!-- หลอดรูปลิ่ม: ซ้าย = สภาพรถ  ขวา = น้ำมัน (ไล่จากล่างขึ้นบน) -->
-  <linearGradient id="gh" gradientUnits="userSpaceOnUse" x1="0" y1="300" x2="0" y2="94">
-   <stop offset="0" stop-color="#1b78e0"/><stop id="gh2" offset="1" stop-color="#1b78e0"/><stop id="gh3" offset="1" stop-color="#3b414b"/><stop offset="1" stop-color="#3b414b"/></linearGradient>
-  <linearGradient id="gf" gradientUnits="userSpaceOnUse" x1="0" y1="300" x2="0" y2="94">
-   <stop offset="0" stop-color="#1b78e0"/><stop id="gf2" offset=".5" stop-color="#1b78e0"/><stop id="gf3" offset=".5" stop-color="#3b414b"/><stop offset="1" stop-color="#3b414b"/></linearGradient>
-  <clipPath id="cl"><path d="M290 24L470 64L358 322L215 318L125 290L45 218L80 130L135 62Z"/></clipPath>
+  <radialGradient id="pg" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#101b2e"/><stop offset=".6" stop-color="#0a0d12"/><stop offset="1" stop-color="#07080a"/></radialGradient>
+  <linearGradient id="sg" gradientUnits="userSpaceOnUse" x1="0" y1="400" x2="0" y2="55"><stop offset="0" stop-color="#0f5fb8"/><stop offset="1" stop-color="#2aa8ff"/></linearGradient>
+  <linearGradient id="hg" gradientUnits="userSpaceOnUse" x1="0" y1="300" x2="0" y2="128"><stop offset="0" stop-color="#0f5fb8"/><stop offset="1" stop-color="#2aa8ff"/></linearGradient>
+  <clipPath id="cS"><rect id="rS" x="400" y="55" width="600" height="345"/></clipPath>
+  <clipPath id="cT"><rect id="rT" x="600" y="50" width="0" height="25"/></clipPath>
+  <clipPath id="cH"><rect id="rH" x="400" y="128" width="140" height="172"/></clipPath>
+  <clipPath id="cF"><rect id="rF" x="400" y="128" width="140" height="172"/></clipPath>
  </defs>
 
- <!-- ปีกซ้าย -->
+ <!-- แผงซ้าย : ความเร็ว + สภาพรถ -->
  <g class="gl">
-  <path d="M290 24L470 64L358 322L215 318L125 290L45 218L80 130L135 62Z" fill="url(#bg)"/>
-  <path d="M358 322L215 318L125 290L45 218L80 130L135 62L290 24" fill="none" stroke="url(#bl)" stroke-width="44" stroke-linejoin="miter" clip-path="url(#cl)"/>
-  <g class="wx">
-   <text x="258" y="96" text-anchor="middle" fill="#e2e2e6" style="font:400 27px Kanit,sans-serif;letter-spacing:2px">KMH</text>
-   <text id="sp" x="238" y="208" text-anchor="middle" fill="#f1f1f4" style="font:600 62px Kanit,sans-serif">0</text>
-   <path id="hb" d="M440 94L311 298L346 300Z" fill="url(#gh)"/>
-   <text id="ht" transform="translate(382 143) rotate(-57.7)" text-anchor="middle" fill="#e2e2e6" style="font:500 17px Kanit,sans-serif">100%</text>
-   <!-- ไอคอนเครื่องยนต์ -->
-   <path transform="translate(262 283)" fill="#e8e8ec" d="M-14-6H-7V-12H3V-8H11L16-3H21V-7H26V9H21V5H16V12H-5L-10 7H-14Z"/>
+  <path d="M150 45H410L535 115L395 395H150L60 210Z" fill="url(#pg)" stroke="#050607" stroke-width="4" stroke-linejoin="round"/>
+  <text x="250" y="150" text-anchor="middle" fill="var(--lbl)" style="font:500 26px Kanit,sans-serif;letter-spacing:4px">KM/H</text>
+  <text id="sp" x="250" y="258" text-anchor="middle" fill="#f4f6fa" style="font:600 112px Kanit,sans-serif">0</text>
+  <text x="250" y="316" text-anchor="middle" fill="var(--lbl)" style="font:500 24px Kanit,sans-serif;letter-spacing:4px">ENGINE</text>
+  <text id="ht" x="250" y="368" text-anchor="middle" fill="#fff" style="font:700 30px Kanit,sans-serif">100%</text>
+  <g id="hb">
+   <path d="M498 128H518L432 300H412Z" fill="var(--dim)"/>
+   <path d="M498 128H518L432 300H412Z" fill="url(#hg)" clip-path="url(#cH)"/>
   </g>
  </g>
 
- <!-- ปีกขวา -->
+ <!-- แผงขวา : เกียร์ + น้ำมัน -->
  <g class="gr">
-  <g class="t" transform="translate(1125 0) scale(-1 1)">
-   <path d="M290 24L470 64L358 322L215 318L125 290L45 218L80 130L135 62Z" fill="url(#bg)"/>
-   <path d="M358 322L215 318L125 290L45 218L80 130L135 62L290 24" fill="none" stroke="url(#bl)" stroke-width="44" stroke-linejoin="miter" clip-path="url(#cl)"/>
-  </g>
-  <g class="wx">
-   <text x="865" y="96" text-anchor="middle" fill="#e2e2e6" style="font:400 27px Kanit,sans-serif;letter-spacing:2px">GEAR</text>
-   <text id="gr" x="887" y="208" text-anchor="middle" fill="#f1f1f4" style="font:600 62px Kanit,sans-serif">N</text>
-   <path id="fb" d="M685 94L814 298L779 300Z" fill="url(#gf)"/>
-   <text id="ft" transform="translate(743 143) rotate(57.7)" text-anchor="middle" fill="#e2e2e6" style="font:500 17px Kanit,sans-serif">50%</text>
-   <!-- ไอคอนน้ำมัน -->
-   <g class="t" transform="translate(852 283) scale(3.6)">
-    <path d="M-4-5.5H1.6A1 1 0 0 1 2.6-4.5V4.4H-4Z" fill="#e8e8ec"/><rect x="-3" y="-4.5" width="4.6" height="3" rx=".5" fill="#1d1d1f"/><path d="M-5 5.4H3.6" stroke="#e8e8ec" stroke-width="1.2" stroke-linecap="round"/><path d="M2.6-3.4L4.4-1.8V3.2a.9.9 0 0 0 1.8 0V-1.6L4.8-3" fill="none" stroke="#e8e8ec" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/>
-   </g>
+  <path d="M1210 45H950L825 115L965 395H1210L1300 210Z" fill="url(#pg)" stroke="#050607" stroke-width="4" stroke-linejoin="round"/>
+  <text x="1110" y="150" text-anchor="middle" fill="var(--lbl)" style="font:500 26px Kanit,sans-serif;letter-spacing:4px">GEAR</text>
+  <text id="gp" x="1000" y="240" text-anchor="middle" fill="var(--lbl)" style="font:600 58px Kanit,sans-serif"></text>
+  <text id="gt" x="1095" y="258" text-anchor="middle" fill="#f4f6fa" style="font:600 112px Kanit,sans-serif">N</text>
+  <text x="1110" y="316" text-anchor="middle" fill="var(--lbl)" style="font:500 24px Kanit,sans-serif;letter-spacing:4px">FUEL</text>
+  <text id="ft" x="1110" y="368" text-anchor="middle" fill="#fff" style="font:700 30px Kanit,sans-serif">50%</text>
+  <g id="fb">
+   <path d="M862 128H842L928 300H948Z" fill="var(--dim)"/>
+   <g transform="translate(1360 0) scale(-1 1)"><path d="M498 128H518L432 300H412Z" fill="url(#hg)" clip-path="url(#cF)"/></g>
   </g>
  </g>
 
- <!-- ตรงกลาง -->
+ <!-- ตรงกลาง : รถ + หลอดความเร็วข้างล้อ -->
  <g class="gc">
-  <path d="M482 66H643L753 318L562.5 348L372 318Z" fill="url(#bg)"/>
-  <path d="M482 66L372 318M643 66L753 318" stroke="#c9a96a" stroke-width="2" stroke-linecap="round" opacity=".85"/>
-  <g id="wh" fill="#e8e8ec">
-   <rect x="483" y="120" width="14" height="38" rx="3"/><rect x="483" y="206" width="14" height="38" rx="3"/>
-   <rect x="628" y="120" width="14" height="38" rx="3"/><rect x="628" y="206" width="14" height="38" rx="3"/>
+  <path d="M610 38H750L890 330L850 405H510L470 330Z" fill="#000" stroke="#000" stroke-width="8" stroke-linejoin="round"/>
+  <!-- กรอบฟ้าด้านล่าง -->
+  <path d="M481 335L515 392H845L879 335" fill="none" stroke="url(#sg)" stroke-width="14" stroke-linejoin="round" stroke-linecap="butt" clip-path="url(#cS)"/>
+  <!-- หลอดความเร็วซ้าย/ขวา (ขึ้นจากล่าง) -->
+  <path d="M615 55H633L499 335H481Z" fill="url(#sg)" clip-path="url(#cS)"/><path d="M609 69L615 55H680V69Z" fill="url(#sg)" clip-path="url(#cT)"/>
+  <g transform="translate(1360 0) scale(-1 1)"><path d="M615 55H633L499 335H481Z" fill="url(#sg)" clip-path="url(#cS)"/><path d="M609 69L615 55H680V69Z" fill="url(#sg)" clip-path="url(#cT)"/></g>
+
+  <!-- ล้อ -->
+  <g id="wh" fill="#f2f2f4">
+   <rect x="616" y="108" width="36" height="56" rx="10"/><rect x="708" y="108" width="36" height="56" rx="10"/>
+   <rect x="586" y="192" width="40" height="84" rx="12"/><rect x="734" y="192" width="40" height="84" rx="12"/>
   </g>
-  <!-- รถมองจากด้านบน -->
-  <g class="t" transform="translate(562.5 188)">
-   <path d="M0-93C22-93 36-78 38-54L40-20C41 10 40 40 38 65C36 88 22 93 0 93C-22 93-36 88-38 65C-40 40-41 10-40-20L-38-54C-36-78-22-93 0-93Z" fill="url(#car)"/>
-   <path d="M-40-22H-46Q-48-22-47-26L-44-30H-39ZM40-22H46Q48-22 47-26L44-30H39Z" fill="#c8c8cc"/>
-   <path d="M-27-40H27L31-12H-31Z" fill="#1f1f22"/><path d="M-22-62Q0-70 22-62L27-42H-27Z" fill="#e6e6e9"/>
-   <path d="M-30-9H30L28 24H-28Z" fill="#dcdcdf"/>
-   <path d="M-28 27H28L26 54H-26Z" fill="#26262a"/>
-   <path d="M-33 70Q0 78 33 70" fill="none" stroke="#9a9a9f" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- ตัวรถ -->
+  <g fill="#050505" stroke="#8c8f96" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+   <path d="M652 104Q680 97 708 104L730 150Q740 190 740 240Q736 276 706 280H654Q624 276 620 240Q620 190 630 150Z"/>
+   <path d="M644 158H716L728 212H632Z" fill="none"/>
+   <path d="M640 250Q680 262 720 250" fill="none"/>
   </g>
-  <text id="tire" x="562.5" y="310" text-anchor="middle" fill="#5a9bff" style="font:500 19px Kanit,sans-serif">ยางแตก</text>
+  <!-- ไอคอนล่าง -->
+  <!-- ไอคอนเครื่องยนต์ -->
+  <path transform="translate(608 358) scale(1.25) translate(-6 0)" fill="#f2f2f4" stroke="#f2f2f4" stroke-width="1" stroke-linejoin="round" d="M-14-6H-7V-12H3V-8H11L16-3H21V-7H26V9H21V5H16V12H-5L-10 7H-14Z"/>
+  <!-- ไอคอนปั๊มน้ำมัน -->
+  <g transform="translate(752 358) scale(4.6)">
+   <path d="M-4-5.5H1.6A1 1 0 0 1 2.6-4.5V4.4H-4Z" fill="#f2f2f4"/><rect x="-3" y="-4.5" width="4.6" height="3" rx=".5" fill="#000"/><path d="M-5 5.4H3.6" stroke="#f2f2f4" stroke-width="1.2" stroke-linecap="round"/><path d="M2.6-3.4L4.4-1.8V3.2a.9.9 0 0 0 1.8 0V-1.6L4.8-3" fill="none" stroke="#f2f2f4" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+  <path d="M680 298L714 332L680 366L646 332Z" fill="#000" stroke="var(--blue)" stroke-width="5" stroke-linejoin="round"/>
+  <circle id="tireI" cx="680" cy="332" r="9" fill="none" stroke="#f2f2f4" stroke-width="5"/>
  </g>
 </svg></div></div>
 <script>
 const PREVIEW=false;
+const MAXV=200;   // ความเร็วที่หลอดข้างล้อเต็ม (กม./ชม.) ปรับได้
 const $=id=>document.getElementById(id);
-let shown=false,K=1,cur=0,tgt=0,ch=100,cf=100,th=100,tf=100,lh=-1,lf=-1;
-function fit(){K=Math.min(1,innerWidth*.96/250,innerHeight*.4/82);$("hud").style.setProperty("--k",K)}
-function grad(p,v){const o=v/100;$(p+"2").setAttribute("offset",o);$(p+"3").setAttribute("offset",o)}
+let shown=false,K=1,cur=0,tgt=0,ch=100,cf=100,th=100,tf=100,lh=-1,lf=-1,ls=-1;
+function fit(){K=Math.min(1,innerWidth*.96/300,innerHeight*.4/93);$("hud").style.setProperty("--k",K)}
+function setClip(id,y0,H,r){const h=Math.round(H*r*10)/10;$(id).setAttribute("y",y0-h);$(id).setAttribute("height",h)}
 function frame(){
  cur+=(tgt-cur)*.16;if(Math.abs(tgt-cur)<.4)cur=tgt;
  $("sp").textContent=Math.round(cur);
+ const r=Math.max(0,Math.min(1,cur/MAXV));if(r!==ls){ls=r;setClip("rS",400,345,Math.min(1,r/.88));$("rT").setAttribute("width",80*Math.max(0,(r-.88)/.12))}
  ch+=(th-ch)*.16;if(Math.abs(th-ch)<.3)ch=th;
  cf+=(tf-cf)*.16;if(Math.abs(tf-cf)<.3)cf=tf;
- if(ch!==lh){lh=ch;grad("gh",ch);$("ht").textContent=Math.round(ch)+"%"}
- if(cf!==lf){lf=cf;grad("gf",cf);$("ft").textContent=Math.round(cf)+"%"}
+ if(ch!==lh){lh=ch;setClip("rH",300,172,ch/100);$("ht").textContent=Math.round(ch)+"%"}
+ if(cf!==lf){lf=cf;setClip("rF",300,172,cf/100);$("ft").textContent=Math.round(cf)+"%"}
  requestAnimationFrame(frame);
 }
 function gear(g){
- const t=g>0?String(g):"N";if($("gr").textContent==t)return;
- $("gr").textContent=t;$("gr").classList.remove("pop");void $("gr").getBoundingClientRect();$("gr").classList.add("pop");
+ const t=g>0?String(g):"N";if($("gt").textContent==t)return;
+ $("gp").textContent=g>1?String(g-1):"";
+ $("gt").textContent=t;$("gt").classList.remove("pop");void $("gt").getBoundingClientRect();$("gt").classList.add("pop");
 }
 function bar(id,v){
  v=Math.max(0,Math.min(100,v));
  if(id=="hb")th=v;else tf=v;
- $(id).classList.toggle("low",v<15);
+ $(id).classList.toggle("low",v<15);$(id=="hb"?"ht":"ft").classList.toggle("low",v<15);
 }
 // รับจากเซิร์ฟเวอร์: speedo:update = [speed, gear, fuel, hp%, show, tires]
-// ซ้าย = สภาพรถ (hp)  ขวา = น้ำมัน (fuel)
-const VOL=.35;let AC=null; // เสียงเตือนแบบ FiveM: ดึ๋ง ดึ๋ง ดึ๋ง (ปรับความดัง VOL 0-1, 0 = ปิดเสียง)
+// ซ้าย = สภาพรถ (hp)  ขวา = น้ำมัน (fuel)  หลอดข้างล้อ = ความเร็ว
+const VOL=.35;let AC=null; // เสียงเตือน (VOL 0-1, 0 = ปิดเสียง)
 function chime(){
  if(!VOL)return;
  try{
@@ -151,7 +150,7 @@ function chime(){
 function upd(a){
  const [s,g,f,h,sh,t]=a.map(Number);
  tgt=s;gear(g);bar("hb",h);bar("fb",f);
- $("tire").classList.toggle("on",t>0);$("wh").classList.toggle("burst",t>0);
+ $("tireI").classList.toggle("on",t>0);$("wh").classList.toggle("burst",t>0);
  const el=$("in");
  if(sh&&!shown){shown=true;cur=0;ch=th;cf=tf;fit();el.classList.remove("off");el.classList.add("on");chime()}
  else if(!sh&&shown){shown=false;el.classList.remove("on");el.classList.add("off")}
@@ -166,7 +165,7 @@ function bind(){
 }
 if(!bind()){const iv=setInterval(()=>{if(bind())clearInterval(iv)},100);addEventListener("load",bind)}
 addEventListener("resize",fit);fit();frame();
-if(PREVIEW||location.hash=="#preview"){ // โหมดตัวอย่างนอกเกม: ขับวนแล้วลงรถ/ขึ้นรถสลับกัน
+if(PREVIEW||location.hash=="#preview"){
  let t0=Date.now();
  setInterval(()=>{
   const t=(Date.now()-t0)/1000,c=t%14;
