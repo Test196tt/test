@@ -3,95 +3,107 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>HUD (แบบตัวอย่าง)</title>
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&display=swap" rel="stylesheet">
+<title>HUD</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --s:.6;              /* ขนาดรวม (1 = ปกติ) */
   --left:14px;         /* ระยะจากขอบซ้าย */
   --bottom:14px;       /* ระยะจากขอบล่าง */
-  --hp-a:#12387c;      /* หลอดเลือด ปลายซ้าย */
-  --hp-b:#1f4c9c;      /* หลอดเลือด ปลายขวา */
-  --hp-track:#0b1d3e;  /* พื้นหลอดเลือดว่าง */
-  --ring:#1d6fd0;      /* วงแหวนฟ้า */
-  --navy:#0a152e;      /* พื้นกลางวงกลม */
-  --track:#1a1e28;     /* พื้นหลอดเกราะว่าง */
+  /* ชุดสีเดียวกับ speedo */
+  --blue0:#0f5fb8;     /* น้ำเงินเข้ม (ปลายหลอด) */
+  --blue:#1d6fd0;      /* น้ำเงินกลาง */
+  --blue2:#2aa8ff;     /* น้ำเงินสว่าง (ปลายหลอด) */
+  --ice:#a8dcff;       /* ฟ้าอ่อน ใช้กับเกราะ */
+  --dim:#1a1e26;      /* พื้นหลอดว่าง */
+  --lbl:#3c4350;       /* สีป้ายข้อความ */
 }
 *{box-sizing:border-box;margin:0}
 html,body{height:100%;background:transparent;overflow:hidden;pointer-events:none;user-select:none;
   font-family:Kanit,"Noto Sans Thai",Tahoma,sans-serif}
-#hud{position:fixed;left:var(--left);bottom:var(--bottom);width:456px;height:84px;
+#hud{position:fixed;left:var(--left);bottom:var(--bottom);width:470px;height:92px;
   transform:scale(var(--s)) translateY(24px);transform-origin:left bottom;opacity:0;
   transition:opacity .3s,transform .4s cubic-bezier(.2,.9,.3,1.1)}
 #hud.on{opacity:1;transform:scale(var(--s))}
+.bg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 
-/* กล่องหลอด */
-.box{position:absolute;left:58px;top:18px;width:276px;height:58px;background:#000;border-radius:7px}
-.arow{position:absolute;left:22px;right:5px;top:5px;height:17px;display:flex;gap:4px}
-.alab{width:56px;background:#fff;color:#000;font:800 10px/17px Kanit,sans-serif;letter-spacing:.6px;text-align:center;border-radius:3px}
-.atr{flex:1;background:var(--track);border-radius:3px;overflow:hidden}
-#afill{width:0;height:100%;background:linear-gradient(#fff,#cfd3da);transition:width .35s ease}
-.hrow{position:absolute;left:22px;right:5px;top:27px;height:26px;background:var(--hp-track);border-radius:3px;overflow:hidden}
-#hfill{position:absolute;left:0;top:0;bottom:0;width:100%;background:linear-gradient(90deg,var(--hp-a),var(--hp-b));transition:width .35s ease}
-.idtab{position:absolute;left:0;top:0;height:14px;width:66px;padding-left:9px;background:#000;color:#fff;
-  font:700 9.5px/14px Kanit,sans-serif;letter-spacing:.6px;white-space:nowrap;clip-path:polygon(0 0,100% 0,calc(100% - 9px) 100%,0 100%)}
-#hpv{position:absolute;right:9px;top:50%;transform:translateY(-50%);color:#fff;font:700 14px/1 Kanit,sans-serif;text-shadow:0 1px 2px rgba(0,0,0,.6)}
-.low #hfill,.low #hpv,.low .emb{animation:blink .6s infinite alternate}
+/* ป้ายข้อความ */
+.lb{position:absolute;color:var(--lbl);font:500 11px/1 Kanit,sans-serif;letter-spacing:3px;white-space:nowrap}
+.lb b{color:#8fa6c4;font-weight:600;letter-spacing:1.5px}
+#l-hp{left:52px;top:11px}
+#l-id{left:92px;top:11px}
+#l-ar{right:182px;top:11px;text-align:right}
+.val{position:absolute;color:#f4f6fa;font-weight:600;line-height:1;white-space:nowrap}
+#hpv{left:50px;top:21px;font-size:32px}
+#arv{right:182px;top:27px;font-size:22px;text-align:right}
 
-/* วงกลมโลโก้ซ้าย */
-.emb{position:absolute;left:0;top:4px;width:76px;height:76px}
+/* หลอด (ปลายเฉียงแบบเดียวกับ speedo) */
+.trk{position:absolute;left:46px;width:254px;background:var(--dim);
+  clip-path:polygon(9px 0,100% 0,calc(100% - 9px) 100%,0 100%)}
+#t-hp{top:57px;height:15px}
+#t-ar{top:76px;height:6px}
+.fill{position:absolute;left:0;top:0;bottom:0;width:100%;transition:width .35s ease;
+  clip-path:polygon(9px 0,100% 0,calc(100% - 9px) 100%,0 100%)}
+#hfill{background:linear-gradient(90deg,var(--blue0),var(--blue2))}
+#hfill::after{content:"";position:absolute;left:0;right:0;top:0;height:42%;background:rgba(255,255,255,.14)}
+#afill{width:0;background:linear-gradient(90deg,var(--blue),var(--ice))}
 
-/* วงกลมเล็ก หิว/น้ำ */
-.mini{position:absolute;top:22px;width:54px;height:54px}
-#m-hg{left:344px}#m-wt{left:402px}
-.mini svg.r{position:absolute;inset:0;width:100%;height:100%}
-.mini .prog{transition:stroke-dasharray .4s ease}
-.num{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:#000;color:#fff;
-  font:700 10px/13px Kanit,sans-serif;padding:0 7px;border-radius:7px}
-.mini.low svg.r{animation:blink .6s infinite alternate}
-@keyframes blink{from{opacity:1}to{opacity:.4}}
+/* วงกลม หิว/น้ำ */
+.mini{position:absolute;top:14px;width:54px;height:54px}
+#m-hg{left:322px}#m-wt{left:386px}
+.mini svg{position:absolute;inset:0;width:100%;height:100%}
+.prog{transition:stroke-dasharray .4s ease}
+.num{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);background:#000;color:#fff;
+  font:600 10px/13px Kanit,sans-serif;padding:0 7px;border-radius:7px;border:1px solid #0b1522}
+
+/* เลือด/ของใกล้หมด กะพริบ */
+.low #hfill,.low #hpv{animation:blink .6s infinite alternate}
+.mini.low svg{animation:blink .6s infinite alternate}
+@keyframes blink{from{opacity:1}to{opacity:.3}}
 </style>
 </head>
 <body>
 <div id="hud">
-  <div class="box">
-    <div class="arow"><div class="alab">ARMOR</div><div class="atr"><div id="afill"></div></div></div>
-    <div class="hrow">
-      <div id="hfill"></div>
-      <div class="idtab">ID : <span id="uid">0</span></div>
-      <div id="hpv">100%</div>
-    </div>
-  </div>
-
-  <svg class="emb" viewBox="0 0 76 76">
-    <defs><radialGradient id="eg" cx=".5" cy=".4" r=".7"><stop offset="0" stop-color="#14305e"/><stop offset="1" stop-color="#0a152e"/></radialGradient></defs>
-    <circle cx="38" cy="38" r="37.5" fill="#000"/>
-    <circle cx="38" cy="38" r="33" fill="url(#eg)"/>
-    <circle cx="38" cy="38" r="29.5" fill="none" stroke="#1d6fd0" stroke-width="5" pathLength="100" stroke-dasharray="21 4" transform="rotate(-127.8 38 38)"/>
-    <circle cx="38" cy="38" r="24" fill="none" stroke="#050a14" stroke-width="2"/>
-    <path d="M42 22L29 40H37L32 56L48 35H40Z" fill="#eaf1ff" stroke="#9db7e6" stroke-width="1" stroke-linejoin="round" transform="rotate(8 38 38)"/>
+  <!-- แผงพื้นหลัง -->
+  <svg class="bg" viewBox="0 0 470 92">
+    <defs>
+      <radialGradient id="pg" cx=".4" cy=".5" r=".7"><stop offset="0" stop-color="#101b2e"/><stop offset=".6" stop-color="#0a0d12"/><stop offset="1" stop-color="#07080a"/></radialGradient>
+    </defs>
+    <path d="M26 3H444L467 46L444 89H26L3 46Z" fill="url(#pg)" stroke="#050607" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M26 3H444L467 46L444 89H26L3 46Z" fill="none" stroke="var(--blue)" stroke-opacity=".28" stroke-width="1" stroke-linejoin="round"/>
   </svg>
 
+  <div class="lb" id="l-hp">HP</div>
+  <div class="lb" id="l-id"><b>ID : <span id="uid">0</span></b></div>
+  <div class="lb" id="l-ar">ARMOR</div>
+  <div class="val" id="hpv">100%</div>
+  <div class="val" id="arv">0</div>
+
+  <div class="trk" id="t-hp"><div class="fill" id="hfill"></div></div>
+  <div class="trk" id="t-ar"><div class="fill" id="afill"></div></div>
+
+  <!-- หิว -->
   <div class="mini" id="m-hg">
-    <svg class="r" viewBox="0 0 54 54">
+    <svg viewBox="0 0 54 54">
+      <defs><linearGradient id="gh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0f5fb8"/><stop offset="1" stop-color="#2aa8ff"/></linearGradient></defs>
       <circle cx="27" cy="27" r="26.5" fill="#000"/>
-      <circle cx="27" cy="27" r="21" fill="none" stroke="#0e2a55" stroke-width="4"/>
-      <circle class="prog" id="pg-hg" cx="27" cy="27" r="21" fill="none" stroke="#1d6fd0" stroke-width="4" pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 27 27)"/>
-      <path d="M27 3v8M27 43v8M3 27h8M43 27h8" stroke="#000" stroke-width="2.6"/>
-      <circle cx="27" cy="27" r="16" fill="#0a152e"/>
-      <!-- ส้อม+มีด -->
-      <g fill="#fff"><path d="M20.5 18h1.5v5.5h1.2V18h1.5v5.5h1.2V18h1.5v6.2a3 3 0 0 1-2.4 2.9V36h-2.1v-8.9a3 3 0 0 1-2.4-2.9z" transform="translate(-1.5 0)"/><path d="M31.2 18c2 .8 3.3 3.4 3.3 6.4h-1.6V36h-2.1z" transform="translate(1.5 0)"/></g>
+      <circle cx="27" cy="27" r="21" fill="none" stroke="#1a1e26" stroke-width="4"/>
+      <circle class="prog" id="pg-hg" cx="27" cy="27" r="21" fill="none" stroke="url(#gh)" stroke-width="4" pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 27 27)"/>
+      <circle cx="27" cy="27" r="16" fill="#0a0d12"/>
+      <g fill="#f2f2f4"><path d="M20.5 18h1.5v5.5h1.2V18h1.5v5.5h1.2V18h1.5v6.2a3 3 0 0 1-2.4 2.9V36h-2.1v-8.9a3 3 0 0 1-2.4-2.9z" transform="translate(-1.5 0)"/><path d="M31.2 18c2 .8 3.3 3.4 3.3 6.4h-1.6V36h-2.1z" transform="translate(1.5 0)"/></g>
     </svg>
     <div class="num" id="n-hg">100</div>
   </div>
+
+  <!-- น้ำ -->
   <div class="mini" id="m-wt">
-    <svg class="r" viewBox="0 0 54 54">
+    <svg viewBox="0 0 54 54">
+      <defs><linearGradient id="gw" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0f5fb8"/><stop offset="1" stop-color="#2aa8ff"/></linearGradient></defs>
       <circle cx="27" cy="27" r="26.5" fill="#000"/>
-      <circle cx="27" cy="27" r="21" fill="none" stroke="#0e2a55" stroke-width="4"/>
-      <circle class="prog" id="pg-wt" cx="27" cy="27" r="21" fill="none" stroke="#1d6fd0" stroke-width="4" pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 27 27)"/>
-      <path d="M27 3v8M27 43v8M3 27h8M43 27h8" stroke="#000" stroke-width="2.6"/>
-      <circle cx="27" cy="27" r="16" fill="#0a152e"/>
-      <path d="M27 16.5C23 22 19.5 25.5 19.5 30a7.5 7.5 0 0 0 15 0C34.5 25.5 31 22 27 16.5z" fill="#fff"/>
+      <circle cx="27" cy="27" r="21" fill="none" stroke="#1a1e26" stroke-width="4"/>
+      <circle class="prog" id="pg-wt" cx="27" cy="27" r="21" fill="none" stroke="url(#gw)" stroke-width="4" pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 27 27)"/>
+      <circle cx="27" cy="27" r="16" fill="#0a0d12"/>
+      <path d="M27 16.5C23 22 19.5 25.5 19.5 30a7.5 7.5 0 0 0 15 0C34.5 25.5 31 22 27 16.5z" fill="#f2f2f4"/>
     </svg>
     <div class="num" id="n-wt">100</div>
   </div>
@@ -108,6 +120,7 @@ html,body{height:100%;background:transparent;overflow:hidden;pointer-events:none
     $('hfill').style.width=hp+'%';
     $('hpv').textContent=hp+'%';
     $('afill').style.width=ar+'%';
+    $('arv').textContent=ar;
     $('pg-hg').style.strokeDasharray=hg+' 100';
     $('pg-wt').style.strokeDasharray=wt+' 100';
     $('n-hg').textContent=hg;$('n-wt').textContent=wt;
@@ -121,7 +134,6 @@ html,body{height:100%;background:transparent;overflow:hidden;pointer-events:none
 
   window.addEventListener('cef:hud:update',function(e){onUpdate(e.detail)});
 
-  // เผื่อใช้ cef.on แบบ speedo
   function bind(){
     if(!window.cef||!cef.on)return false;
     cef.on('hud:update',function(){
@@ -134,9 +146,9 @@ html,body{height:100%;background:transparent;overflow:hidden;pointer-events:none
 
   // โหมดทดสอบ: เปิดไฟล์ด้วย ?demo
   if(/[?&]demo/.test(location.search)){
-    document.body.style.background='#2f5a2a';
+    document.body.style.background='#2a2f38';
     var t=0;apply(100,100,100,100,1,59);
-    setInterval(function(){t++;apply(50+Math.round(50*Math.abs(Math.sin(t/6))),Math.round(100*Math.abs(Math.cos(t/9))),Math.max(0,100-t%100),70,1,59)},700);
+    setInterval(function(){t++;apply(20+Math.round(80*Math.abs(Math.sin(t/6))),Math.round(100*Math.abs(Math.cos(t/9))),Math.max(0,100-t%100),70,1,59)},700);
   }
 })();
 </script>
