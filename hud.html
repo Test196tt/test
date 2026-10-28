@@ -10,124 +10,108 @@
   --s:.6;              /* ขนาดรวม (1 = ปกติ) */
   --left:14px;         /* ระยะจากขอบซ้าย */
   --bottom:14px;       /* ระยะจากขอบล่าง */
-  /* ชุดสีเดียวกับ speedo */
-  --blue0:#0f5fb8;     /* น้ำเงินเข้ม (ปลายหลอด) */
-  --blue:#1d6fd0;      /* น้ำเงินกลาง */
-  --blue2:#2aa8ff;     /* น้ำเงินสว่าง (ปลายหลอด) */
-  --ice:#a8dcff;       /* ฟ้าอ่อน ใช้กับเกราะ */
-  --dim:#1a1e26;      /* พื้นหลอดว่าง */
-  --lbl:#3c4350;       /* สีป้ายข้อความ */
 }
 *{box-sizing:border-box;margin:0}
 html,body{height:100%;background:transparent;overflow:hidden;pointer-events:none;user-select:none;
   font-family:Kanit,"Noto Sans Thai",Tahoma,sans-serif}
-#hud{position:fixed;left:var(--left);bottom:var(--bottom);width:470px;height:92px;
+#hud{position:fixed;left:var(--left);bottom:var(--bottom);width:555px;height:105px;
   transform:scale(var(--s)) translateY(24px);transform-origin:left bottom;opacity:0;
   transition:opacity .3s,transform .4s cubic-bezier(.2,.9,.3,1.1)}
 #hud.on{opacity:1;transform:scale(var(--s))}
-.bg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-
-/* ป้ายข้อความ */
-.lb{position:absolute;color:var(--lbl);font:500 11px/1 Kanit,sans-serif;letter-spacing:3px;white-space:nowrap}
-.lb b{color:#8fa6c4;font-weight:600;letter-spacing:1.5px}
-#l-hp{left:52px;top:11px}
-#l-id{left:92px;top:11px}
-#l-ar{right:182px;top:11px;text-align:right}
-.val{position:absolute;color:#f4f6fa;font-weight:600;line-height:1;white-space:nowrap}
-#hpv{left:50px;top:21px;font-size:32px}
-#arv{right:182px;top:27px;font-size:22px;text-align:right}
-
-/* หลอด (ปลายเฉียงแบบเดียวกับ speedo) */
-.trk{position:absolute;left:46px;width:254px;background:var(--dim);
-  clip-path:polygon(9px 0,100% 0,calc(100% - 9px) 100%,0 100%)}
-#t-hp{top:57px;height:15px}
-#t-ar{top:76px;height:6px}
-.fill{position:absolute;left:0;top:0;bottom:0;width:100%;transition:width .35s ease;
-  clip-path:polygon(9px 0,100% 0,calc(100% - 9px) 100%,0 100%)}
-#hfill{background:linear-gradient(90deg,var(--blue0),var(--blue2))}
-#hfill::after{content:"";position:absolute;left:0;right:0;top:0;height:42%;background:rgba(255,255,255,.14)}
-#afill{width:0;background:linear-gradient(90deg,var(--blue),var(--ice))}
-
-/* วงกลม หิว/น้ำ */
-.mini{position:absolute;top:14px;width:54px;height:54px}
-#m-hg{left:322px}#m-wt{left:386px}
-.mini svg{position:absolute;inset:0;width:100%;height:100%}
-.prog{transition:stroke-dasharray .4s ease}
-.num{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);background:#000;color:#fff;
-  font:600 10px/13px Kanit,sans-serif;padding:0 7px;border-radius:7px;border:1px solid #0b1522}
-
-/* เลือด/ของใกล้หมด กะพริบ */
-.low #hfill,.low #hpv{animation:blink .6s infinite alternate}
-.mini.low svg{animation:blink .6s infinite alternate}
+#hud svg{width:100%;height:100%;overflow:visible;display:block}
+.t{fill:#fff;font-family:Kanit,"Noto Sans Thai",sans-serif}
+#hptxt{font-size:44px;font-weight:600;letter-spacing:-1px}
+#stxt{font-size:29px;font-weight:500}
+#idtxt{font-size:22px;font-weight:600;letter-spacing:-.8px}
+#mic{fill:#fff;stroke:#fff}#mic.talk{fill:#2aa8ff;stroke:#2aa8ff}
+.bar{transition:width .35s ease}
+.ring{transition:stroke-dasharray .4s ease}
+.low #hpfill,.low #hptxt{animation:blink .6s infinite alternate}
+.lowi{animation:blink .6s infinite alternate}
 @keyframes blink{from{opacity:1}to{opacity:.3}}
 </style>
 </head>
 <body>
 <div id="hud">
-  <!-- แผงพื้นหลัง -->
-  <svg class="bg" viewBox="0 0 470 92">
-    <defs>
-      <radialGradient id="pg" cx=".4" cy=".5" r=".7"><stop offset="0" stop-color="#101b2e"/><stop offset=".6" stop-color="#0a0d12"/><stop offset="1" stop-color="#07080a"/></radialGradient>
-    </defs>
-    <path d="M26 3H444L467 46L444 89H26L3 46Z" fill="url(#pg)" stroke="#050607" stroke-width="4" stroke-linejoin="round"/>
-    <path d="M26 3H444L467 46L444 89H26L3 46Z" fill="none" stroke="var(--blue)" stroke-opacity=".28" stroke-width="1" stroke-linejoin="round"/>
+<svg viewBox="245 74 1110 202" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gHp" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0b4bb0"/><stop offset="1" stop-color="#1f74e6"/></linearGradient>
+    <linearGradient id="gAr" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1d6fd0"/><stop offset="1" stop-color="#a8dcff"/></linearGradient>
+    <linearGradient id="gAcc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a86ff"/><stop offset=".55" stop-color="#0f5fd0"/><stop offset="1" stop-color="#0a2f6e"/></linearGradient>
+    <linearGradient id="gPanel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#03275a"/><stop offset="1" stop-color="#021c40"/></linearGradient>
+    <linearGradient id="gEmpty" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34393d"/><stop offset="1" stop-color="#25292c"/></linearGradient>
+    <clipPath id="ckHp"><polygon points="497,165 1036,165 1060,218 497,218"/></clipPath>
+    <clipPath id="ckAr"><polygon points="505,132 1010,132 1034,160 505,160"/></clipPath>
+    <g id="icChicken">
+      <ellipse cx="5" cy="-6" rx="14" ry="11" transform="rotate(-40 5 -6)"/>
+      <path d="M-2 2L-13 13" stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none"/>
+      <circle cx="-16" cy="12" r="4.5"/><circle cx="-11" cy="17" r="4.5"/>
+    </g>
+    <path id="icDrop" d="M27 16.5C23 22 19.5 25.5 19.5 30a7.5 7.5 0 0 0 15 0C34.5 25.5 31 22 27 16.5z"/>
+  </defs>
+  <g id="hpg">
+    <polygon points="312,126 345,82 598,82 628,108 312,108" fill="#000"/>
+    <polygon points="258,128 312,126 330,108 992,108 1097,237 748,239 716,268 345,268 258,150" fill="#000"/>
+    <polygon points="505,132 1010,132 1034,160 505,160" fill="url(#gEmpty)"/>
+    <g clip-path="url(#ckAr)"><rect class="bar" id="arfill" x="505" y="132" width="0" height="28" fill="#fff"/></g>
+    <polygon points="497,165 1036,165 1060,218 497,218" fill="url(#gEmpty)"/>
+    <g clip-path="url(#ckHp)" id="hpfill"><rect class="bar" id="hfill" x="497" y="165" width="236" height="53" fill="url(#gHp)"/></g>
+    <polygon points="255,142 298,131 352,212 352,258" fill="url(#gAcc)"/>
+    <polygon points="255,142 298,131 306,143 262,154" fill="#3b97ff" opacity=".75"/>
+    <polygon points="300,132 520,132 520,152 498,190 498,217 352,217" fill="url(#gPanel)"/>
+    <polygon points="300,132 520,132 520,136 300,136" fill="#0b3b80" opacity=".6"/>
+    <text class="t" id="hptxt" x="417" y="186" text-anchor="middle">HP 100</text>
+    <text class="t" id="stxt" x="470" y="119">ปกติ</text>
+    <text class="t" id="idtxt" x="372" y="263">ไอดีตัวละคร : 0 00/00/0000</text>
+    <g id="mic" stroke-width="3">
+      <rect x="398" y="91" width="14" height="23" rx="7" stroke="none"/>
+      <path d="M393 106a12 12 0 0 0 24 0" fill="none"/>
+      <path d="M405 118V125M398 125H412" fill="none"/>
+    </g>
+  </g>
+  <g id="bHg">
+    <path d="M1160 122L1203.3 147.0V197.0L1160 222L1116.7 197.0V147.0Z" fill="#000" stroke="#000" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M1160 130L1196.4 151.0V193.0L1160 214L1123.6 193.0V151.0Z" fill="#05070a" stroke="#14233d" stroke-width="6" stroke-linejoin="round"/>
+    <path id="rHg" class="ring" d="M1160 130L1196.4 151.0V193.0L1160 214L1123.6 193.0V151.0Z" fill="none" stroke="#1f74e6" stroke-width="6" stroke-linejoin="round" pathLength="100" stroke-dasharray="100 100"/>
+    <g fill="#fff"><use href="#icChicken" transform="translate(1161.4 170.4)"/></g>
+  </g>
+  <g id="bWt">
+    <path d="M1255 122L1298.3 147.0V197.0L1255 222L1211.7 197.0V147.0Z" fill="#000" stroke="#000" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M1255 130L1291.4 151.0V193.0L1255 214L1218.6 193.0V151.0Z" fill="#05070a" stroke="#14233d" stroke-width="6" stroke-linejoin="round"/>
+    <path id="rWt" class="ring" d="M1255 130L1291.4 151.0V193.0L1255 214L1218.6 193.0V151.0Z" fill="none" stroke="#1f74e6" stroke-width="6" stroke-linejoin="round" pathLength="100" stroke-dasharray="100 100"/>
+    <g fill="#fff"><use href="#icDrop" transform="translate(1255 172) scale(2.1) translate(-27 -27)"/></g>
+  </g>
   </svg>
-
-  <div class="lb" id="l-hp">HP</div>
-  <div class="lb" id="l-id"><b>ID : <span id="uid">0</span></b></div>
-  <div class="lb" id="l-ar">ARMOR</div>
-  <div class="val" id="hpv">100%</div>
-  <div class="val" id="arv">0</div>
-
-  <div class="trk" id="t-hp"><div class="fill" id="hfill"></div></div>
-  <div class="trk" id="t-ar"><div class="fill" id="afill"></div></div>
-
-  <!-- หิว -->
-  <div class="mini" id="m-hg">
-    <svg viewBox="0 0 54 54">
-      <defs><linearGradient id="gh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0f5fb8"/><stop offset="1" stop-color="#2aa8ff"/></linearGradient></defs>
-      <circle cx="27" cy="27" r="26.5" fill="#000"/>
-      <circle cx="27" cy="27" r="21" fill="none" stroke="#1a1e26" stroke-width="4"/>
-      <circle class="prog" id="pg-hg" cx="27" cy="27" r="21" fill="none" stroke="url(#gh)" stroke-width="4" pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 27 27)"/>
-      <circle cx="27" cy="27" r="16" fill="#0a0d12"/>
-      <g fill="#f2f2f4"><path d="M20.5 18h1.5v5.5h1.2V18h1.5v5.5h1.2V18h1.5v6.2a3 3 0 0 1-2.4 2.9V36h-2.1v-8.9a3 3 0 0 1-2.4-2.9z" transform="translate(-1.5 0)"/><path d="M31.2 18c2 .8 3.3 3.4 3.3 6.4h-1.6V36h-2.1z" transform="translate(1.5 0)"/></g>
-    </svg>
-    <div class="num" id="n-hg">100</div>
-  </div>
-
-  <!-- น้ำ -->
-  <div class="mini" id="m-wt">
-    <svg viewBox="0 0 54 54">
-      <defs><linearGradient id="gw" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0f5fb8"/><stop offset="1" stop-color="#2aa8ff"/></linearGradient></defs>
-      <circle cx="27" cy="27" r="26.5" fill="#000"/>
-      <circle cx="27" cy="27" r="21" fill="none" stroke="#1a1e26" stroke-width="4"/>
-      <circle class="prog" id="pg-wt" cx="27" cy="27" r="21" fill="none" stroke="url(#gw)" stroke-width="4" pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 27 27)"/>
-      <circle cx="27" cy="27" r="16" fill="#0a0d12"/>
-      <path d="M27 16.5C23 22 19.5 25.5 19.5 30a7.5 7.5 0 0 0 15 0C34.5 25.5 31 22 27 16.5z" fill="#f2f2f4"/>
-    </svg>
-    <div class="num" id="n-wt">100</div>
-  </div>
 </div>
 
 <script>
 (function(){
   var $=function(id){return document.getElementById(id)};
   function clamp(v){v=Math.round(Number(v));return isNaN(v)?0:Math.max(0,Math.min(100,v))}
+  function p(n){return n<10?'0'+n:n}
+  var uidNow=0;
 
-  // hud:update -> [hp, armor, hunger, thirst, show, uid]
-  function apply(hp,ar,hg,wt,show,uid){
+  function setId(){
+    var d=new Date();
+    $('idtxt').textContent='ไอดีตัวละคร : '+uidNow+' '+p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear();
+  }
+
+  // hud:update -> [hp, armor, hunger, thirst, show, uid, status, talk]
+  // (status = ข้อความสถานะ, talk = 1 เมื่อกำลังพูดไมค์ — ไม่ส่งก็ได้)
+  function apply(hp,ar,hg,wt,show,uid,status,talk){
     hp=clamp(hp);ar=clamp(ar);hg=clamp(hg);wt=clamp(wt);
-    $('hfill').style.width=hp+'%';
-    $('hpv').textContent=hp+'%';
-    $('afill').style.width=ar+'%';
-    $('arv').textContent=ar;
-    $('pg-hg').style.strokeDasharray=hg+' 100';
-    $('pg-wt').style.strokeDasharray=wt+' 100';
-    $('n-hg').textContent=hg;$('n-wt').textContent=wt;
+    $('hfill').style.width=(563*hp/100)+'px';
+    $('hptxt').textContent='HP '+hp;
+    $('arfill').style.width=(530*ar/100)+'px';
+    $('rHg').setAttribute('stroke-dasharray',hg+' 100');
+    $('rWt').setAttribute('stroke-dasharray',wt+' 100');
     $('hud').classList.toggle('low',hp<=25);
-    $('m-hg').classList.toggle('low',hg<=20);
-    $('m-wt').classList.toggle('low',wt<=20);
-    if(uid!==undefined)$('uid').textContent=Math.round(Number(uid))||0;
+    $('bHg').classList.toggle('lowi',hg<=20);
+    $('bWt').classList.toggle('lowi',wt<=20);
+    if(uid!==undefined)uidNow=Math.round(Number(uid))||0;
+    setId();
+    if(status!==undefined&&status!==null)$('stxt').textContent=String(status);
+    if(talk!==undefined)$('mic').classList.toggle('talk',Number(talk)===1);
     if(show!==undefined)$('hud').classList.toggle('on',Number(show)===1);
   }
   function onUpdate(d){if(Array.isArray(d))apply.apply(null,d)}
@@ -144,11 +128,13 @@ html,body{height:100%;background:transparent;overflow:hidden;pointer-events:none
   }
   if(!bind()){var iv=setInterval(function(){if(bind())clearInterval(iv)},100)}
 
+  apply(100,0,100,100,undefined,0);
+
   // โหมดทดสอบ: เปิดไฟล์ด้วย ?demo
   if(/[?&]demo/.test(location.search)){
     document.body.style.background='#2a2f38';
-    var t=0;apply(100,100,100,100,1,59);
-    setInterval(function(){t++;apply(20+Math.round(80*Math.abs(Math.sin(t/6))),Math.round(100*Math.abs(Math.cos(t/9))),Math.max(0,100-t%100),70,1,59)},700);
+    var t=0;apply(100,100,100,100,1,59,'ปกติ',0);
+    setInterval(function(){t++;apply(20+Math.round(80*Math.abs(Math.sin(t/6))),Math.round(100*Math.abs(Math.cos(t/9))),Math.max(0,100-t%100),70,1,59,'ปกติ',t%6<3?1:0)},700);
   }
 })();
 </script>
