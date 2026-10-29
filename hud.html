@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --s:.6;              /* ขนาดรวม (1 = ปกติ) */
+  --s:.45;              /* ขนาดรวม (1 = ปกติ) */
   --left:14px;         /* ระยะจากขอบซ้าย */
   --bottom:14px;       /* ระยะจากขอบล่าง */
 }
@@ -21,9 +21,8 @@ html,body{height:100%;background:transparent;overflow:hidden;pointer-events:none
 #hud svg{width:100%;height:100%;overflow:visible;display:block}
 .t{fill:#fff;font-family:Kanit,"Noto Sans Thai",sans-serif}
 #hptxt{font-size:44px;font-weight:600;letter-spacing:-1px}
-#stxt{font-size:29px;font-weight:500}
 #idtxt{font-size:22px;font-weight:600;letter-spacing:-.8px}
-#mic{fill:#fff;stroke:#fff}#mic.talk{fill:#2aa8ff;stroke:#2aa8ff}
+#uidtop{font-size:26px;font-weight:600}
 .bar{transition:width .35s ease}
 .ring{transition:stroke-dasharray .4s ease}
 .low #hpfill,.low #hptxt{animation:blink .6s infinite alternate}
@@ -39,7 +38,7 @@ html,body{height:100%;background:transparent;overflow:hidden;pointer-events:none
     <linearGradient id="gAr" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1d6fd0"/><stop offset="1" stop-color="#a8dcff"/></linearGradient>
     <linearGradient id="gAcc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a86ff"/><stop offset=".55" stop-color="#0f5fd0"/><stop offset="1" stop-color="#0a2f6e"/></linearGradient>
     <linearGradient id="gPanel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#03275a"/><stop offset="1" stop-color="#021c40"/></linearGradient>
-    <linearGradient id="gEmpty" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34393d"/><stop offset="1" stop-color="#25292c"/></linearGradient>
+    <linearGradient id="gEmpty" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34393d" stop-opacity=".3"/><stop offset="1" stop-color="#25292c" stop-opacity=".3"/></linearGradient>
     <filter id="fGrey" color-interpolation-filters="sRGB" x="0" y="0" width="100%" height="100%">
       <feColorMatrix type="saturate" values="0"/>
       <feComponentTransfer><feFuncR type="linear" slope="1.15" intercept=".12"/><feFuncG type="linear" slope="1.15" intercept=".12"/><feFuncB type="linear" slope="1.15" intercept=".12"/></feComponentTransfer>
@@ -70,25 +69,20 @@ html,body{height:100%;background:transparent;overflow:hidden;pointer-events:none
     <polygon points="300,132 520,132 520,152 498,190 498,217 352,217" fill="url(#gPanel)"/>
     <polygon points="300,132 520,132 520,136 300,136" fill="#0b3b80" opacity=".6"/>
     <text class="t" id="hptxt" x="417" y="186" text-anchor="middle">HP 100</text>
-    <text class="t" id="stxt" x="470" y="119">ปกติ</text>
-    <text class="t" id="idtxt" x="372" y="263">ไอดีตัวละคร : 0 00/00/0000</text>
-    <g id="mic" stroke-width="3">
-      <rect x="398" y="91" width="14" height="23" rx="7" stroke="none"/>
-      <path d="M393 106a12 12 0 0 0 24 0" fill="none"/>
-      <path d="M405 118V125M398 125H412" fill="none"/>
-    </g>
+    <text class="t" id="idtxt" x="372" y="256">00/00/0000</text>
+    <text class="t" id="uidtop" x="345" y="119">ID 0</text>
   </g>
   <g id="bHg">
-    <path d="M1160 122L1203.3 147.0V197.0L1160 222L1116.7 197.0V147.0Z" fill="#000" stroke="#000" stroke-width="4" stroke-linejoin="round"/>
-    <path d="M1160 130L1196.4 151.0V193.0L1160 214L1123.6 193.0V151.0Z" fill="#05070a" stroke="#14233d" stroke-width="6" stroke-linejoin="round"/>
-    <path id="rHg" class="ring" d="M1160 130L1196.4 151.0V193.0L1160 214L1123.6 193.0V151.0Z" fill="none" stroke="#1f74e6" stroke-width="6" stroke-linejoin="round" pathLength="100" stroke-dasharray="100 100"/>
-    <g fill="#fff"><use href="#icChicken" transform="translate(1161.4 170.4)"/></g>
+    <path d="M1160.0 216.0 L1140.0 216.0 L1134.0 210.0 L1112.0 140.0 L1122.0 128.0 L1198.0 128.0 L1208.0 140.0 L1186.0 210.0 L1180.0 216.0Z" fill="#000" stroke="#000" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M1160.0 209.8 L1142.8 209.8 L1137.6 204.7 L1118.7 144.5 L1127.3 134.2 L1192.7 134.2 L1201.3 144.5 L1182.4 204.7 L1177.2 209.8Z" fill="#05070a" fill-opacity=".3" stroke="#14233d" stroke-width="6" stroke-linejoin="round"/>
+    <path id="rHg" class="ring" d="M1160.0 209.8 L1142.8 209.8 L1137.6 204.7 L1118.7 144.5 L1127.3 134.2 L1192.7 134.2 L1201.3 144.5 L1182.4 204.7 L1177.2 209.8Z" fill="none" stroke="#1f74e6" stroke-width="6" stroke-linejoin="round" pathLength="100" stroke-dasharray="100 100"/>
+    <g fill="#fff"><use href="#icChicken" transform="translate(1161.4 164)"/></g>
   </g>
   <g id="bWt">
-    <path d="M1255 122L1298.3 147.0V197.0L1255 222L1211.7 197.0V147.0Z" fill="#000" stroke="#000" stroke-width="4" stroke-linejoin="round"/>
-    <path d="M1255 130L1291.4 151.0V193.0L1255 214L1218.6 193.0V151.0Z" fill="#05070a" stroke="#14233d" stroke-width="6" stroke-linejoin="round"/>
-    <path id="rWt" class="ring" d="M1255 130L1291.4 151.0V193.0L1255 214L1218.6 193.0V151.0Z" fill="none" stroke="#1f74e6" stroke-width="6" stroke-linejoin="round" pathLength="100" stroke-dasharray="100 100"/>
-    <g fill="#fff"><use href="#icDrop" transform="translate(1255 172) scale(2.1) translate(-27 -27)"/></g>
+    <path d="M1255.0 216.0 L1217.0 216.0 L1207.0 204.0 L1229.0 134.0 L1235.0 128.0 L1275.0 128.0 L1281.0 134.0 L1303.0 204.0 L1293.0 216.0Z" fill="#000" stroke="#000" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M1255.0 209.8 L1222.3 209.8 L1213.7 199.5 L1232.6 139.3 L1237.8 134.2 L1272.2 134.2 L1277.4 139.3 L1296.3 199.5 L1287.7 209.8Z" fill="#05070a" fill-opacity=".3" stroke="#14233d" stroke-width="6" stroke-linejoin="round"/>
+    <path id="rWt" class="ring" d="M1255.0 209.8 L1222.3 209.8 L1213.7 199.5 L1232.6 139.3 L1237.8 134.2 L1272.2 134.2 L1277.4 139.3 L1296.3 199.5 L1287.7 209.8Z" fill="none" stroke="#1f74e6" stroke-width="6" stroke-linejoin="round" pathLength="100" stroke-dasharray="100 100"/>
+    <g fill="#fff"><use href="#icDrop" transform="translate(1255 178) scale(2.1) translate(-27 -27)"/></g>
   </g>
   </svg>
 </div>
@@ -102,11 +96,12 @@ html,body{height:100%;background:transparent;overflow:hidden;pointer-events:none
 
   function setId(){
     var d=new Date();
-    $('idtxt').textContent='ไอดีตัวละคร : '+uidNow+' '+p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear();
+    $('uidtop').textContent='ID '+uidNow;
+    $('idtxt').textContent=p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear();
   }
 
   // hud:update -> [hp, armor, hunger, thirst, show, uid, status, talk]
-  // (status = ข้อความสถานะ, talk = 1 เมื่อกำลังพูดไมค์ — ไม่ส่งก็ได้)
+  // (uid = ID ผู้เล่น SAMP; status กับ talk ไม่ใช้แล้ว ไม่ส่งก็ได้)
   function apply(hp,ar,hg,wt,show,uid,status,talk){
     hp=clamp(hp);ar=clamp(ar);hg=clamp(hg);wt=clamp(wt);
     $('hfill').style.width=(563*hp/100)+'px';
@@ -119,8 +114,6 @@ html,body{height:100%;background:transparent;overflow:hidden;pointer-events:none
     $('bWt').classList.toggle('lowi',wt<=20);
     if(uid!==undefined&&uid!==null){var u=Math.round(Number(uid));uidNow=(isNaN(u)||u<0)?0:u}
     setId();
-    if(status!==undefined&&status!==null)$('stxt').textContent=String(status);
-    if(talk!==undefined)$('mic').classList.toggle('talk',Number(talk)===1);
     if(show!==undefined)$('hud').classList.toggle('on',Number(show)===1);
   }
   function onUpdate(d){if(Array.isArray(d))apply.apply(null,d)}
