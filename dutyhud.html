@@ -5,21 +5,21 @@
 <title>duty hud</title>
 <style>
   html, body { margin: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; font-family: "Segoe UI", Tahoma, sans-serif; }
-  #hud { position: fixed; right: 14px; bottom: 14px; display: flex; gap: 8px; }
+  #hud { position: fixed; right: 14px; bottom: 14px; display: flex; gap: 8px; transform: scale(.7); transform-origin: right bottom; }
   .item {
     display: flex; align-items: center; gap: 8px;
     padding: 4px 6px 4px 4px; border-radius: 8px;
-    background: rgba(8, 12, 24, .85); border: 1px solid rgba(30, 110, 255, .6);
-    box-shadow: 0 0 10px rgba(16, 96, 240, .35);
+    background: rgba(14, 14, 17, .88); border: 1px solid rgba(29, 111, 208, .55);
+    box-shadow: 0 0 10px rgba(42, 168, 255, .3);
   }
   .ico {
-    width: 28px; height: 28px; border-radius: 6px; background: #141b2e;
+    width: 28px; height: 28px; border-radius: 6px; background: #151518;
     display: flex; align-items: center; justify-content: center;
   }
-  .ico svg { width: 18px; height: 18px; fill: #fff; }
+  .ico svg { width: 18px; height: 18px; fill: #e6e9ef; }
   .num {
     min-width: 34px; height: 24px; padding: 0 8px; border-radius: 12px; box-sizing: border-box;
-    background: linear-gradient(180deg, #4aa8ff, #0840c0); color: #fff;
+    background: linear-gradient(90deg, #1d6fd0, #2aa8ff); color: #fff;
     font-weight: 700; font-size: 14px; line-height: 24px; text-align: center;
   }
   .num.bump { animation: bump .25s ease; }
