@@ -6,8 +6,8 @@
 <title>Melvy Town Menu</title>
 <style>
 :root{
-  --red:#1e6bff;          /* สีน้ำเงินหลัก */
-  --red2:#5a9bff;         /* แดงสว่าง ตอนชี้เมาส์ */
+  --red:#2aa8ff;          /* สีน้ำเงินหลัก */
+  --red2:#7fd0ff;         /* แดงสว่าง ตอนชี้เมาส์ */
   --bar:rgba(34,34,38,.92);
   --u:calc(100vh / 432);  /* 1 หน่วย = 1 พิกเซลของภาพตัวอย่าง (จอสูง 432) ปรับตามจอให้อัตโนมัติ */
   --k:1;                  /* ขนาดรวมของเมนู (1 = ปกติ, 1.2 = ใหญ่ขึ้น) */
@@ -19,7 +19,7 @@ html,body{margin:0;height:100%;background:transparent;overflow:hidden;
   transform:translate(-50%,-50%) scale(var(--k));opacity:0;transition:opacity .2s}
 #menu.on{opacity:1}
 .btn{position:absolute;width:calc(110*var(--u));height:calc(29.5*var(--u));pointer-events:auto;cursor:pointer;
-  background:linear-gradient(180deg,#2b2b2f,#202024);border-radius:calc(6*var(--u));
+  background:linear-gradient(180deg,#151518,#0e0e11);border-radius:calc(6*var(--u));
   box-shadow:0 0 0 calc(.5*var(--u)) rgba(0,0,0,.55);transition:filter .15s,transform .1s}
 .btn.L{left:0}
 .btn.R{left:calc(184*var(--u))}
@@ -34,16 +34,16 @@ html,body{margin:0;height:100%;background:transparent;overflow:hidden;
 .tx{position:absolute;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;white-space:nowrap}
 .L .tx{right:calc(30*var(--u));text-align:right}
 .R .tx{left:calc(30*var(--u));text-align:left}
-.t{color:#f2f2f4;font-weight:800;font-size:calc(11*var(--u));letter-spacing:calc(.5*var(--u));line-height:1.15;text-shadow:0 calc(1*var(--u)) 0 rgba(0,0,0,.6)}
-.s{color:#8a8a90;font-size:calc(5.8*var(--u));line-height:1.3;margin-top:calc(1.5*var(--u))}
+.t{color:#e6e9ef;font-weight:800;font-size:calc(11*var(--u));letter-spacing:calc(.5*var(--u));line-height:1.15;text-shadow:0 calc(1*var(--u)) 0 rgba(0,0,0,.6)}
+.s{color:#8b93a1;font-size:calc(5.8*var(--u));line-height:1.3;margin-top:calc(1.5*var(--u))}
 
 /* เพชรไอคอน */
 .dia{position:absolute;top:50%;width:calc(24*var(--u));height:calc(24*var(--u));margin-top:calc(-12*var(--u));
-  background:#1d1d21;border:calc(2.2*var(--u)) solid var(--red);border-radius:calc(4.5*var(--u));box-sizing:border-box;
+  background:#0e0e11;border:calc(2.2*var(--u)) solid var(--red);border-radius:calc(4.5*var(--u));box-sizing:border-box;
   transform:rotate(45deg);box-shadow:0 0 0 calc(1*var(--u)) #09080a;transition:border-color .15s,box-shadow .15s}
 .L .dia{left:calc(108*var(--u) - 12*var(--u) - 1*var(--u))}
 .R .dia{left:calc(-12*var(--u) + 1*var(--u))}
-.btn:hover .dia{border-color:var(--red2);box-shadow:0 0 0 calc(1*var(--u)) #09080a,0 0 calc(7*var(--u)) rgba(70,140,255,.7)}
+.btn:hover .dia{border-color:var(--red2);box-shadow:0 0 0 calc(1*var(--u)) #09080a,0 0 calc(7*var(--u)) rgba(42,168,255,.7)}
 .ic{position:absolute;top:50%;width:calc(15*var(--u));height:calc(15*var(--u));margin-top:calc(-7.5*var(--u));fill:var(--red);pointer-events:none}
 .L .ic{left:calc(108*var(--u) - 7.5*var(--u))}
 .R .ic{left:calc(-7.5*var(--u))}
@@ -60,7 +60,7 @@ html,body{margin:0;height:100%;background:transparent;overflow:hidden;
   <div class="btn R r1" data-k="setting"><div class="tx"><div class="t">Setting</div><div class="s">การตั้งค่า</div></div><div class="dia"></div>
     <svg class="ic" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></div>
   <div class="btn L r2" data-k="donate"><div class="tx"><div class="t">Donate</div><div class="s">โดเนท</div></div><div class="dia"></div>
-    <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4.6"/><path d="M2 15.5l4-1.2 5 1.2c1 .2 1.6 1.200 1.200 2l-.3.500H9.500l-1-.3-2.300.3L2 19zM12.500 16.700l7-3.200c.9-.4 1.900.4 1.500 1.300l-.3.600-7.700 4.200-4.200.5.6-1.800z" fill-opacity=".95"/><path d="M12 5v4M10.800 5.800h2.400M10.800 8.200h2.400" stroke="#1d1d21" stroke-width="1" fill="none"/></svg></div>
+    <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4.6"/><path d="M2 15.5l4-1.2 5 1.2c1 .2 1.6 1.200 1.200 2l-.3.500H9.500l-1-.3-2.300.3L2 19zM12.500 16.700l7-3.200c.9-.4 1.900.4 1.500 1.300l-.3.600-7.700 4.200-4.200.5.6-1.800z" fill-opacity=".95"/><path d="M12 5v4M10.800 5.800h2.400M10.800 8.200h2.400" stroke="#0e0e11" stroke-width="1" fill="none"/></svg></div>
   <div class="btn R r2" data-k="gps"><div class="tx"><div class="t">GPS</div><div class="s">แผนที่นำทาง</div></div><div class="dia"></div>
     <svg class="ic" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.200 7 13 7 13s7-7.800 7-13a7 7 0 0 0-7-7zm0 9.500A2.500 2.500 0 1 1 12 6.500a2.500 2.500 0 0 1 0 5z" fill-rule="evenodd"/></svg></div>
 </div>

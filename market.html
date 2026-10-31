@@ -7,15 +7,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --red:#1f6bff;
-    --red-hi:#4d94ff;
-    --red-dk:#0b2f9e;
-    --bg:#2b3448;
-    --panel:#242c3d;
-    --tile:#3b455b;
-    --tile-hi:#465169;
-    --text:#f2f4f8;
-    --muted:#9aa4b8;
+    --red:#1d6fd0;
+    --red-hi:#2aa8ff;
+    --red-dk:#0f3f7a;
+    --bg:#0e0e11;
+    --panel:#151518;
+    --tile:#1b1b1f;
+    --tile-hi:#23232a;
+    --text:#e6e9ef;
+    --muted:#8b93a1;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
   html,body{width:100%;height:100%;overflow:hidden;background:transparent;
@@ -26,14 +26,14 @@
 
   /* เวทีขนาดคงที่ แล้วย่อ/ขยายให้พอดีจอด้วย JS */
   #stage{width:1000px;height:620px;flex:none;transform-origin:center center;
-    display:flex;gap:14px;padding:14px;background:var(--bg);border:2px solid #151a26;
+    display:flex;gap:14px;padding:14px;background:var(--bg);border:2px solid #000;
     border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.55)}
 
   .panel{background:var(--panel);display:flex;flex-direction:column;min-width:0}
   .left{flex:1 1 auto}
   .right{width:290px;flex:none}
 
-  .bar{height:46px;flex:none;background:var(--red);color:#fff;display:flex;align-items:center;
+  .bar{height:46px;flex:none;background:linear-gradient(90deg,#1d6fd0,#2aa8ff);color:#fff;display:flex;align-items:center;
     justify-content:center;font-size:19px;font-weight:500;letter-spacing:.3px;position:relative;
     border-bottom:2px solid var(--red-dk)}
   .bar .x{position:absolute;right:8px;top:7px;width:32px;height:32px;border:0;border-radius:4px;
@@ -57,15 +57,15 @@
   .tile.has .cnt{background:var(--red)}
   .tile.empty{opacity:.4}
   .tile:hover{background:var(--tile-hi)}
-  .tile.sel{border-color:var(--red-hi);background:var(--tile-hi);box-shadow:0 0 0 2px rgba(31,107,255,.35) inset}
+  .tile.sel{border-color:var(--red-hi);background:#12284a;box-shadow:0 0 0 2px rgba(42,168,255,.35) inset}
   .tile.sel .ico,.tile:hover .ico{filter:none}
 
   /* ---------- แถบขายด้านล่าง ---------- */
-  .sell{height:50px;flex:none;border:0;background:var(--red);color:#fff;font-family:inherit;
+  .sell{height:50px;flex:none;border:0;background:linear-gradient(90deg,#1d6fd0,#2aa8ff);color:#fff;font-family:inherit;
     font-size:18px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:10px;
     cursor:pointer;border-top:2px solid var(--red-dk)}
   .sell:active{background:var(--red-dk)}
-  .sell.off{background:#243a68;color:#9fb2d6;cursor:default}
+  .sell.off{background:#15304f;color:#8b93a1;cursor:default}
   .sell .money{color:#fff;font-weight:600}
 
   /* ---------- รายการราคา ---------- */
@@ -82,7 +82,7 @@
 
   /* ---------- toast ---------- */
   #toast{position:fixed;left:50%;bottom:7%;transform:translate(-50%,20px);opacity:0;pointer-events:none;
-    background:#1a2030;border:2px solid var(--red);color:#fff;padding:10px 22px;border-radius:6px;
+    background:#0e0e11;border:2px solid var(--red-hi);color:#fff;padding:10px 22px;border-radius:6px;
     font-size:17px;transition:opacity .2s,transform .2s;z-index:10}
   #toast.show{opacity:1;transform:translate(-50%,0)}
   #toast b{color:var(--red-hi)}

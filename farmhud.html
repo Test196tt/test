@@ -14,9 +14,9 @@
     position:fixed;left:1.1vw;top:50%;
     width:clamp(118px,10.5vw,168px);box-sizing:border-box;
     padding:9px 10px 11px;border-radius:14px;
-    background:linear-gradient(160deg,#0b0b0d 0%,#070d17 58%,#0a1a33 100%);
-    border:1px solid rgba(31,107,255,.55);
-    box-shadow:0 0 18px rgba(31,107,255,.28),inset 0 0 18px rgba(0,0,0,.65);
+    background:linear-gradient(160deg,#0e0e11 0%,#0e0e11 58%,#12284a 100%);
+    border:1px solid rgba(29,111,208,.55);
+    box-shadow:0 0 18px rgba(42,168,255,.25),inset 0 0 18px rgba(0,0,0,.65);
     opacity:0;transform:translate(-26px,-50%);
     transition:opacity .3s ease,transform .3s ease;
   }
@@ -25,17 +25,17 @@
   .head{display:flex;align-items:center;gap:7px}
   .mark{
     flex:none;width:15px;height:15px;border-radius:5px;
-    background:linear-gradient(135deg,#4d94ff,#0b2f9e);
-    box-shadow:0 0 8px rgba(31,107,255,.6);
+    background:linear-gradient(135deg,#2aa8ff,#1d6fd0);
+    box-shadow:0 0 8px rgba(42,168,255,.6);
   }
   .ttl{min-width:0;line-height:1.1}
   .ttl b{display:block;font-size:11px;font-weight:800;letter-spacing:.07em;color:#fff}
 
   .ring{position:relative;width:76px;height:76px;margin:9px auto 7px}
   .ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
-  .ring .track{fill:rgba(0,0,0,.45);stroke:#10224a;stroke-width:5}
-  .ring .bar{fill:none;stroke:#1f6bff;stroke-width:5;stroke-linecap:round;
-    filter:drop-shadow(0 0 4px rgba(31,107,255,.7))}
+  .ring .track{fill:rgba(0,0,0,.45);stroke:#15304f;stroke-width:5}
+  .ring .bar{fill:none;stroke:url(#gRing);stroke-width:5;stroke-linecap:round;
+    filter:drop-shadow(0 0 4px rgba(42,168,255,.7))}
   .ring .ico{
     position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
     font-size:29px;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,.6);
@@ -44,11 +44,11 @@
   .cnt{
     display:flex;align-items:center;justify-content:center;gap:7px;
     padding:3px 0;border-radius:9px;
-    background:rgba(31,107,255,.10);border:1px solid rgba(31,107,255,.38);
+    background:rgba(29,111,208,.14);border:1px solid rgba(29,111,208,.5);
     font-size:12.5px;font-weight:800;color:#fff;
   }
-  .cnt i{font-style:normal;color:#4d94ff;font-weight:700}
-  .cnt span{color:#c9c9cf}
+  .cnt i{font-style:normal;color:#2aa8ff;font-weight:700}
+  .cnt span{color:#e6e9ef}
 </style>
 </head>
 <body>
@@ -58,7 +58,7 @@
       <div class="ttl"><b>AUTO FARM</b></div>
     </div>
     <div class="ring">
-      <svg viewBox="0 0 76 76">
+      <svg viewBox="0 0 76 76"><defs><linearGradient id="gRing" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d6fd0"/><stop offset="1" stop-color="#3fc3e0"/></linearGradient></defs>
         <circle class="track" cx="38" cy="38" r="33"></circle>
         <circle class="bar" id="bar" cx="38" cy="38" r="33"></circle>
       </svg>

@@ -4,18 +4,18 @@
 <title>Hotbar</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--blue:#1e6bff;--blue2:#0f63c8}
+:root{--blue:#1d6fd0;--blue2:#15509b}
 *{box-sizing:border-box;margin:0}
 html,body{height:100%;background:transparent;overflow:hidden;font-family:Kanit,"Noto Sans Thai",Tahoma,sans-serif;user-select:none}
 #hud{position:fixed;left:50%;bottom:8px;width:340px;height:60px;margin-left:-170px;transform-origin:50% 100%;transform:scale(var(--k,1))}
-#in{position:absolute;inset:0;opacity:0;display:flex;gap:4px;padding:5px;background:linear-gradient(#262628,#1b1b1d);border:2px solid var(--blue);border-radius:9px;box-shadow:0 0 0 1px #0008}
+#in{position:absolute;inset:0;opacity:0;display:flex;gap:4px;padding:5px;background:linear-gradient(#1b1b1f,#0e0e11);border:2px solid var(--blue);border-radius:9px;box-shadow:0 0 0 1px #0008}
 #in.on{animation:bIn .45s cubic-bezier(.2,.9,.3,1.1) both}
 #in.off{animation:bOut .3s ease-in both}
 .s{position:relative;flex:1;border-radius:6px;background:#2c2c2f;border:1px solid #3a3a3e;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;transition:transform .12s,border-color .12s}
 .s:hover{border-color:var(--blue)}
-.s.use{animation:pop .28s ease-out;border-color:var(--blue)}
+.s.use{animation:pop .28s ease-out;border-color:#2aa8ff;box-shadow:0 0 10px #1d6fd066}
 .s.empty .ic{opacity:0}
-.k{position:absolute;left:0;top:0;width:18px;height:18px;background:linear-gradient(135deg,#2f8cff,var(--blue2));clip-path:polygon(0 0,100% 0,0 100%);color:#fff;font:600 9px/10px Kanit,sans-serif;padding:1px 0 0 3px}
+.k{position:absolute;left:0;top:0;width:18px;height:18px;background:linear-gradient(135deg,#2aa8ff,#1d6fd0);clip-path:polygon(0 0,100% 0,0 100%);color:#fff;font:600 9px/10px Kanit,sans-serif;padding:1px 0 0 3px}
 .ic{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;color:#e8e8ec;text-align:center;font-weight:500}
 .ic img{max-width:78%;max-height:78%;object-fit:contain;pointer-events:none}
 @keyframes bIn{from{opacity:0;transform:translateY(40px) scale(.85)}to{opacity:1;transform:none}}
@@ -62,7 +62,7 @@ function upd(o){
  else if(o.show===0&&shown||o.show===false&&shown){shown=false;sfx("close");el.classList.remove("on");el.classList.add("off")}
 }
 // hotbar:use = [slot] -> เล่นอนิเมชั่นกดช่อง (เรียกตอนผู้เล่นกดปุ่มลัด)
-const PH="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect x="6" y="6" width="36" height="36" rx="9" fill="#202020" stroke="#0879cb" stroke-width="2"/><path d="M24 13l9 11-9 11-9-11z" fill="#0879cb"/></svg>');
+const PH="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect x="6" y="6" width="36" height="36" rx="9" fill="#202020" stroke="#1d6fd0" stroke-width="2"/><path d="M24 13l9 11-9 11-9-11z" fill="#1d6fd0"/></svg>');
 // ---------- เสียง (สร้างด้วย Web Audio ไม่ต้องมีไฟล์) ----------
 const SFX={on:true,vol:.5};   // on=false ปิดเสียงทั้งหมด, vol 0-1 ปรับความดัง
 let ac,nb;

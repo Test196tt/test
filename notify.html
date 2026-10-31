@@ -7,8 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&family=Orbitron:wght@800;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --add:#0b5a96;        /* แถบด้านขวาตอนได้รับของ (สีน้ำเงินเดียวกับหลอดเลือด) */
-    --add-t:#3aa4f5;      /* ตัวหนังสือ ADDED */
+    --add:#1d6fd0;        /* แถบด้านขวาตอนได้รับของ (สีน้ำเงินเดียวกับหลอดเลือด) */
+    --add-t:#2aa8ff;      /* ตัวหนังสือ ADDED */
     --rem:#f92b2b;        /* แถบด้านขวาตอนของลดลง */
     --rem-t:#f12a2a;      /* ตัวหนังสือ REMOVE */
   }
@@ -27,7 +27,7 @@
     position:relative;box-sizing:border-box;
     width:clamp(170px,15vw,230px);height:clamp(52px,5.2vw,64px);
     display:flex;align-items:stretch;border-radius:9px;overflow:hidden;
-    background:#222;box-shadow:0 3px 10px rgba(0,0,0,.45);
+    background:#0e0e11;border:1px solid rgba(29,111,208,.45);box-shadow:0 3px 10px rgba(0,0,0,.45),0 0 12px rgba(42,168,255,.18);
     opacity:0;transform:translateX(34px);
     transition:opacity .28s ease,transform .28s ease;
   }
@@ -40,7 +40,7 @@
   /* กล่องรูปไอเทมด้านซ้าย + ป้ายเล็ก */
   .img{
     position:relative;flex:none;align-self:center;margin:0 0 0 5px;
-    width:clamp(40px,3.8vw,50px);height:calc(100% - 10px);border-radius:7px;background:#141414;
+    width:clamp(40px,3.8vw,50px);height:calc(100% - 10px);border-radius:7px;background:#151518;
     display:flex;align-items:center;justify-content:center;
   }
   .img img{max-width:70%;max-height:62%;object-fit:contain;margin-top:6px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}
@@ -54,8 +54,8 @@
   .tx{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0 4px;line-height:1}
   .ttl{font-family:'Orbitron','Kanit',sans-serif;font-weight:900;font-size:clamp(10px,1vw,13px);letter-spacing:.06em;color:var(--t);
     text-shadow:0 1px 0 rgba(0,0,0,.6)}
-  .sub{font-size:clamp(7px,.62vw,8.5px);color:#e3e3e3;font-weight:400}
-  .num{min-width:62%;text-align:center;padding:2px 8px;border-radius:5px;background:#161616;
+  .sub{font-size:clamp(7px,.62vw,8.5px);color:#e6e9ef;font-weight:400}
+  .num{min-width:62%;text-align:center;padding:2px 8px;border-radius:5px;background:#151518;
     font-size:clamp(9px,.85vw,11px);font-weight:600;color:#fff}
 
   /* แถบสีด้านขวา + รอยบากสี่เหลี่ยมข้าวหลามตัด */

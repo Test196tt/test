@@ -4,11 +4,11 @@
 <title>Generator</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;0,600;1,600&display=swap" rel="stylesheet">
 <style>
-:root{--r:#ff4040;--a:#4aa3ff;--g:#35c01e;--o:#1e6bff}
+:root{--r:#ff4040;--a:#2aa8ff;--g:#35c01e;--o:#1d6fd0}
 *{box-sizing:border-box;margin:0}
 html,body{height:100%;background:transparent;overflow:hidden;font-family:Kanit,"Noto Sans Thai",Tahoma,sans-serif;user-select:none}
 #hud{position:fixed;left:10px;top:50%;width:200px;display:flex;flex-direction:column;gap:8px;transform-origin:0 50%;transform:translateY(-50%) scale(var(--k,1))}
-.cd{position:relative;display:none;border-radius:12px;background:linear-gradient(#262628,#1a1a1c);border:1px solid #ffffff14;box-shadow:0 4px 14px #0007;overflow:hidden}
+.cd{position:relative;display:none;border-radius:12px;background:linear-gradient(#151518,#0e0e11);border:1px solid rgba(29,111,208,.45);box-shadow:0 4px 14px #0007,0 0 12px rgba(42,168,255,.15);overflow:hidden}
 .cd::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--o);box-shadow:0 0 10px var(--o)}
 .cd.on{display:block;animation:in .45s cubic-bezier(.2,.9,.3,1.15) both}
 .cd.out{display:block;animation:out .3s ease-in both}
@@ -17,7 +17,7 @@ html,body{height:100%;background:transparent;overflow:hidden;font-family:Kanit,"
 .bolt{width:30px;height:30px;flex:none;border-radius:9px;background:#ffffff10;display:flex;align-items:center;justify-content:center}
 .bolt svg{width:18px;height:18px;filter:drop-shadow(0 0 5px var(--o))}
 .ti{flex:1;min-width:0}
-.ti b{display:block;font:italic 600 14px/15px Kanit,sans-serif;letter-spacing:.8px;color:#f1f1f4}
+.ti b{display:block;font:italic 600 14px/15px Kanit,sans-serif;letter-spacing:.8px;color:#e6e9ef}
 .ti span{display:block;font:400 9px/11px Kanit,sans-serif;color:#a9a9b0}
 .ct{font:600 13px/20px Kanit,sans-serif;padding:0 8px;border-radius:9px;background:#ffffff14;color:#fff;font-variant-numeric:tabular-nums}
 .pg{height:3px;margin:8px 0 7px;background:#ffffff12;border-radius:2px;overflow:hidden}
@@ -30,14 +30,14 @@ html,body{height:100%;background:transparent;overflow:hidden;font-family:Kanit,"
 .rw.s0{--c:var(--r);background:#ff40400d;border-color:#ff404033}
 .rw.s0 .ch::before{animation:blink 1s infinite}
 .rw.s1{--c:var(--g)}.rw.s1 .nm{color:#9a9aa2}
-.rw.s2{--c:var(--a);background:#4aa3ff12;border-color:#4aa3ff55}
+.rw.s2{--c:var(--a);background:#2aa8ff12;border-color:#2aa8ff55}
 .rw.s2 .ch::before{animation:blink .5s infinite}
 #rp{padding:8px 10px 9px 14px}
 .rt{display:flex;justify-content:space-between;align-items:baseline}
-.rt b{font:italic 600 12px/14px Kanit,sans-serif;letter-spacing:.6px;color:#f1f1f4}
+.rt b{font:italic 600 12px/14px Kanit,sans-serif;letter-spacing:.6px;color:#e6e9ef}
 .rt span{font:600 15px/16px Kanit,sans-serif;color:var(--a);font-variant-numeric:tabular-nums}
 .rb{height:7px;margin:6px 0 7px;border-radius:4px;background:#ffffff14;overflow:hidden}
-.rb i{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,#1e6bff,#4aa3ff);box-shadow:0 0 8px #4aa3ff88;transition:width .45s linear}
+.rb i{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,#1d6fd0,#2aa8ff);box-shadow:0 0 8px #2aa8ff88;transition:width .45s linear}
 .ht{display:flex;align-items:center;gap:6px;font:400 9.5px/12px Kanit,sans-serif;color:#a9a9b0}
 .key{min-width:18px;height:18px;padding:0 4px;border-radius:5px;background:#ffffff1c;border:1px solid #ffffff30;border-bottom-width:2px;color:#fff;font:600 10px/15px Kanit,sans-serif;text-align:center}
 @keyframes in{from{opacity:0;transform:translateX(-46px) scale(.9)}to{opacity:1;transform:none}}
@@ -48,7 +48,7 @@ html,body{height:100%;background:transparent;overflow:hidden;font-family:Kanit,"
 <div id="hud">
  <div class="cd" id="pn">
   <div class="hd">
-   <div class="bolt"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6z" fill="#4aa3ff"/></svg></div>
+   <div class="bolt"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6z" fill="#2aa8ff"/></svg></div>
    <div class="ti"><b>GENERATOR</b><span id="sub">เครื่องปั่นไฟขัดข้อง</span></div>
    <div class="ct" id="ct">0/5</div>
   </div>
