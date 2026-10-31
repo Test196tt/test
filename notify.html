@@ -23,15 +23,15 @@
   }
 
   .n{
-    --c:var(--add);--t:var(--add-t);
+    --c:var(--add);--t:var(--add-t);--bd:rgba(29,111,208,.45);--gl:rgba(42,168,255,.18);
     position:relative;box-sizing:border-box;
     width:clamp(170px,15vw,230px);height:clamp(52px,5.2vw,64px);
     display:flex;align-items:stretch;border-radius:9px;overflow:hidden;
-    background:#0e0e11;border:1px solid rgba(29,111,208,.45);box-shadow:0 3px 10px rgba(0,0,0,.45),0 0 12px rgba(42,168,255,.18);
+    background:#0e0e11;border:1px solid var(--bd);box-shadow:0 3px 10px rgba(0,0,0,.45),0 0 12px var(--gl);
     opacity:0;transform:translateX(34px);
     transition:opacity .28s ease,transform .28s ease;
   }
-  .n.remove{--c:var(--rem);--t:var(--rem-t)}
+  .n.remove{--c:var(--rem);--t:var(--rem-t);--bd:rgba(249,43,43,.55);--gl:rgba(249,43,43,.22)}
   .n.in{opacity:1;transform:translateX(0)}
   .n.out{opacity:0;transform:translateX(34px)}
   .n.pop{animation:pop .22s ease}
