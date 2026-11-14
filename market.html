@@ -7,9 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --red:#1d6fd0;
-    --red-hi:#2aa8ff;
-    --red-dk:#0f3f7a;
+    --red:#00a000;
+    --red-hi:#22f022;
+    --red-dk:#033d03;
     --bg:#0e0e11;
     --panel:#151518;
     --tile:#1b1b1f;
@@ -33,7 +33,7 @@
   .left{flex:1 1 auto}
   .right{width:290px;flex:none}
 
-  .bar{height:46px;flex:none;background:linear-gradient(90deg,#1d6fd0,#2aa8ff);color:#fff;display:flex;align-items:center;
+  .bar{height:46px;flex:none;background:linear-gradient(90deg,#00a000,#22f022);color:#fff;display:flex;align-items:center;
     justify-content:center;font-size:19px;font-weight:500;letter-spacing:.3px;position:relative;
     border-bottom:2px solid var(--red-dk)}
   .bar .x{position:absolute;right:8px;top:7px;width:32px;height:32px;border:0;border-radius:4px;
@@ -57,15 +57,15 @@
   .tile.has .cnt{background:var(--red)}
   .tile.empty{opacity:.4}
   .tile:hover{background:var(--tile-hi)}
-  .tile.sel{border-color:var(--red-hi);background:#12284a;box-shadow:0 0 0 2px rgba(42,168,255,.35) inset}
+  .tile.sel{border-color:var(--red-hi);background:#032a06;box-shadow:0 0 0 2px rgba(34,240,34,.35) inset}
   .tile.sel .ico,.tile:hover .ico{filter:none}
 
   /* ---------- แถบขายด้านล่าง ---------- */
-  .sell{height:50px;flex:none;border:0;background:linear-gradient(90deg,#1d6fd0,#2aa8ff);color:#fff;font-family:inherit;
+  .sell{height:50px;flex:none;border:0;background:linear-gradient(90deg,#00a000,#22f022);color:#fff;font-family:inherit;
     font-size:18px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:10px;
     cursor:pointer;border-top:2px solid var(--red-dk)}
   .sell:active{background:var(--red-dk)}
-  .sell.off{background:#15304f;color:#8b93a1;cursor:default}
+  .sell.off{background:#033d03;color:#8b93a1;cursor:default}
   .sell .money{color:#fff;font-weight:600}
 
   /* ---------- รายการราคา ---------- */
