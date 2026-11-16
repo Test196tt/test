@@ -24,7 +24,7 @@
     transform:translateY(var(--skull-offset-y)) scale(.2);
     transform-origin:50% 100%;
     opacity:0;
-    filter:drop-shadow(0 0 .6vh rgba(16,110,255,.9)) drop-shadow(0 0 1.6vh rgba(16,110,255,.55));
+    filter:drop-shadow(0 0 .6vh rgba(34,201,74,.9)) drop-shadow(0 0 1.6vh rgba(34,201,74,.55));
   }
   #skull.on{animation:pop .45s cubic-bezier(.2,1.4,.4,1) forwards, shake .5s .45s ease-in-out 1;opacity:1;transform:translateY(var(--skull-offset-y)) scale(1);}
   #skull.off{animation:out .35s ease-in forwards;}
@@ -54,15 +54,15 @@
         <stop offset=".55" stop-color="#3a2a10" stop-opacity="0"/><stop offset="1" stop-color="#3a2a10" stop-opacity=".45"/>
       </radialGradient>
       <radialGradient id="eyeg" cx=".5" cy=".5" r=".5">
-        <stop offset="0" stop-color="#e4f3ff"/><stop offset=".3" stop-color="#2a8cff"/><stop offset="1" stop-color="#0a2a8a" stop-opacity="0"/>
+        <stop offset="0" stop-color="#e4ffe9"/><stop offset=".3" stop-color="#2ae85a"/><stop offset="1" stop-color="#0a8a2a" stop-opacity="0"/>
       </radialGradient>
       <radialGradient id="aura" cx=".5" cy=".5" r=".5">
-        <stop offset="0" stop-color="#1a6cff" stop-opacity=".55"/><stop offset="1" stop-color="#1a6cff" stop-opacity="0"/>
+        <stop offset="0" stop-color="#1fd04a" stop-opacity=".55"/><stop offset="1" stop-color="#1fd04a" stop-opacity="0"/>
       </radialGradient>
       <filter id="blur"><feGaussianBlur stdDeviation="1.6"/></filter>
     </defs>
 
-    <!-- รัศมีแดงด้านหลัง -->
+    <!-- รัศมีเขียวด้านหลัง -->
     <circle class="aura" cx="60" cy="66" r="78" fill="url(#aura)"/>
 
     <!-- กะโหลก -->
@@ -82,8 +82,8 @@
     <!-- แสงในตา -->
     <circle class="eye" cx="40" cy="58" r="9" fill="url(#eyeg)" filter="url(#blur)"/>
     <circle class="eye" cx="80" cy="58" r="9" fill="url(#eyeg)" filter="url(#blur)"/>
-    <circle class="eye" cx="40" cy="58" r="3.2" fill="#d8efff"/>
-    <circle class="eye" cx="80" cy="58" r="3.2" fill="#d8efff"/>
+    <circle class="eye" cx="40" cy="58" r="3.2" fill="#d8ffe0"/>
+    <circle class="eye" cx="80" cy="58" r="3.2" fill="#d8ffe0"/>
 
     <!-- จมูก -->
     <path d="M60 70C56 76 52 84 54 89C57 87 59 85 60 85C61 85 63 87 66 89C68 84 64 76 60 70Z" fill="#0d0d0d"/>
