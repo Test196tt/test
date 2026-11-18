@@ -8,11 +8,10 @@
 <style>
 :root{--g:#00e676;--g2:#00b050;--gd:#0a3d22;--bg:#050805;--card:#0b110c;--line:#12301d;--tx:#d8f5e2;--mut:#6f9a80;--red:#ff5252}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
-input{user-select:text}
 html,body{height:100%;background:transparent;font-family:'Sarabun','Noto Sans Thai',system-ui,sans-serif;color:var(--tx);overflow:hidden}
-#wrap{position:fixed;inset:0;display:none;align-items:flex-end;justify-content:flex-end;padding:0 16px 16px 0;pointer-events:none}
+#wrap{position:fixed;inset:0;display:none;align-items:flex-end;justify-content:flex-end;padding:0 max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) 0;pointer-events:none}
 #wrap.on{display:flex}
-.box{pointer-events:auto;width:min(92vw,280px);background:linear-gradient(160deg,#0d160f,var(--bg));border:1px solid var(--g2);border-radius:14px;box-shadow:0 0 0 1px #000,0 0 18px rgba(0,230,118,.2);padding:10px;animation:in .2s ease-out}
+.box{pointer-events:auto;width:min(92vw,260px);background:linear-gradient(160deg,#0d160f,var(--bg));border:1px solid var(--g2);border-radius:14px;box-shadow:0 0 0 1px #000,0 0 18px rgba(0,230,118,.2);padding:10px;animation:in .2s ease-out}
 @keyframes in{from{transform:translateY(10px) scale(.97);opacity:0}to{transform:none;opacity:1}}
 .top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .led{width:8px;height:8px;border-radius:50%;background:#2a3a2f;box-shadow:0 0 0 2px #000}
@@ -22,30 +21,23 @@ html,body{height:100%;background:transparent;font-family:'Sarabun','Noto Sans Th
 @keyframes bl{50%{opacity:.25}}
 h1{flex:1;font-size:14px;letter-spacing:2px;color:var(--g);font-weight:700}
 h1 small{font-size:10px;letter-spacing:.5px;color:var(--mut);font-weight:400;margin-left:5px}
-.x{width:24px;height:24px;border-radius:7px;border:1px solid var(--line);background:var(--card);color:var(--g);font-size:12px;cursor:pointer}
+.x{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--g);font-size:13px;cursor:pointer}
 .x:active{background:var(--gd)}
 .disp{background:#000;border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:8px}
-.eq{display:flex;align-items:flex-end;gap:3px;height:30px;margin-bottom:6px}
+.eq{display:flex;align-items:flex-end;gap:3px;height:28px;margin-bottom:6px}
 .eq i{flex:1;background:linear-gradient(to top,var(--g2),var(--g));border-radius:2px;height:8%;opacity:.35}
 .eq.play i{opacity:1;animation:eq .9s ease-in-out infinite}
 @keyframes eq{0%,100%{height:12%}50%{height:96%}}
 .song{font-size:12px;font-weight:600;color:var(--g);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .st{font-size:10.5px;color:var(--mut);margin-top:2px;min-height:14px;line-height:1.3}
 .st.err{color:var(--red)}
-.srch{display:flex;gap:6px;margin-bottom:8px}
-.srch input{flex:1;min-width:0;padding:8px 9px;border-radius:9px;border:1px solid var(--line);background:#000;color:var(--tx);font:400 12px 'Sarabun',sans-serif;outline:none}
-.srch input:focus{border-color:var(--g2)}
-.srch input::placeholder{color:var(--mut)}
-.vol{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:10.5px;color:var(--mut)}
-.vol input{flex:1;accent-color:var(--g);height:4px}
-.vol b{width:26px;text-align:right;font-weight:600;color:var(--g)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.b{padding:8px 6px;border-radius:9px;border:1px solid var(--g2);background:var(--card);color:var(--g);font:600 12px 'Sarabun',sans-serif;cursor:pointer;transition:.12s}
+.b{min-height:36px;padding:7px 6px;border-radius:9px;border:1px solid var(--g2);background:var(--card);color:var(--g);font:600 12px 'Sarabun',sans-serif;cursor:pointer;transition:.12s}
 .b:active{transform:scale(.97);background:var(--gd)}
 .b.main{background:linear-gradient(135deg,var(--g2),var(--g));color:#021a0c;border-color:var(--g)}
 .b.full{grid-column:1/3}
 .b.dng{border-color:#6b2a2a;color:var(--red)}
-.b[disabled],.srch input[disabled]{opacity:.3;pointer-events:none}
+.hint{margin-top:7px;font-size:10px;color:var(--mut);text-align:center;line-height:1.3}
 </style>
 </head>
 <body>
@@ -61,106 +53,66 @@ h1 small{font-size:10px;letter-spacing:.5px;color:var(--mut);font-weight:400;mar
       <div class="song" id="song">-</div>
       <div class="st" id="st"></div>
     </div>
-    <div class="srch">
-      <input id="q" type="text" maxlength="300" placeholder="ชื่อเพลง หรือลิงก์ YouTube" autocomplete="off">
-      <button class="b main" id="bsearch">เล่น</button>
-    </div>
-    <div class="vol">
-      <span>เสียง</span>
-      <input id="vol" type="range" min="0" max="100" step="5" value="50">
-      <b id="volv">50</b>
-    </div>
     <div class="grid">
       <button class="b main full" id="bplace">สะพายลำโพง</button>
+      <button class="b main full" id="bsearch">ค้นหาเพลง</button>
       <button class="b" id="bstop">หยุดเพลง</button>
       <button class="b dng" id="bpick">เก็บลำโพง</button>
     </div>
+    <div class="hint" id="hint">กด "ค้นหาเพลง" แล้วพิมพ์ชื่อเพลงหรือวางลิงก์ YouTube ในช่องที่เด้งขึ้นมา</div>
   </div>
 </div>
 <script>
 const $=id=>document.getElementById(id);
-const C=window.cef;
 const emit=(n,...a)=>{try{window.cef.emit(n,...a)}catch(e){console.log('emit',n,a)}};
 const eq=$('eq');
 for(let i=0;i<14;i++){const b=document.createElement('i');b.style.animationDelay=(i*0.07)+'s';b.style.animationDuration=(0.6+(i%5)*0.15)+'s';eq.appendChild(b)}
 
+// รหัส error จาก main.pwn (MsBoombox_Status) -> ข้อความไทย
 const ERR={E_SERVER:'ติดต่อเซิร์ฟเวอร์เพลงไม่ได้',E_TIMEOUT:'โหลดเพลงนานเกินไป ลองใหม่อีกครั้ง',E_BAD:'เซิร์ฟเวอร์เพลงตอบกลับผิดรูปแบบ'};
-const SEARCH_TIMEOUT=45000;
-let placed=false,st=0,searchTimer=null,localErr='';
 
 // payload จากเซิร์ฟเวอร์ = "placed|state|title"  state: 0 ว่าง, 1 กำลังค้นหา, 2 กำลังเล่น, 3 ผิดพลาด
+// (เซิร์ฟเวอร์เป็นคนจับเวลา/ตัด timeout เอง หน้าเว็บแค่แสดงผล)
 function render(s){
-  const p=String(s).split('|');
-  placed=p[0]==='1';st=+p[1]||0;
-  const title=p.slice(2).join('|');
-  localErr='';
-  clearTimeout(searchTimer);
-  if(st===1)searchTimer=setTimeout(()=>{st=3;draw('E_TIMEOUT')},SEARCH_TIMEOUT);
-  draw(title);
-}
-function draw(title){
-  const led=$('led'),stx=$('st'),song=$('song');
-  led.className='led'+(st===2?' on':st===1?' warn':st===3?' err':placed?' on':'');
+  const p=String(s).split('|'),placed=p[0]==='1',st=+p[1]||0,title=p.slice(2).join('|');
+  $('led').className='led'+(st===2?' on':st===1?' warn':st===3?' err':placed?' on':'');
   eq.className='eq'+(st===2?' play':'');
-  stx.className='st'+(st===3||localErr?' err':'');
-  song.textContent=st===2?(title||'-'):'-';
-  stx.textContent=localErr||(!placed?'ยังไม่ได้สะพายลำโพง':st===1?'กำลังค้นหา / โหลดเพลง... (10-30 วินาที)':st===2?'กำลังเล่นเพลง':st===3?(ERR[title]||title||'เกิดข้อผิดพลาด'):'พร้อมใช้งาน');
+  $('st').className='st'+(st===3?' err':'');
+  $('song').textContent=st===2?(title||'-'):'-';
+  $('st').textContent=!placed?'ยังไม่ได้สะพายลำโพง':st===1?'กำลังค้นหา / โหลดเพลง... (10-30 วินาที)':st===2?'กำลังเล่นเพลง':st===3?(ERR[title]||title||'เกิดข้อผิดพลาด'):'พร้อมใช้งาน ยังไม่ได้เปิดเพลง';
   $('bplace').style.display=placed?'none':'';
-  $('bpick').style.display=placed?'':'none';
-  $('bstop').style.display=placed?'':'none';
-  $('bsearch').disabled=!placed||st===1;
-  $('bstop').disabled=!placed;
-  $('q').disabled=!placed;
+  for(const id of ['bsearch','bstop','bpick'])$(id).style.display=placed?'':'none';
+  $('hint').style.display=placed?'':'none';
 }
-const show=on=>{$('wrap').classList.toggle('on',on);if(on&&placed)setTimeout(()=>$('q').focus(),50)};
+const show=on=>$('wrap').classList.toggle('on',on);
 
-function doSearch(){
-  const q=$('q').value.trim();
-  if(!q){localErr='พิมพ์ชื่อเพลงหรือวางลิงก์ก่อน';draw();return}
-  localErr='';
-  emit('boombox:search',q);
+if(window.cef&&window.cef.on){
+  cef.on('boombox:open',s=>{render(s);show(true)});
+  cef.on('boombox:state',s=>render(s));
+  cef.on('boombox:close',()=>show(false));
 }
-let volT=null;
-function setVol(){
-  $('volv').textContent=$('vol').value;
-  clearTimeout(volT);
-  volT=setTimeout(()=>emit('boombox:volume',+$('vol').value),120);
-}
-
-if(C&&C.on){
-  C.on('boombox:open',s=>{render(s);show(true)});
-  C.on('boombox:state',s=>render(s));
-  C.on('boombox:close',()=>show(false));
-}
+// ส่งกลับเฉพาะคำสั่ง ASCII ตามที่ ms_boombox_cef.inc รับ
 $('bx').onclick=()=>emit('boombox:close');
 $('bplace').onclick=()=>emit('boombox:place');
 $('bpick').onclick=()=>emit('boombox:pickup');
-$('bsearch').onclick=doSearch;
+$('bsearch').onclick=()=>emit('boombox:search');
 $('bstop').onclick=()=>emit('boombox:stop');
-$('vol').oninput=setVol;
-$('q').addEventListener('keydown',e=>{
-  e.stopPropagation();
-  if(e.key==='Enter')doSearch();
-  if(e.key==='Escape')emit('boombox:close');
-});
-$('q').addEventListener('input',()=>{if(localErr){localErr='';draw()}});
 addEventListener('keydown',e=>{if(e.key==='Escape')emit('boombox:close')});
 
-// ทดสอบในเบราว์เซอร์ปกติ: เปิดหน้านี้แล้วพิมพ์ใน console เช่น __t('1|2|ชื่อเพลง')
+// ทดสอบในเบราว์เซอร์ปกติ (ไม่มี window.cef): จำลองเซิร์ฟเวอร์ให้กดปุ่มดูได้
 window.__t=s=>{render(s);show(true)};
-if(!C){
-  window.__t('1|0|');
-  // จำลองเซิร์ฟเวอร์เพื่อทดสอบ UI
-  window.cef={emit:(n,...a)=>{
-    console.log('emit',n,a);
-    if(n==='boombox:search'){__t('1|1|');setTimeout(()=>__t('1|2|'+a[0]),1500)}
-    if(n==='boombox:stop')__t('1|0|');
-    if(n==='boombox:place')__t('1|0|');
-    if(n==='boombox:pickup')__t('0|0|');
+if(!window.cef){
+  let placed=0;
+  window.cef={emit:(n)=>{
+    console.log('emit',n);
+    if(n==='boombox:place'){placed=1;__t('1|0|')}
+    if(n==='boombox:pickup'){placed=0;__t('0|0|')}
+    if(n==='boombox:stop')__t(placed+'|0|');
+    if(n==='boombox:search'){__t('1|1|');setTimeout(()=>__t('1|2|Demo Song - Artist'),1500)}
+    if(n==='boombox:close')show(false);
   }};
-  location.hash||0;
+  __t('0|0|');
 }
-// ใช้ C ที่จำลองในโหมดเบราว์เซอร์
 </script>
 </body>
 </html>
