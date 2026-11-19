@@ -86,11 +86,6 @@ function render(s){
 }
 const show=on=>$('wrap').classList.toggle('on',on);
 
-if(window.cef&&window.cef.on){
-  cef.on('boombox:open',s=>{render(s);show(true)});
-  cef.on('boombox:state',s=>render(s));
-  cef.on('boombox:close',()=>show(false));
-}
 // ส่งกลับเฉพาะคำสั่ง ASCII ตามที่ ms_boombox_cef.inc รับ
 $('bx').onclick=()=>emit('boombox:close');
 $('bplace').onclick=()=>emit('boombox:place');
@@ -99,20 +94,44 @@ $('bsearch').onclick=()=>emit('boombox:search');
 $('bstop').onclick=()=>emit('boombox:stop');
 addEventListener('keydown',e=>{if(e.key==='Escape')emit('boombox:close')});
 
-// ทดสอบในเบราว์เซอร์ปกติ (ไม่มี window.cef): จำลองเซิร์ฟเวอร์ให้กดปุ่มดูได้
 window.__t=s=>{render(s);show(true)};
-if(!window.cef){
+
+function bind(){
+  cef.on('boombox:open',s=>{render(s);show(true)});
+  cef.on('boombox:state',s=>render(s));
+  cef.on('boombox:close',()=>show(false));
+}
+
+// โหมดทดสอบ: เปิดได้เฉพาะเมื่อใส่ #demo ท้าย URL ในเบราว์เซอร์ปกติ (ในเกมไม่ใช้)
+function demo(){
   let placed=0;
-  window.cef={emit:(n)=>{
-    console.log('emit',n);
+  window.cef={on:()=>{},emit:(n)=>{
     if(n==='boombox:place'){placed=1;__t('1|0|')}
     if(n==='boombox:pickup'){placed=0;__t('0|0|')}
     if(n==='boombox:stop')__t(placed+'|0|');
-    if(n==='boombox:search'){__t('1|1|');setTimeout(()=>__t('1|2|Demo Song - Artist'),1500)}
+    if(n==='boombox:search'){
+      const q=prompt('(จำลอง Dialog ในเกม) พิมพ์ชื่อเพลง หรือวางลิงก์ YouTube :');
+      if(q){__t('1|1|');setTimeout(()=>__t('1|2|'+q),1200)}
+    }
     if(n==='boombox:close')show(false);
   }};
   __t('0|0|');
 }
+
+// รอ window.cef สูงสุด 5 วินาที (กรณี CEF ฉีด object หลังโหลดหน้า)
+let tries=0;
+(function wait(){
+  if(window.cef&&window.cef.on){bind();return}
+  if(++tries<50)return setTimeout(wait,100);
+  if(location.hash==='#demo'){demo();return}
+  // ไม่พบ cef = ไม่ได้เปิดในเกม: แสดงให้เห็นชัดๆ แทนที่จะเงียบหรือแสดงของปลอม
+  $('led').className='led err';
+  $('song').textContent='-';
+  $('st').className='st err';
+  $('st').textContent='ไม่พบ CEF: หน้านี้ต้องเปิดในเกมเท่านั้น (ทดสอบในเบราว์เซอร์: เติม #demo ท้าย URL)';
+  for(const id of ['bplace','bsearch','bstop','bpick','hint'])$(id).style.display='none';
+  show(true);
+})();
 </script>
 </body>
 </html>
